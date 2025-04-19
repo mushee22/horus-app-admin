@@ -2,6 +2,8 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.apps import apps
 from rest_framework.exceptions import AuthenticationFailed
+# model imports
+from web.models import *
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -19,3 +21,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         #     raise AuthenticationFailed("This account has been deleted.")
         
         return data
+    
+class CustomerCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = '__all__'

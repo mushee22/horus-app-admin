@@ -1,5 +1,5 @@
 from django.urls import path
-from web.views import CustomTokenObtainPairView
+from web.views import *
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -9,4 +9,5 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('registration/', CustomerRegistrationView.as_view(), name='student-registration'),
 ]
