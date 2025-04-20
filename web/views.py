@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 # Internal funcions imports
 from web.serializers import *
+from baseapp.mixins import LoginRequiredMixin
 
 # Create your views here.
 
@@ -39,3 +40,25 @@ class CustomerRegistrationView(APIView):
                     "message":serializer.errors
                 }
         return Response(response)
+    
+class CustomerProfileView(LoginRequiredMixin,APIView):
+    def get(self,request):
+        try:
+            student = Student.objects.get(user=request.user)
+        except:
+            response = {"resp_code":0,"message":"Student not found","data":{}}
+        else:
+            serializer = PersonalProfileSerilizer(student)
+            response = {"resp_code":1,"message":"success","data":serializer.data}
+        return Response(response)
+    
+# class ProfileUpdateView(LoginRequiredMixin,APIView):
+#     def post(self,request):
+#         try:
+#             student = Student.objects.get(user=request.user)
+#         except:
+#             response = {"resp_code":0,"message":"Student not found","data":{}}
+#         else:
+#             serializer = 
+
+

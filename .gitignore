@@ -11,3 +11,4 @@ __pycache__/
 *.py[cod]
 */migrations/*.pyc
 .env
+!*/migrations/__init__.py

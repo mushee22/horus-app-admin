@@ -21,8 +21,26 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         #     raise AuthenticationFailed("This account has been deleted.")
         
         return data
-    
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'first_name', 'last_name', 'email']
+
+
 class CustomerCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = '__all__'
+
+class PurchasedPackagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Purchase
+        fields = '__all__'
+
+class PersonalProfileSerilizer(serializers.ModelSerializer):
+    purchases = PurchasedPackagesSerializer(source='purchased_student',many=True,read_only=True)
+    user = CustomUserSerializer()
     class Meta:
         model = Student
         fields = '__all__'
