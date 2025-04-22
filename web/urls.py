@@ -11,5 +11,6 @@ urlpatterns = [
     path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('registration/', CustomerRegistrationView.as_view(), name='student-registration'),
     path('student-profile/', CustomerProfileView.as_view(), name='student-profile'),
+    path('student-profile/update/', ProfileUpdateView.as_view(), name='student-profile-update'),
 
 ]

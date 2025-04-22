@@ -18,7 +18,8 @@ class CustomerRegistrationView(APIView):
         try:
             user = CustomUser.objects.create_user(
                 first_name=data["first_name"], last_name=data["last_name"],
-                email=data["email"], phone=data["phone"],username=data["username"]
+                email=data["email"], phone=data["phone"],username=data["username"],
+                password=data["password"]
             )
         except Exception as e:
             response = {
@@ -41,6 +42,7 @@ class CustomerRegistrationView(APIView):
                 }
         return Response(response)
     
+    
 class CustomerProfileView(LoginRequiredMixin,APIView):
     def get(self,request):
         try:
@@ -52,13 +54,13 @@ class CustomerProfileView(LoginRequiredMixin,APIView):
             response = {"resp_code":1,"message":"success","data":serializer.data}
         return Response(response)
     
-# class ProfileUpdateView(LoginRequiredMixin,APIView):
-#     def post(self,request):
-#         try:
-#             student = Student.objects.get(user=request.user)
-#         except:
-#             response = {"resp_code":0,"message":"Student not found","data":{}}
-#         else:
-#             serializer = 
+    
+class ProfileUpdateView(LoginRequiredMixin,APIView):
+    def post(self,request):
+        student = Student.objects.get(user=request.user)
+        serializer = CustomerUpdateSerializer(
+            isinstance=student, data=request.data, 
+            user=request.data['user'], partial=True
+        )
 
 

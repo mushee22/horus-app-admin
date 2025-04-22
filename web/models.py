@@ -59,6 +59,18 @@ class Purchase(BasemodelMixin):
     # def __str__(self):
     #     return f"{self.course_name.title} {self.get_status_display()}"
 
+class ChapterProgress(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='chapter_progress')
+    chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, related_name='student_progress')
+    is_completed = models.BooleanField(default=False)
+    watched_duration = models.IntegerField(default=0)
+    last_watched_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('student', 'chapter')
+
+    # def __str__(self):
+    #     return f"{self.student.user} - {self.chapter.title} - {'Completed' if self.is_completed else 'In Progress'}"
 
 
 
