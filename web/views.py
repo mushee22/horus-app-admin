@@ -56,11 +56,23 @@ class CustomerProfileView(LoginRequiredMixin,APIView):
     
     
 class ProfileUpdateView(LoginRequiredMixin,APIView):
-    def post(self,request):
+    def put(self,request):
         student = Student.objects.get(user=request.user)
         serializer = CustomerUpdateSerializer(
-            isinstance=student, data=request.data, 
+            instance=student, data=request.data, 
             user=request.data['user'], partial=True
         )
+        if serializer.is_valid():
+            serializer.save()
+            response = {"resp_code":1,
+                        "message":"Profile updated",
+                        "data":serializer.data
+                        }
+        else:
+            response = {"resp_code":0,
+                        "message":serializer.errors,
+                        "data":{}
+                        }
+        return Response(response)
 
 

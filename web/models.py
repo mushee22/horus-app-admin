@@ -8,7 +8,7 @@ class StudentId(models.Model):
 
 class Student(BasemodelMixin):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
-    group_code = models.ForeignKey(StudentId,on_delete=models.SET_NULL,null=True,blank=True)
+    group_code = models.CharField(max_length=200,null=True,blank=True)
     profile_image = models.ImageField(null=True,blank=True,upload_to='students')
 
     # def __str__(self):
@@ -37,13 +37,21 @@ class Chapter(BasemodelMixin):
     course = models.ForeignKey(Course,on_delete=models.CASCADE,related_name='course_chapter')
     title = models.CharField(max_length=200)
     description = models.TextField(null=True,blank=True)
-    video_url = models.TextField()
-    thumbnail = models.ImageField(upload_to='courses/chapters')
-    duration = models.IntegerField()
+    duration = models.IntegerField(null=True,blank=True)
     order = models.IntegerField()
 
     # def __str__(self):
     #     return f"{self.title}"
+
+class SubChapters(BasemodelMixin):
+    chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,related_name="sub_chapter")
+    title = models.CharField(max_length=200)
+    description = models.TextField(null=True,blank=True)
+    video_url = models.TextField()
+    thumbnail = models.ImageField(upload_to='courses/chapters')
+    duration = models.IntegerField(null=True,blank=True)
+    order = models.IntegerField()
+
 
 class Purchase(BasemodelMixin):
     payment_status = [

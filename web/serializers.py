@@ -33,12 +33,14 @@ class CustomerCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CustomerUpdateSerializer(serializers.ModelSerializer):
+    user = CustomUserSerializer(read_only=True)
     class Meta:
         model =Student
         fields = "__all__"
 
     def __init__(self, *args, **kwargs):
         self.user_data = kwargs.pop('user',None)
+        print(self.user_data)
         return super().__init__(*args, **kwargs)
     
     def update(self, instance, validated_data):
@@ -48,13 +50,17 @@ class CustomerUpdateSerializer(serializers.ModelSerializer):
             ).exclude(id=instance.user.id).exists():
                 raise serializers.ValidationError("Username exists")
             elif CustomUser.objects.filter(
-                mobile=self.user_data.get('mobile')
+                phone=self.user_data.get('phone')
             ).exclude(id=instance.user.id).exists():
                 raise serializers.ValidationError("Mobile exists")
+            elif CustomUser.objects.filter(
+                email=self.user_data.get('email')
+            ).exclude(id=instance.user.id).exists():
+                raise serializers.ValidationError("Email exists")
             else:
                 for attr,value in self.user_data.items():
                     setattr(instance.user,attr,value)
-                isinstance.user.save()
+                instance.user.save()
         return super().update(instance, validated_data)
 
 class CourseSerializer(serializers.ModelSerializer):
