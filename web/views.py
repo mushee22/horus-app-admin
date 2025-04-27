@@ -70,6 +70,7 @@ class ProfileUpdateView(LoginRequiredMixin,APIView):
                         }
         return Response(response)
     
+    
 class CourseListView(APIView):
     def get(self, request):
         try:
