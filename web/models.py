@@ -30,8 +30,8 @@ class Course(BasemodelMixin):
     offer = models.FloatField(default=0)
     thumbnail =  models.ImageField(upload_to='courses')
 
-    # def __str__(self):
-    #     return f"{self.title}"
+    def __str__(self):
+        return f"{self.title}"
 
 class Chapter(BasemodelMixin):
     course = models.ForeignKey(Course,on_delete=models.CASCADE,related_name='course_chapter')

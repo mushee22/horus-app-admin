@@ -87,6 +87,11 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = '__all__'
 
+class ChapterSerializer(serializers.ModelSerializer):
+    class Meta:
+        models = Chapter
+        fields = '__all__'
+
 class PurchasedPackagesSerializer(serializers.ModelSerializer):
     course_name = CourseSerializer()
     class Meta:

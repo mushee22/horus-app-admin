@@ -70,27 +70,74 @@ class ProfileUpdateView(LoginRequiredMixin,APIView):
                         }
         return Response(response)
     
-
 class CourseListView(APIView):
-    def get(self,request):
-        pass
-
+    def get(self, request):
         try:
             courses = Course.objects.filter(flag=True)
-        except:
+            search = request.GET.get('search')
+            # category = request.GET.get('category')
+
+            if search:
+                courses = courses.filter(title__icontains=search)
+
+            # if category:
+            #     courses = courses.filter(category__name__icontains=category)
+
+        except Exception as e:
             return Response(
                 {
-                    "message":"Error fetching data",
-                    "resp_code":0
+                    "message": "Error fetching data",
+                    "resp_code": 0,
+                    "error": str(e) 
                 }
             )
         else:
-            serializer = CourseSerializer(courses)
+            serializer = CourseSerializer(courses, many=True)
             return Response(
                 {
-                    "message":"success",
-                    "resp_code":1,
-                    "data":serializer.data
+                    "message": "success",
+                    "resp_code": 1,
+                    "data": serializer.data
+                }
+            )
+        
+        
+class ChapterListView(APIView):
+    def get(self, request):
+        course_id = request.GET.get("course_id")
+        search = request.GET.get('search')
+
+        if not course_id:
+            return Response(
+                {"message": "Course ID is required", "resp_code": 0},
+                status=400
+            )
+
+        try:
+            if not Course.objects.filter(id=course_id, flag=True).exists():
+                return Response(
+                    {"message": "Course not found", "resp_code": 0}
+                )
+            
+            chapters = Chapter.objects.filter(course_id=course_id, flag=True)
+
+            if search:
+                chapters = chapters.filter(title__icontains=search)
+
+            serializer = ChapterSerializer(chapters, many=True)
+            return Response(
+                {
+                    "message": "success",
+                    "resp_code": 1,
+                    "data": serializer.data
+                }
+            )
+        
+        except Exception as e:
+            return Response(
+                {
+                    "message": f"An error occurred: {str(e)}",
+                    "resp_code": 0
                 }
             )
 
