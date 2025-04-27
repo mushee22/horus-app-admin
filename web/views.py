@@ -69,5 +69,31 @@ class ProfileUpdateView(LoginRequiredMixin,APIView):
                         "data":{}
                         }
         return Response(response)
+    
+
+class CourseListView(APIView):
+    def get(self,request):
+        pass
+
+        try:
+            courses = Course.objects.filter(flag=True)
+        except:
+            return Response(
+                {
+                    "message":"Error fetching data",
+                    "resp_code":0
+                }
+            )
+        else:
+            serializer = CourseSerializer(courses)
+            return Response(
+                {
+                    "message":"success",
+                    "resp_code":1,
+                    "data":serializer.data
+                }
+            )
+
+
 
 
