@@ -21,6 +21,27 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         #     raise AuthenticationFailed("This account has been deleted.")
         
         return data
+    
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'email', 'phone', 'password']
+
+    def validate_email(self, value):
+        if CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("A user with this email already exists. Try different.")
+        return value
+
+    def validate_phone(self, value):
+        if CustomUser.objects.filter(phone=value).exists():
+            raise serializers.ValidationError("A user with this phone number already exists. Try different.")
+        return value
+
+    def create(self, validated_data):
+        user = CustomUser.objects.create_user(**validated_data)
+        return user
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,20 +67,18 @@ class CustomerUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if self.user_data:
             if CustomUser.objects.filter(
-                username=self.user_data.get('username')
+                email=self.user_data.get('email')
             ).exclude(id=instance.user.id).exists():
-                raise serializers.ValidationError("Username exists")
+                raise serializers.ValidationError("A user with this email already exists. Try different.")
             elif CustomUser.objects.filter(
                 phone=self.user_data.get('phone')
             ).exclude(id=instance.user.id).exists():
-                raise serializers.ValidationError("Mobile exists")
-            elif CustomUser.objects.filter(
-                email=self.user_data.get('email')
-            ).exclude(id=instance.user.id).exists():
-                raise serializers.ValidationError("Email exists")
+                raise serializers.ValidationError("A user with this phone number already exists. Try different.")
             else:
                 for attr,value in self.user_data.items():
                     setattr(instance.user,attr,value)
+                if self.user_data.get('email'):
+                    instance.user.username = self.user_data.get('email')
                 instance.user.save()
         return super().update(instance, validated_data)
 

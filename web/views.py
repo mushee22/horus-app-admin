@@ -13,34 +13,29 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 class CustomerRegistrationView(APIView):
-    def post(self,request):
-        data = request.data
-        try:
-            user = CustomUser.objects.create_user(
-                first_name=data["first_name"], last_name=data["last_name"],
-                email=data["email"], phone=data["phone"],username=data["username"],
-                password=data["password"]
-            )
-        except Exception as e:
-            response = {
-                "resp_code":0,
-                "message":f"{e}"
-            }
-        else:
-            data["user"] =  user.id
-            serializer = CustomerCreateSerializer(data=data)
-            if serializer.is_valid():
-                serializer.save()
-                response = {
-                    "message":"User creation completed succesfully.",
-                    "resp_code":1
-                }
+    def post(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            data = request.data.copy()
+            data['user'] = user.id
+            customer_serializer = CustomerCreateSerializer(data=data)
+            if customer_serializer.is_valid():
+                customer_serializer.save()
+                return Response({
+                    "message": "User creation completed successfully.",
+                    "resp_code": 1
+                })
             else:
-                response = {
-                    "resp_code":0,
-                    "message":serializer.errors
-                }
-        return Response(response)
+                return Response({
+                    "resp_code": 0,
+                    "message": customer_serializer.errors
+                })
+        else:
+            return Response({
+                "resp_code": 0,
+                "message": serializer.errors
+            })
     
     
 class CustomerProfileView(LoginRequiredMixin,APIView):
@@ -65,7 +60,7 @@ class ProfileUpdateView(LoginRequiredMixin,APIView):
         if serializer.is_valid():
             serializer.save()
             response = {"resp_code":1,
-                        "message":"Profile updated",
+                        "message":"Profile updated successfully.",
                         "data":serializer.data
                         }
         else:
