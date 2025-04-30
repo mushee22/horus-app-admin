@@ -10,6 +10,7 @@ class Student(BasemodelMixin):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
     group_code = models.CharField(max_length=200,null=True,blank=True)
     profile_image = models.ImageField(null=True,blank=True,upload_to='students')
+    student_bio = models.TextField(null=True,blank=True)
 
     # def __str__(self):
     #     return f"{self.user}"
