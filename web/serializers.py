@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.apps import apps
+from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import AuthenticationFailed
 # model imports
 from web.models import *
@@ -12,7 +13,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         student = apps.get_model('web','Student').objects.get(user=self.user)
         # Check the user is inactive
-        if not student.flag:
+        if not student.is_active:
             raise AuthenticationFailed("Your account is inactive and can't be accessed. \
                                     Need help? Contact support")
 
@@ -81,22 +82,56 @@ class CustomerUpdateSerializer(serializers.ModelSerializer):
                     instance.user.username = self.user_data.get('email')
                 instance.user.save()
         return super().update(instance, validated_data)
+    
+    
+class ProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChapterProgress
+        fields = '__all__'
+    
 
-class CourseSerializer(serializers.ModelSerializer):
+class CourseSerializer(serializers.ModelSerializer):   
     class Meta:
         model = Course
         fields = '__all__'
 
+
 class ChapterSerializer(serializers.ModelSerializer):
+    progress = serializers.SerializerMethodField()
     class Meta:
-        models = Chapter
+        model = Chapter
         fields = '__all__'
+
+    def get_progress(self, course):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return None
+
+        try:
+            student = request.user.student 
+        except Student.DoesNotExist:
+            return None
+        
+        has_purchased = Purchase.objects.filter(
+            student=student, status="success",is_active=True
+        ).exists()
+
+        if not has_purchased:
+            return None
+        
+        
+        # progress = get_object_or_404(ChapterProgress,student=)
+        return PurchasedPackagesSerializer()
+
+        
+
 
 class PurchasedPackagesSerializer(serializers.ModelSerializer):
     course_name = CourseSerializer()
     class Meta:
         model = Purchase
         fields = '__all__'
+
 
 class PersonalProfileSerilizer(serializers.ModelSerializer):
     purchases = PurchasedPackagesSerializer(source='purchased_student',many=True,read_only=True)

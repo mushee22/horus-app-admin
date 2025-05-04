@@ -74,7 +74,7 @@ class ProfileUpdateView(LoginRequiredMixin,APIView):
 class CourseListView(APIView):
     def get(self, request):
         try:
-            courses = Course.objects.filter(flag=True)
+            courses = Course.objects.filter(is_active=True)
             search = request.GET.get('search')
             # category = request.GET.get('category')
 
@@ -108,24 +108,17 @@ class ChapterListView(APIView):
         course_id = request.GET.get("course_id")
         search = request.GET.get('search')
 
-        if not course_id:
-            return Response(
-                {"message": "Course ID is required", "resp_code": 0},
-                status=400
-            )
-
         try:
-            if not Course.objects.filter(id=course_id, flag=True).exists():
-                return Response(
-                    {"message": "Course not found", "resp_code": 0}
-                )
             
-            chapters = Chapter.objects.filter(course_id=course_id, flag=True)
+            chapters = Chapter.objects.filter(is_active=True)
 
             if search:
                 chapters = chapters.filter(title__icontains=search)
+            if course_id:
+                course = Course.objects.filter(id=course_id).first()
+                chapters = chapters.filter(course=course)
 
-            serializer = ChapterSerializer(chapters, many=True)
+            serializer = ChapterSerializer(chapters, many=True,context={'request': request})
             return Response(
                 {
                     "message": "success",

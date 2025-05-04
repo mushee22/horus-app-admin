@@ -7,7 +7,7 @@ class BasemodelMixin(models.Model):
     created_time = models.TimeField(auto_now_add=True)
     modified_date = models.DateField(auto_now_add=True)
     modified_time = models.TimeField(auto_now_add=True)
-    flag = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         abstract = True
