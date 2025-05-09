@@ -14,9 +14,11 @@ urlpatterns = [
     path('registration/', CustomerRegistrationView.as_view(), name='student-registration'),
     path('student-profile/', CustomerProfileView.as_view(), name='student-profile'),
     path('student-profile/update/', ProfileUpdateView.as_view(), name='student-profile-update'),
-    # Courses 
-    # path('list-courses/', CourseListView.as_view(), name='all-courses'),
+    path('student/update-profile-image/', UpdateStudentProfileImageView.as_view(), name='update-student-image'),
+    # Chapters 
     path('chapters/', ChapterListView.as_view(), name='chapter-list'),
     path('chapters/<slug:slug>/subchapters/', SubChapterListView.as_view(), name='subchapter-list'),
+    path('subchapters/<int:slug>/', SubChapterDetailView.as_view(), name='subchapter-detail'),
+    path('subchapter/progress/update/', UpdateSubChapterProgressView.as_view(), name='update-chapter-progress'),
 
 ]

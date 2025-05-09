@@ -3,6 +3,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 # Internal funcions imports
 from web.serializers import *
 from baseapp.mixins import LoginRequiredMixin
@@ -119,5 +120,81 @@ class SubChapterListView(LoginRequiredMixin, APIView):
             "data": serializer.data
         })
 
+
+class SubChapterDetailView(LoginRequiredMixin, APIView):
+    def get(self, request, slug):
+        try:
+            subchapter = SubChapters.objects.get(id=slug)
+        except SubChapters.DoesNotExist:
+            return Response({
+                "message": "Subchapter not found",
+                "resp_code": 0
+            }, status=404)
+
+        serializer = SubChapterDetailSerializer(subchapter, context={'request': request})
+        return Response({
+            "message": "success",
+            "resp_code": 1,
+            "data": serializer.data
+        })
+    
+
+class UpdateSubChapterProgressView(LoginRequiredMixin, APIView):
+    def post(self, request):
+        sub_chapter_id = request.data.get('sub_chapter_id')
+        is_completed = request.data.get('is_completed', False)
+        watched_duration = request.data.get('watched_duration', 0)
+
+        if sub_chapter_id is None:
+            return Response({
+                "message": "sub_chapter_id is required",
+                "resp_code": 0
+            }, status=400)
+
+        try:
+            student = Student.objects.get(user=request.user)
+            sub_chapter = SubChapters.objects.get(id=sub_chapter_id)
+        except Student.DoesNotExist:
+            return Response({"message": "Student not found", "resp_code": 0}, status=404)
+        except SubChapters.DoesNotExist:
+            return Response({"message": "Subchapter not found", "resp_code": 0}, status=404)
+
+        progress, created = SubChapterProgress.objects.update_or_create(
+            student=student,
+            sub_chapter=sub_chapter,
+            defaults={
+                'is_completed': is_completed,
+                'watched_duration': watched_duration,
+            }
+        )
+
+        return Response({
+            "message": "Progress updated" if not created else "Progress created",
+            "resp_code": 1
+        })
+    
+    
+    
+class UpdateStudentProfileImageView(LoginRequiredMixin, APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def put(self, request):
+        try:
+            student = Student.objects.get(user=request.user)
+        except Student.DoesNotExist:
+            return Response({"message": "Student not found", "resp_code": 0}, status=404)
+
+        profile_image = request.FILES.get('profile_image')
+        if not profile_image:
+            return Response({"message": "No image file provided", "resp_code": 0}, status=400)
+
+        student.profile_image = profile_image
+        student.save()
+
+        return Response({
+            "message": "Profile image updated successfully",
+            "resp_code": 1,
+            "image_url": request.build_absolute_uri(student.profile_image.url)
+        }, status=200)
 
 

@@ -183,6 +183,27 @@ class SubChapterSerializer(serializers.ModelSerializer):
             sub_chapter=obj, 
             is_completed=True
         ).exists()
+    
+    
+class SubChapterDetailSerializer(serializers.ModelSerializer):
+    chapter_name = serializers.CharField(source='chapter.title', read_only=True)
+    progress = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SubChapters
+        fields = '__all__'
+
+    def get_progress(self, obj):
+        request = self.context.get('request')
+        user = request.user
+        try:
+            student = Student.objects.get(user=user)
+            progress = SubChapterProgress.objects.filter(student=student, sub_chapter=obj).first()
+            if progress:
+                return ProgressSerializer(progress).data
+        except Student.DoesNotExist:
+            return None
+        return None
         
 
 
