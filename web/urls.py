@@ -15,7 +15,7 @@ urlpatterns = [
     path('student-profile/', CustomerProfileView.as_view(), name='student-profile'),
     path('student-profile/update/', ProfileUpdateView.as_view(), name='student-profile-update'),
     # Courses 
-    path('list-courses/', CourseListView.as_view(), name='all-courses'),
+    # path('list-courses/', CourseListView.as_view(), name='all-courses'),
     path('list-chapters/', ChapterListView.as_view(), name='all-courses'),
 
 ]

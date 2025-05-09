@@ -86,48 +86,83 @@ class CustomerUpdateSerializer(serializers.ModelSerializer):
     
 class ProgressSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ChapterProgress
+        model = SubChapterProgress
         fields = '__all__'
     
 
-class CourseSerializer(serializers.ModelSerializer):   
-    class Meta:
-        model = Course
-        fields = '__all__'
+
+# class ChapterSerializer(serializers.ModelSerializer):
+#     progress = serializers.SerializerMethodField()
+#     class Meta:
+#         model = Chapter
+#         fields = '__all__'
+
+#     def get_progress(self, chapter):
+#         request = self.context.get('request')
+#         if not request or not request.user.is_authenticated:
+#             return None
+
+#         try:
+#             student = Student.objects.filter(user=request.user).first()
+#         except Student.DoesNotExist:
+#             return None
+        
+#         try:
+#             progress = SubChapterProgress.objects.get(student=student, chapter=chapter)
+#             return {
+#                 "is_completed": progress.is_completed,
+#                 "watched_duration": progress.watched_duration,
+#                 "last_watched_date": progress.modified_date,
+#                 "last_watched_time": progress.modified_time,
+#             }
+#         except SubChapterProgress.DoesNotExist:
+#             # If no progress record exists, return default progress
+#             return {
+#                 "is_completed": False,
+#                 "watched_duration": 0,
+#                 "last_watched_date": None,
+#                 "last_watched_time": None,
+#             }
 
 
 class ChapterSerializer(serializers.ModelSerializer):
-    progress = serializers.SerializerMethodField()
+    total_subchapters = serializers.SerializerMethodField()
+    completed_subchapters = serializers.SerializerMethodField()
+    total_duration = serializers.SerializerMethodField()
+
     class Meta:
         model = Chapter
         fields = '__all__'
+        extra_fields = ['total_subchapters', 'completed_subchapters', 'total_duration']
 
-    def get_progress(self, course):
+    def get_total_subchapters(self, obj):
+        return obj.sub_chapter.count()
+
+    def get_completed_subchapters(self, obj):
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
-            return None
+            return 0
 
         try:
-            student = request.user.student 
+            student = Student.objects.get(user=request.user)
         except Student.DoesNotExist:
-            return None
-        
-        has_purchased = Purchase.objects.filter(
-            student=student, status="success",is_active=True
-        ).exists()
+            return 0
 
-        if not has_purchased:
-            return None
-        
-        
-        # progress = get_object_or_404(ChapterProgress,student=)
-        return PurchasedPackagesSerializer()
+        return SubChapterProgress.objects.filter(
+            student=student,
+            sub_chapter__chapter=obj,
+            is_completed=True
+        ).count()
+
+    def get_total_duration(self, obj):
+        return obj.sub_chapter.aggregate(
+            total_duration=models.Sum('duration')
+        ).get('total_duration') or 0
 
         
 
 
 class PurchasedPackagesSerializer(serializers.ModelSerializer):
-    course_name = CourseSerializer()
     class Meta:
         model = Purchase
         fields = '__all__'

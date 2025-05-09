@@ -69,54 +69,17 @@ class ProfileUpdateView(LoginRequiredMixin,APIView):
                         "data":{}
                         }
         return Response(response)
-    
-    
-class CourseListView(APIView):
-    def get(self, request):
-        try:
-            courses = Course.objects.filter(is_active=True)
-            search = request.GET.get('search')
-            # category = request.GET.get('category')
-
-            if search:
-                courses = courses.filter(title__icontains=search)
-
-            # if category:
-            #     courses = courses.filter(category__name__icontains=category)
-
-        except Exception as e:
-            return Response(
-                {
-                    "message": "Error fetching data",
-                    "resp_code": 0,
-                    "error": str(e) 
-                }
-            )
-        else:
-            serializer = CourseSerializer(courses, many=True)
-            return Response(
-                {
-                    "message": "success",
-                    "resp_code": 1,
-                    "data": serializer.data
-                }
-            )
         
         
-class ChapterListView(APIView):
+class ChapterListView(LoginRequiredMixin,APIView):
     def get(self, request):
-        course_id = request.GET.get("course_id")
         search = request.GET.get('search')
 
         try:
-            
             chapters = Chapter.objects.filter(is_active=True)
 
             if search:
                 chapters = chapters.filter(title__icontains=search)
-            if course_id:
-                course = Course.objects.filter(id=course_id).first()
-                chapters = chapters.filter(course=course)
 
             serializer = ChapterSerializer(chapters, many=True,context={'request': request})
             return Response(
