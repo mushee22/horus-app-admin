@@ -97,7 +97,27 @@ class ChapterListView(LoginRequiredMixin,APIView):
                     "resp_code": 0
                 }
             )
+        
 
+class SubChapterListView(LoginRequiredMixin, APIView):
+    def get(self, request, slug):
+        try:
+            chapter = Chapter.objects.get(id=slug,is_active=True)
+        except Chapter.DoesNotExist:
+            return Response({
+                "message": "Chapter not found",
+                "resp_code": 0
+            }, status=404)
+
+        subchapters = chapter.sub_chapter.all().order_by('order')  # Optional ordering
+        serializer = SubChapterSerializer(subchapters, many=True, context={'request': request})
+
+        return Response({
+            "message": "success",
+            "resp_code": 1,
+            "chapter": chapter.title,
+            "data": serializer.data
+        })
 
 
 

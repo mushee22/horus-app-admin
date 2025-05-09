@@ -35,6 +35,7 @@ class SubChapters(BasemodelMixin):
     thumbnail = models.ImageField(upload_to='chapters/subchapters')
     duration = models.IntegerField(null=True,blank=True)
     order = models.IntegerField()
+    is_completed = models.BooleanField(default=False)
 
 
 class Features(BasemodelMixin):

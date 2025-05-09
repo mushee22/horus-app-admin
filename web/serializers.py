@@ -159,6 +159,30 @@ class ChapterSerializer(serializers.ModelSerializer):
             total_duration=models.Sum('duration')
         ).get('total_duration') or 0
 
+
+class SubChapterSerializer(serializers.ModelSerializer):
+    chapter_name = serializers.CharField(source='chapter.title', read_only=True)
+    is_completed = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SubChapters
+        fields = '__all__'
+
+    def get_is_completed(self, obj):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+
+        try:
+            student = Student.objects.get(user=request.user)
+        except Student.DoesNotExist:
+            return False
+
+        return SubChapterProgress.objects.filter(
+            student=student, 
+            sub_chapter=obj, 
+            is_completed=True
+        ).exists()
         
 
 
