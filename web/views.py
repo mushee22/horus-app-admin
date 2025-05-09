@@ -4,6 +4,7 @@ from .serializers import CustomTokenObtainPairSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework import status
 # Internal funcions imports
 from web.serializers import *
 from baseapp.mixins import LoginRequiredMixin
@@ -173,7 +174,7 @@ class UpdateSubChapterProgressView(LoginRequiredMixin, APIView):
             "resp_code": 1
         })
     
-    
+
     
 class UpdateStudentProfileImageView(LoginRequiredMixin, APIView):
     parser_classes = [MultiPartParser, FormParser]
@@ -196,5 +197,43 @@ class UpdateStudentProfileImageView(LoginRequiredMixin, APIView):
             "resp_code": 1,
             "image_url": request.build_absolute_uri(student.profile_image.url)
         }, status=200)
+    
+    
+class PackageListView(APIView):
+    def get(self, request):
+        packages = Package.objects.all()
+        serializer = PackageSerializer(packages, many=True, context={'request': request})
+        return Response({
+            "message": "success",
+            "resp_code": 1,
+            "data": serializer.data
+        }, status=status.HTTP_200_OK)
+    
+
+class TotalProgressView(LoginRequiredMixin, APIView):
+    def get(self, request):
+        try:
+            user = request.user
+            student = Student.objects.get(user=user)
+
+            total_subchapters = SubChapters.objects.count()
+            completed_subchapters = SubChapterProgress.objects.filter(
+                student=student, is_completed=True
+            ).count()
+
+            return Response({
+                "message": "success",
+                "resp_code": 1,
+                "data": {
+                    "total_subchapters": total_subchapters,
+                    "completed_subchapters": completed_subchapters
+                }
+            }, status=status.HTTP_200_OK)
+
+        except Student.DoesNotExist:
+            return Response({
+                "message": "Student profile not found",
+                "resp_code": 0
+            }, status=status.HTTP_404_NOT_FOUND)
 
 

@@ -40,13 +40,16 @@ class SubChapters(BasemodelMixin):
 class Features(BasemodelMixin):
     name = models.CharField(max_length=200)
 
+    def __str__(self):
+        return f"{self.name}"
+
 
 class Package(BasemodelMixin):
     title = models.CharField(max_length=200)
     thumbnail =  models.ImageField(upload_to='packages')
     price = models.FloatField(default=0)
     offer = models.FloatField(default=0)
-    features= models.ManyToManyField(Chapter,related_name="package_features")
+    features= models.ManyToManyField(Features,related_name="package_features")
 
 
 class Purchase(BasemodelMixin):
@@ -63,7 +66,7 @@ class Purchase(BasemodelMixin):
     # def __str__(self):
     #     return f"{self.course_name.title} {self.get_status_display()}"
 
-class SubChapterProgress(models.Model):
+class SubChapterProgress(BasemodelMixin):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='student_progress')
     sub_chapter = models.ForeignKey(SubChapters, on_delete=models.CASCADE, related_name='sub_chapter_progress')
     is_completed = models.BooleanField(default=False)

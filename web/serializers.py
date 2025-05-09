@@ -224,3 +224,13 @@ class PersonalProfileSerilizer(serializers.ModelSerializer):
     # def get_purchases(self,obj):
     #     purchase_success = obj.purchased_student.filter(status="success")
     #     return PurchasedPackagesSerializer(purchase_success,many=True).data
+
+class PackageSerializer(serializers.ModelSerializer):
+    features = serializers.StringRelatedField(many=True)
+
+    class Meta:
+        model = Package
+        fields = ['id', 'title', 'thumbnail', 'price', 'offer', 'features']
+
+        
+
