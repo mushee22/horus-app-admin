@@ -3,14 +3,19 @@ from baseapp.models import BasemodelMixin
 from backend.models import CustomUser
 
 # Create your models here.
-class StudentId(models.Model):
+class Batch(models.Model):
+    name = models.CharField(max_length=250,null=True,blank=True)
     code = models.CharField(unique=True,max_length=200)
+
+    def __str__(self):
+        return f"{self.name} {self.code}"
 
 class Student(BasemodelMixin):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
     group_code = models.CharField(max_length=200,null=True,blank=True)
     profile_image = models.ImageField(null=True,blank=True,upload_to='students')
     student_bio = models.TextField(null=True,blank=True)
+    batch = models.ForeignKey(Batch,on_delete=models.CASCADE)
 
     # def __str__(self):
     #     return f"{self.user}"

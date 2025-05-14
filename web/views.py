@@ -221,12 +221,17 @@ class TotalProgressView(LoginRequiredMixin, APIView):
                 student=student, is_completed=True
             ).count()
 
+            last_watched_sub_chapter = SubChapterProgress.objects.filter(
+                student=student
+            ).order_by('-last_watched_at').first()
+
             return Response({
                 "message": "success",
                 "resp_code": 1,
                 "data": {
                     "total_subchapters": total_subchapters,
-                    "completed_subchapters": completed_subchapters
+                    "completed_subchapters": completed_subchapters,
+                    "last_watched_sub_chapter":last_watched_sub_chapter.sub_chapter.id
                 }
             }, status=status.HTTP_200_OK)
 

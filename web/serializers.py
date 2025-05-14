@@ -163,6 +163,7 @@ class ChapterSerializer(serializers.ModelSerializer):
 class SubChapterSerializer(serializers.ModelSerializer):
     chapter_name = serializers.CharField(source='chapter.title', read_only=True)
     is_completed = serializers.SerializerMethodField()
+    progress = serializers.SerializerMethodField()
 
     class Meta:
         model = SubChapters
@@ -183,6 +184,24 @@ class SubChapterSerializer(serializers.ModelSerializer):
             sub_chapter=obj, 
             is_completed=True
         ).exists()
+    
+    def get_progress(self, obj):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return None
+
+        try:
+            student = Student.objects.get(user=request.user)
+        except Student.DoesNotExist:
+            return None
+
+        progress =SubChapterProgress.objects.filter(
+            student=student, 
+            sub_chapter=obj, 
+        ).first()
+        if progress:
+            return ProgressSerializer(progress).data
+        return None
     
     
 class SubChapterDetailSerializer(serializers.ModelSerializer):
