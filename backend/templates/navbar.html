@@ -1,0 +1,110 @@
+{% load static %}
+
+<style>
+    .nav-noti-icon-container{
+        display: inline-block;
+        position: relative;
+    }
+    .hide{
+        display: none !important;
+    }
+    .noti-badge{
+        padding: 5px;
+        border-radius: 50%;
+        background-color: red;
+        color: white;
+        font-weight: bold;
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: 13px;
+        /* display: none; */
+        justify-content: center;
+        align-items: center;
+    }
+
+    .noti-badge-2{
+        min-width: 20px;
+        min-height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1px;
+        border-radius: 50%;
+        background-color: red;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+        color: white;
+        font-weight: bold;
+        top: 0;
+        right: 0;
+        font-size: 9px;
+    }
+</style>
+<!-- Navbar Start -->
+<nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
+    <a href="" class="navbar-brand d-flex d-lg-none me-4">
+        <h2 class="text-primary mb-0"><i class="fa fa-hashtag"></i></h2>
+    </a>
+    <a href="#" class="sidebar-toggler flex-shrink-0">
+        <i class="fa fa-bars"></i>
+    </a>
+    <div class="navbar-nav align-items-center ms-auto">
+        <div class="nav-item dropdown">
+            {% comment %} <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                <div class="nav-noti-icon-container ">
+                    <i class="fa fa-bell me-lg-2"></i>
+                    <div id="notification-main" class="noti-badge hide"></div>
+                </div>
+                <span class="d-none d-lg-inline-flex">Notification</span>
+            </a>
+            <div class="notification-drop dropdown-menu dropdown-menu-end bg-light border-2 rounded-0 rounded-bottom m-0">
+                <div class="d-flex align-items-center pe-3">
+                    <a href="{% url 'purchase_form' %}" class="dropdown-item text-start">Purchase form</a>
+                    <div id="purchase_notification" class="noti-badge-2 hide"></div>
+                </div>
+                <hr class="dropdown-divider">
+                <div class="d-flex align-items-center pe-3">
+                    <a href="{% url 'contact_msg' %}" class="dropdown-item text-start">Contact form</a>
+                    <div id="contact_notification" class="noti-badge-2 hide"></div>
+                </div>
+            </div> {% endcomment %}
+        </div>
+        <div class="nav-item dropdown">
+            <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" style="gap:10px;" data-bs-toggle="dropdown">
+                <div class="base-avatar">A</div>
+                <span class="d-none d-lg-inline-flex">{{request.user.email}}</span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-end bg-light border-2 rounded-0 rounded-bottom m-0">
+                <a href="#" class="dropdown-item">Settings</a>
+                <a href="{% url 'logout' %}" class="dropdown-item">Log Out</a>
+            </div>
+        </div>
+    </div>
+</nav>
+<!-- Navbar End -->
+
+<script>
+    {% comment %} window.addEventListener('load',()=>{
+        let mainNotification = document.getElementById("notification-main");
+        let purchaseNotification = document.getElementById("purchase_notification");
+        let contactNotification = document.getElementById("contact_notification");
+        
+        fetch(`{% url 'notification_count' %}`,{
+            'method':'GET'
+        }).then(resp=>resp.json()).then(data=>{
+            console.log(data)
+            if(data.total_noti_count){
+                mainNotification.innerHTML = data.total_noti_count
+                mainNotification.classList.remove('hide')
+            }
+            if(data.purchase_noti_count){
+                purchaseNotification.innerHTML = data.purchase_noti_count
+                purchaseNotification.classList.remove('hide')
+            }
+            if(data.contact_noti_count){
+                contactNotification.innerHTML = data.contact_noti_count
+                contactNotification.classList.remove('hide')
+            }
+        });
+    }) {% endcomment %}
+</script>

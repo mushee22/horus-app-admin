@@ -1,0 +1,13 @@
+{% for message in messages %}
+<div class="message-container">
+    <div class="message-box {{message.tags}}">{{message}}</div>
+</div>
+
+<script>
+    window.addEventListener('load',()=>{
+        setTimeout(()=>{
+            document.querySelector(".message-container").remove();
+        },2000);
+    });
+</script>
+{% endfor %}

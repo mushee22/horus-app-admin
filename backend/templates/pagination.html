@@ -1,0 +1,13 @@
+<div class="d-flex justify-content-end w-100 pe-4 mb-5">
+    <div class="btn-group me-2 d-flex" style="gap:5px;" role="group" aria-label="Second group">
+        {% if page_obj.has_previous %}
+            <a href="?page=1"><button type="button" class="btn btn-secondary"><</button></a>
+            <a href="?page={{ page_obj.previous_page_number }}"><button type="button" class="btn btn-secondary">{{ page_obj.previous_page_number }}</button></a>
+        {% endif %}
+        <button type="button" class="btn btn-primary">{{ page_obj.number }}</button>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}"><button type="button" class="btn btn-secondary">{{ page_obj.next_page_number }}</button></a>
+            <a href="?page={{ page_obj.paginator.num_pages }}"><button type="button" class="btn btn-secondary">></button></a>
+        {% endif %}
+    </div>
+</div>

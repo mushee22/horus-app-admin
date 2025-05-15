@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="content">
+    
+    {% include 'navbar.html' %}
+
+
+    <!-- Sale & Revenue Start -->
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4 mb-2">
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-solid fa-user fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Purchase request</p>
+                        <h6 class="mb-0">{{purchase_count}}</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-solid fa-user-tie fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Contact request</p>
+                        <h6 class="mb-0">{{contact_count}}</h6>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-solid fa-satellite fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Services</p>
+                        <h6 class="mb-0">{{services_count}}</h6>
+                    </div>
+                </div>
+            </div> -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <i class="fa fa-chart-bar fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Total Requests</p>
+                        <h6 class="mb-0">{{total_count}}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="row g-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <div class="ms-3">
+                        <p class="mb-2">Pending Requests</p>
+                        <h6 class="mb-0">{{pending_requests}}</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <div class="ms-3">
+                        <p class="mb-2">Accepted Requests</p>
+                        <h6 class="mb-0">{{accepted_requests}}</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <div class="ms-3">
+                        <p class="mb-2">Completed Requests</p>
+                        <h6 class="mb-0">{{completed_requests}}</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                    <div class="ms-3">
+                        <p class="mb-2">Rejected Requests</p>
+                        <h6 class="mb-0">{{rejected_requests}}</h6>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+    </div>
+    <!-- Sale & Revenue End -->
+
+
+    <!-- Sales Chart Start -->
+    <!-- <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-sm-12 col-xl-6">
+                <div class="bg-light text-center rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">Service Rquests</h6>
+                    </div>
+                    <canvas id="worldwide-sales"></canvas>
+                </div>
+            </div>
+            <div class="col-sm-12 col-xl-6">
+                <div class="bg-light text-center rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">Customers</h6>
+                    </div>
+                    <canvas id="salse-revenue"></canvas>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <!-- Sales Chart End -->
+
+
+    <!-- Recent Sales Start -->
+    <div class="container-fluid pt-4 px-4">
+        <div class="bg-light text-center rounded p-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h6 class="mb-0">New purchase requests</h6>
+                <a href="">Show All</a> 
+            </div>
+            <div class="table-responsive">
+                <table class="table text-start align-middle table-bordered table-hover mb-0">
+                    <thead>
+                        <tr class="text-dark">
+                            <th scope="col">Sl No.</th>
+                            <th scope="col">App version</th>
+                            <th scope="col">Full name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Conatact time</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in purchase %}
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{item.app_version}}</td>
+                            <td>{{item.full_name}}</td>
+                            <td>{{item.email}}</td>
+                            <td>{{item.preferred_contact_time}}</td>
+                            <td><a class="btn btn-sm btn-primary" href="{% url 'detail_purchase_form' pk=item.id %}">Detail</a></td> 
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Recent Sales End -->
+
+
+    <!-- Widgets Start -->
+    
+    <!-- Widgets End -->
+
+
+    <!-- Footer Start -->
+    {% comment %}<div class="container-fluid pt-4 px-4">
+        <div class="bg-light rounded-top p-4">
+            <div class="row">
+                <div class="col-12 col-sm-6 text-center text-sm-start">
+                    &copy; <a href="#">Your Site Name</a>, All Right Reserved. 
+                </div>
+                <div class="col-12 col-sm-6 text-center text-sm-end">
+                    <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
+                    Designed By <a href="https://htmlcodex.com">HTML Codex</a>
+                </br>
+                Distributed By <a class="border-bottom" href="https://themewagon.com" target="_blank">ThemeWagon</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcomment %}
+
+    <!-- Footer End -->
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    window.addEventListener('load',()=>{
+        // bar chart
+        var barChartDetails = JSON.parse('{{bar_chart|safe}}');
+        localStorage.setItem('bar_months',JSON.stringify(barChartDetails.months));
+        localStorage.setItem('barReqCompleted',JSON.stringify(barChartDetails.completed_list));
+        localStorage.setItem('barReqPending',JSON.stringify(barChartDetails.pending_list));
+        localStorage.setItem('barReqRejected',JSON.stringify(barChartDetails.rejected_list));
+
+        // line chart
+        var lineChartDetails = JSON.parse('{{line_chart|safe}}');
+        localStorage.setItem('lineCustomer',JSON.stringify(lineChartDetails.customers));
+    });
+</script>
+{% endblock %}

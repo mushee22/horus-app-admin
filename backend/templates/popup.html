@@ -1,0 +1,56 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/popup.css' %}">
+
+<div class="popup-bg popup-hide">
+    <!-- delete popup start-->
+    <div class="pop-up pop-up-delete popup-hide">
+        <span>Do you want to delete <span class="delete-item"></span>?</span>
+        <input type="hidden" name="delete_id">
+        <div class="d-flex justify-content-between mt-5" style="gap: 1rem;">
+            <button class="btn btn-secondary" onclick="hidePopup(this)">Cancel</button>
+            <button class="btn btn-primary popup-delete-btn">Delete</button>
+        </div>
+    </div>
+    <!-- delete popup end-->
+
+    <!-- assign labour popup start -->
+    <div class="pop-up pop-up-assign popup-hide">
+        <span style="font-size: 1.25rem;font-weight: bold;display: block;" class="mb-3">Assign a Labour</span>
+        <form action="" method="POST" id="assignLabourForm"> 
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="category" class="form-label">Labours</label>
+                <select class="form-control" name="labour_select" id="labourSelect"></select>
+                <input type="hidden" name="req_id" id="reqId">
+            </div>
+        </form>
+        <div class="d-flex justify-content-between mt-5" style="gap: 1rem;">
+            <button class="btn btn-secondary" onclick="hidePopup(this)">Cancel</button>
+            <button class="btn btn-primary" onclick="handleAssign(event)">Assign</button>
+        </div>
+    </div>
+
+    <!-- assign labour popup end -->
+
+    <!-- reject request popup start -->
+    <div class="pop-up pop-up-reject popup-hide">
+        <span>Do you want to reject the request <span class="reject-item"></span>?</span>
+        <input type="hidden" name="reject_id">
+        <div class="d-flex justify-content-between mt-5" style="gap: 1rem;">
+            <button class="btn btn-secondary" onclick="hidePopup(this)">Cancel</button>
+            <button class="btn btn-danger popup-reject-btn">Reject</button>
+        </div>
+    </div>
+    <!-- reject request popup end -->
+
+    <!-- complete request popup start -->
+    <div class="pop-up pop-up-complete popup-hide">
+        <span>Do you want to complete the request <span class="complete-item"></span>?</span>
+        <input type="hidden" name="complete_id">
+        <div class="d-flex justify-content-between mt-5" style="gap: 1rem;">
+            <button class="btn btn-secondary" onclick="hidePopup(this)">Cancel</button>
+            <button class="btn btn-primary popup-complete-btn">Complete</button>
+        </div>
+    </div>
+    <!-- complete request popup end -->
+</div>

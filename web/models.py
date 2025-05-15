@@ -16,6 +16,8 @@ class Student(BasemodelMixin):
     profile_image = models.ImageField(null=True,blank=True,upload_to='students')
     student_bio = models.TextField(null=True,blank=True)
     batch = models.ForeignKey(Batch,on_delete=models.CASCADE)
+    start_date = models.DateField(null=True,blank=True)
+    end_date = models.DateField(null=True,blank=True)
 
     # def __str__(self):
     #     return f"{self.user}"

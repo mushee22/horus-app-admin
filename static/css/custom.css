@@ -1,0 +1,152 @@
+
+.main-container{
+    padding: 1rem;
+}
+.bread-crumb-container{
+    width: 100%;
+    padding: 2rem;
+    display:  flex;
+    justify-content: flex-start;
+    gap: 10px;
+    font-weight: bold;
+}
+.bread-crumb-container>.parent{
+    color: var(--bs-primary);
+}
+
+.top-container, .sub-container{
+    width: 100%;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.top-container{
+    padding-left: 0;
+    gap: 1rem;
+}
+.top-container form{
+    display: flex;
+    justify-content: flex-start;
+    gap: 1rem;
+}
+
+.sub-container{
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+.sub-container-card{
+    width: 48%;
+    box-shadow: 0 0 15px 0px #757575;
+    border-radius: 10px;
+    padding: 1rem;
+}
+.sub-container-card .card-heading{
+    font-weight: bold;
+}
+.sub-container-card .details{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 1rem;
+}
+
+.action-form-field{
+    width: auto;
+}
+
+.table .action-box{
+    display: flex;
+    padding: 5px;
+    gap: 1rem;
+}
+
+.table .action-box  svg{
+    width: 1rem;
+    cursor: pointer;
+}
+
+.h3-heading{
+    margin: 1rem;
+}
+
+.base-avatar{
+    width: 40px;
+    height: 40px;
+    background-color: black;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+.message-container,.message-box{
+    width: 100%;
+    padding: 1rem;
+}
+.message-box{
+    color: white;
+    font-size: 1.1rem;
+    border-radius: 15px;
+}
+
+.success{
+    background-color: green;
+}
+
+.error{
+    background-color: red;
+}
+
+.login-message{
+    display: block;
+    font-size: 13px;
+}
+.login-message-error{
+    color: red;
+}
+.login-message-success{
+    color: green;
+}
+
+.required::after {
+    content: " *";
+    color: red;
+    font-size: 12px;
+}
+.cke_editable {
+    font-size: 16px !important;
+    line-height: 1.8 !important;
+}
+.image-box{
+    width: 10rem;
+    height: 10rem;
+    border: 2px solid grey;
+    border-radius: 10px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+}
+
+.hide{
+    display: none;
+}
+
+@media screen and (max-width:768px){
+    .top-container{
+        flex-wrap: wrap;
+    }
+    .top-container form{
+        flex-wrap: wrap;
+    }
+    .sub-container{
+        gap: 1.5rem;
+    }
+    .sub-container-card{
+        width: auto;
+        flex-basis: 300px;
+        flex-grow: 1;
+    }
+}

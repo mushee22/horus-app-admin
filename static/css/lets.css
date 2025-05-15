@@ -1,0 +1,71 @@
+.lets-talk-popup{
+    border-radius: 10px;
+    background: #FFF;
+    width: 757px;
+    height: 445px;
+    border: 1px solid rgba(150, 146, 146, 0.384);
+    padding: 50px 60px;
+}
+
+.lets-talk-popup.active.down {
+    animation: slideDown 0.5s ease-out forwards;
+}
+
+@keyframes slideDown {
+    from {
+        transform:  translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform:  translateY(0);
+        opacity: 1;
+    }
+}
+
+.lets-talk-popup.closing {
+    animation: slideUp 0.5s ease-in forwards;
+}
+
+@keyframes slideUp {
+    from {
+        transform:  translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform:  translateY(-100%);
+        opacity: 0;
+    }
+}
+
+.lets-whole {
+    height: 100vh;
+}
+.speak-direct{
+    width: 372px;
+    /* height: 79px; */
+    border-radius: 8px;
+    border: 1px solid #DFDFDF;
+    padding: 12px 19px;
+    gap: 5px;
+}
+.callback-icon{
+    width: 24px;
+    height: 24px;
+}
+.call-back,.speak-direct{
+    width: 372px;
+    border-radius: 8px;
+    border: 1px solid #DFDFDF;
+    padding: 12px 19px;
+    gap: 5px;
+}
+
+.speak-direct{
+    height: 79px;
+}
+.call-back{
+    height: 94px !important;
+}
+.arrow-callback{
+    position: unset;
+}

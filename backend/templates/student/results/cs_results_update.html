@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="content">
+
+    {% include 'navbar.html' %}
+
+    <div class="main-container">
+        <div class="bread-crumb-container">
+            <a href="{% url 'cs_result' %}"><span class="parent">Case study results</span></a>><span>Update</span>
+        </div>
+        <form method="POST" action="{% url 'update_cs_result' pk=context_data.id %}" id="CreateFormId">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="case_study" class="form-label required">Case study</label>
+                <select class="form-control" name="case_study" id="case_study">
+                    <option value="">--select a case study--</option>
+                    {% for item in case_studies %}
+                    <option value="{{item.id}}" {% if context_data.case_study.id == item.id %}selected{% endif %}>{{item.heading}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="point" class="form-label required">Point</label>
+                <input type="text" value="{{context_data.point}}" class="form-control" id="point" name="point">
+            </div>
+            <a href="{% url 'cs_result' %}"><button type="button" class="btn btn-secondary">Cancel</button></a>
+            <button type="button" class="btn btn-primary" onclick="handleSubmitForm(event)">Save</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<!-- <script src="{% static 'js/caseStudyFormValidator.js' %}"></script> -->
+<script src="{% static 'js/validationMessageGenerator.js' %}"></script>
+<script>
+    const handleSubmitForm = (e)=>{
+        e.preventDefault();
+        var case_study = document.getElementById('case_study')
+        var point = document.getElementById('point')
+        if(!case_study.value){
+            showValidationError(case_study,"Case study is required")
+        }
+        else if(!point.value){
+            showValidationError(point,"Point is required")
+        }
+        else{
+            document.getElementById("CreateFormId").submit();
+        }
+    }
+
+</script>
+{% endblock %}

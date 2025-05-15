@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="content">
+
+    {% include 'navbar.html' %}
+
+    <div class="main-container">
+        <div class="bread-crumb-container">
+            <a href="{% url 'case_studies' %}"><span class="parent">Case Studies</span></a>><span>Update</span>
+        </div>
+        <form method="POST" enctype="multipart/form-data" action="{% url 'update_case_studies' pk=case_study.id  %}" id="CaseStudyUpdateForm">
+            {% csrf_token %}
+            <input type="text" value="" class="d-none" id="id" name="id">
+            <div class="mb-3">
+                <label for="heading" class="form-label required">Heading</label>
+                <input type="text" value="{{case_study.heading}}" class="form-control" id="heading" name="heading">
+            </div>
+            <div class="mb-3">
+                <div class="form-label">Image</div>
+                <label for="image" class="image-box required" style="background-image: url(/static/images/default-image.jpg);/"></label>
+                <input type="file" class="ImageField" id="image" name="image" style="display: none;" data-value="{{case_study.image.url}}">
+            </div>
+            <!-- <div class="mb-3">
+                <label for="inner_image" class="form-label">Inner Image</label>
+                <input type="file" data-value="{{case_study.inner_image.url}}"  class="form-control" id="inner_image" name="inner_image">
+                {% if case_study.inner_image %}
+                    <p>Current Image: <a href="{{ case_study.inner_image.url }}" target="_blank">View</a></p>
+                {% endif %}
+            </div> -->
+            <div class="mb-3 hello">
+                <div class="form-label">Inner Image</div>
+                <label for="inner_image" class="image-box required" style="background-image: url(/static/images/default-image.jpg);/"></label>
+                <input type="file" class="ImageField" id="inner_image" name="inner_image" style="display: none;" data-value="{{case_study.inner_image.url}}">
+            </div>
+            <div class="mb-3">
+                <label for="client_overview" class="form-label required">Client Overview</label>
+                <textarea rows="4" class="form-control" id="client_overview" name="client_overview">{{case_study.client_overview}}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="client_says" class="form-label required">Client Says</label>
+                <textarea rows="4" class="form-control" id="client_says" name="client_says">{{case_study.client_says}}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="challenge_description" class="form-label required">Challenge Description</label>
+                <textarea rows="4" class="form-control" id="challenge_description" name="challenge_description">{{case_study.challenge_description}}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="solution_description" class="form-label required">Solution Description</label>
+                <textarea rows="4" class="form-control" id="solution_description" name="solution_description">{{case_study.solution_description}}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="result_description" class="form-label required">Result Description</label>
+                <textarea rows="4" class="form-control" id="result_description" name="result_description">{{case_study.result_description}}</textarea>
+            </div>
+            <!-- <div class="mb-3">
+                <label for="building" class="form-label">Building</label>
+                <input type="text" class="form-control" id="building" name="building">
+            </div> -->
+            <div class="mb-3">
+                <label for="industries" class="form-label required">Industries</label>
+                <select class="form-control d-none" name="industries" id="industries" multiple>
+                    {% for item in industries %}
+                        <option value="{{item.id}}">{{item.industry_name}}</option>
+                    {% endfor %}
+                </select>
+            
+                <!-- Custom Multi-Select UI -->
+                <div id="selectedTags" class="border p-2 rounded d-none flex-wrap mt-2"></div>
+            
+                <!-- Dropdown for selection -->
+                <div class="dropdown mt-2">
+                    <button 
+                    class="btn btn-outline-secondary dropdown-toggle d-flex justify-content-between align-items-center w-100 required"
+                    type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        Select Industries
+                    </button>
+                    <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton" id="dropdownOptions">
+                        {% for item in industries %}
+                            <li><a class="dropdown-item" href="#" data-value="{{item.id}}">{{item.industry_name}}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="country" class="form-label required">Country</label>
+                <select class="form-control" name="country" id="country">
+                    <option value="">--select a Country--</option>
+                    {% for item in countries %}
+                    <option value="{{item.id}}" {% if case_study.country.id == item.id %}selected{% endif %}>
+                        {{item.name}}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- <div class="mb-3">
+                <label for="labourType" class="form-label">Labour Type</label>
+                <select class="form-control" name="type" id="labourType">
+                    <option value="">--select a type--</option>
+                    <option value="Freelancer">Freelancer</option>
+                    <option value="Company">Company</option>
+                    <option value="Establishment">Establishment</option>
+                </select>
+            </div> -->
+            
+            
+            <a href="{% url 'case_studies' %}"><button type="button" class="btn btn-secondary">Cancel</button></a>
+            <button type="button" class="btn btn-primary" onclick="handleCaseStudyAdd(event)">Save</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/caseStudyFormValidator.js' %}"></script>
+<script src="{% static 'js/validationMessageGenerator.js' %}"></script>
+<script src="{% static 'js/showMultipleSelectedImage.js' %}"></script>
+<script>
+    const handleCaseStudyAdd = (e)=>{
+        e.preventDefault();
+        if(caseStudyUpdateValidator()){
+            document.getElementById("CaseStudyUpdateForm").submit();
+        }
+    }
+    
+// FUNCTION TO UPDATE INDUSTRIES TAG
+document.addEventListener("DOMContentLoaded", function () {
+    const selectedTags = document.getElementById("selectedTags");
+    const dropdownOptions = document.getElementById("dropdownOptions");
+    const industryType = document.getElementById("industries");
+
+    // Function to update visibility of selected tags section
+    function updateTagVisibility() {
+        if(selectedTags.children.length > 0){
+            selectedTags.classList.add('d-flex');
+            selectedTags.classList.remove('d-none');
+        }else{
+            selectedTags.classList.remove('d-flex');
+            selectedTags.classList.add('d-none');
+        }
+    }
+
+    // Function to add a tag
+    function addTag(value, text) {
+        const industryType = document.getElementById("industries");
+        // Check if already selected
+        if ([...industryType.options].some(opt => opt.value === value && opt.selected)) return;
+        
+        // Create tag element
+        const tag = document.createElement("span");
+        tag.className = "badge bg-primary me-2 p-2";
+        tag.setAttribute("data-value",value)
+        tag.innerHTML = `${text} <span class="ms-1 text-white fw-bold" style="cursor:pointer;" onclick="removeTag('${value}')">&times;</span>`;
+        
+        // Append tag to UI
+        selectedTags.appendChild(tag);
+
+        // Update hidden select field
+        [...industryType.options].forEach(opt => {
+            if (opt.value === value) opt.selected = true;
+        });
+
+        updateTagVisibility(); // Show tags section if tags exist
+    }
+
+    // Function to remove a tag
+    window.removeTag = function (value) {
+        // Deselect option in select field
+        [...industryType.options].forEach(opt => {
+            if (opt.value === value) opt.selected = false;
+        });
+
+        // Remove tag from UI
+        [...selectedTags.children].forEach(tag => {
+            if (tag.dataset.value.includes(value)) tag.remove();
+        });
+
+        updateTagVisibility(); // Hide tags section if empty
+    };
+
+    // Handle dropdown selection
+    dropdownOptions.addEventListener("click", function (event) {
+        event.preventDefault();
+        const value = event.target.getAttribute("data-value");
+        const text = event.target.textContent;
+        if (value) addTag(value, text);
+    });
+
+    '{% for i in case_study.industries.all %}'
+        addTag('{{i.id}}','{{i.industry_name}}');
+    '{% endfor %}'
+});
+</script>
+{% endblock %}
