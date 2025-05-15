@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib import auth
-from django.shortcuts import redirect
+from django.shortcuts import redirect,get_object_or_404
 from datetime import datetime
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -133,91 +133,111 @@ class StudentListView(LoginRequiredMixin,ListView):
 
         return queryset
     
-    
-class StudentCreateView(LoginRequiredMixin,TemplateView):
+
+class StudentCreateView(LoginRequiredMixin, TemplateView):
     template_name = 'student/create_student.html'
-        
+
     def get_context_data(self, **kwargs):
-        context =  super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['batches'] = Batch.objects.all()
         return context
-    
-    def post(self,request):
+
+    def post(self, request):
         try:
-            batch = Batch.objects.get(
-                id=request.POST.get("batch")
-            )
-        except:
-            messages.error(request,"Batch does not exist.")
-            return redirect('list_student')
-        
+            batch = Batch.objects.get(id=request.POST.get("batch"))
+        except Batch.DoesNotExist:
+            messages.error(request, "Batch does not exist.")
+            return redirect('student_list')
+
         try:
-            case_study = CaseStudy.objects.create(
-                heading = request.POST.get("heading"),
-                image = request.FILES.get("image"),
-                inner_image = request.FILES.get("inner_image"),
-                client_overview = request.POST.get("client_overview"),
-                client_says = request.POST.get("client_says"),
-                challenge_description = request.POST.get("challenge_description"),
-                solution_description = request.POST.get("solution_description"),
-                result_description = request.POST.get("result_description"),
-                country = country
+            # Create user and hash the password properly
+            user = CustomUser(
+                first_name=request.POST.get("first_name"),
+                last_name=request.POST.get("last_name"),
+                username=request.POST.get("email"),
+                email=request.POST.get("email"),
+                phone=request.POST.get("phone")
             )
-            case_study.industries.set(request.POST.getlist("industries"))
-            case_study.save()
-            messages.success(request,"Case studies created")
-            return redirect('case_studies')
+            user.set_password(request.POST.get("password"))  # ✅ Hash the password
+            user.save()
+
+            # Handle profile image properly
+            profile_image = request.FILES.get("profile_image")
+
+            Student.objects.create(
+                user=user,
+                profile_image=profile_image,
+                batch=batch,
+                start_date=request.POST.get("start_date"),
+                end_date=request.POST.get("end_date"),
+                student_bio=request.POST.get("student_bio")
+            )
+
+            messages.success(request, "Student created successfully.")
+            return redirect('student_list')
 
         except Exception as e:
-            messages.error(request,"Failed to create Case studies")
-            return redirect('case_studies')
+            messages.error(request, f"Failed to create student: {str(e)}")
+            return redirect('student_list')
+
         
         
-# class CaseStudiesUpdateView(LoginRequiredMixin,DetailView):
-#     model = CaseStudy
-#     template_name = 'casestudy/update_case_study.html'
-#     context_object_name = 'case_study'
-        
-#     def get_context_data(self, **kwargs):
-#         context =  super().get_context_data(**kwargs)
-#         context['countries'] = Country.objects.filter(
-#             is_archived=False
-#         )
-#         industries = Industry.objects.filter(
-#             is_archived=False
-#         )
-#         current = context["case_study"].industries.values_list("id","industry_name")
-#         context['industries']= industries
-#         context['indus'] = list(current)
-#         return context
-    
-#     def post(self,request,*args,**kwargs):
-#         try:
-#             country = Country.objects.get(
-#                 id=request.POST.get("country")
-#             )
-#         except:
-#             messages.error(request,"Country does not exist.")
-#             return redirect('case_studies')
-        
-#         if self.model.objects.filter(id=kwargs['pk']).exists():
-#             case_study = self.model.objects.get(id=kwargs['pk'])
-#             case_study.heading = request.POST.get("heading")
-#             case_study.image = request.FILES.get("image",case_study.image)
-#             case_study.inner_image = request.FILES.get("inner_image",case_study.inner_image)
-#             case_study.client_overview = request.POST.get("client_overview")
-#             case_study.client_says = request.POST.get("client_says")
-#             case_study.challenge_description = request.POST.get("challenge_description")
-#             case_study.solution_description = request.POST.get("solution_description")
-#             case_study.result_description = request.POST.get("result_description")
-#             case_study.country = country
-#             case_study.industries.set(request.POST.getlist("industries"))
-#             case_study.save()
-#             messages.success(request,"Case studies Updated")
-#             return redirect('case_studies')
-#         else:
-#             messages.error(request,"Failed to update Case studies")
-#             return redirect('case_studies')
+class StudentUpdateView(LoginRequiredMixin, TemplateView):
+    template_name = 'student/update_student.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        student_id = self.kwargs.get('pk')  # Assuming URL is like path('student/update/<int:pk>/')
+        student = get_object_or_404(Student, pk=student_id)
+
+        context['student'] = student
+        context['user'] = student.user
+        context['batches'] = Batch.objects.all()
+        return context
+
+    def post(self, request, pk):
+        student = get_object_or_404(Student, pk=pk)
+        user = student.user
+
+        try:
+            batch = Batch.objects.get(id=request.POST.get("batch"))
+        except Batch.DoesNotExist:
+            messages.error(request, "Batch does not exist.")
+            return redirect('student_list')
+
+        try:
+            # Update user details
+            user.first_name = request.POST.get("first_name")
+            user.last_name = request.POST.get("last_name")
+            user.email = request.POST.get("email")
+            user.username = request.POST.get("email")
+            user.phone = request.POST.get("phone")
+
+            # Only update password if provided
+            new_password = request.POST.get("password")
+            if new_password:
+                user.set_password(new_password)
+
+            user.save()
+
+            # Update student details
+            student.batch = batch
+            student.start_date = request.POST.get("start_date")
+            student.end_date = request.POST.get("end_date")
+            student.student_bio = request.POST.get("student_bio")
+
+            # Update profile image if a new one is uploaded
+            if request.FILES.get("profile_image"):
+                student.profile_image = request.FILES.get("profile_image")
+
+            student.save()
+
+            messages.success(request, "Student details updated successfully.")
+            return redirect('student_list')
+
+        except Exception as e:
+            messages.error(request, f"Failed to update student: {str(e)}")
+            return redirect('student_list')
         
 
 class StudentDeleteView(LoginRequiredMixin,DeleteMasterView):
