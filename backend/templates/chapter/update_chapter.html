@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="content">
+
+    {% include 'navbar.html' %}
+
+    <div class="main-container">
+        <div class="bread-crumb-container">
+            <a href="{% url 'student_list' %}"><span class="parent">Student</span></a>><span>Update</span>
+        </div>
+        <form method="POST" action="{% url 'update_student' pk=context_data.id %}" enctype="multipart/form-data" id="CreateFormId">
+            {% csrf_token %}
+            <div class="mb-3">
+                <div class="form-label required">Image</div>
+                <label for="ImageField" class="image-box" style="background-image: url(/static/images/default-image.jpg);/"></label>
+                <input type="file" id="ImageField" name="profile_image"  data-value="{{context_data.profile_image.url}}" style="display: none;">
+            </div>
+            <div class="mb-3">
+                <label for="first_name" class="form-label required">First Name</label>
+                <input type="text" value="{{context_data.user.first_name}}" class="form-control" id="first_name" name="first_name">
+            </div>
+            <div class="mb-3">
+                <label for="last_name" class="form-label required">Last Name</label>
+                <input type="text" value="{{context_data.user.last_name}}" class="form-control" id="last_name" name="last_name">
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label required">Email</label>
+                <input type="email" value="{{context_data.user.email}}" class="form-control" id="email" name="email">
+            </div>
+            <div class="mb-3">
+                <label for="phone" class="form-label required">Phone</label>
+                <input type="text" class="form-control" value="{{context_data.user.email}}"  id="phone" name="phone" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+            <div class="mb-3">
+                <label for="batch" class="form-label required">Batch</label>
+                <select class="form-control" name="batch" id="batch">
+                    <option value="">--select a Batch--</option>
+                    {% for item in batches %}
+                    <option value="{{item.id}}" {% if context_data.batch.id == item.id %}selected{% endif %}>{{item.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="start_date" class="form-label required">Start Date</label>
+                <input type="date" class="form-control" value="{{context_data.start_date|date:'Y-m-d'}}" id="start_date" name="start_date">
+            </div>
+            <div class="mb-3">
+                <label for="end_date" class="form-label required">End Date</label>
+                <input type="date" class="form-control" value="{{context_data.end_date|date:'Y-m-d'}}" id="end_date" name="end_date">
+            </div>
+            <div class="mb-3">
+                <label for="student_bio" class="form-label required">Student Bio</label>
+                <textarea class="form-control" id="student_bio" name="student_bio" rows="4">{{context_data.student_bio}}</textarea>
+            </div>
+            <a href="{% url 'student_list' %}"><button type="button" class="btn btn-secondary">Cancel</button></a>
+            <button type="button" class="btn btn-primary" onclick="handleSubmitForm(event)">Save</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/showSelectedImage.js' %}"></script>
+<script src="{% static 'js/validationMessageGenerator.js' %}"></script>
+<script>
+    const handleSubmitForm = (e)=>{
+        e.preventDefault();
+        const ImageField = document.getElementById('ImageField');
+        const ccccc = document.getElementById('first_name');
+        const last_name = document.getElementById('last_name');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const phone = document.getElementById('phone');
+        const batch = document.getElementById('batch');
+        const start_date = document.getElementById('start_date');
+        const end_date = document.getElementById('end_date');
+        const student_bio = document.getElementById('student_bio');
+
+        let update_image = ImageField ? ImageField.getAttribute("data-value") || "" : "";
+        
+        if(!ImageField.value && !update_image.length>0){
+            showValidationError(ImageField,"Customer image is required")
+        } 
+        else if (!first_name.value.trim()) {
+            showValidationError(first_name, "First name is required");
+        } else if (!last_name.value.trim()) {
+            showValidationError(last_name, "Last name is required");
+        } else if (!email.value.trim()) {
+            showValidationError(email, "Email is required");
+        
+        } else if (!phone.value.trim()) {
+            showValidationError(phone, "Phone number is required");
+        } else if (!batch.value) {
+            showValidationError(batch, "Batch is required");
+        } else if (!start_date.value) {
+            showValidationError(start_date, "Start date is required");
+        } else if (!end_date.value) {
+            showValidationError(end_date, "End date is required");
+        } else if (!student_bio.value.trim()) {
+            showValidationError(student_bio, "Student bio is required");
+        } else {
+            document.getElementById("CreateFormId").submit();
+        }
+    }
+
+</script>
+{% endblock %}

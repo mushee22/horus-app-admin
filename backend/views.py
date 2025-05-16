@@ -73,7 +73,7 @@ class LoginView(TemplateView):
         user = authenticate(request,username=email,password=password)
         if user is not None:
             login(request,user)
-            return redirect('dashboard')
+            return redirect('student_list')
         else:
             messages.error(request,"User not found")
             return redirect('admin_login')
@@ -182,16 +182,18 @@ class StudentCreateView(LoginRequiredMixin, TemplateView):
 
         
         
-class StudentUpdateView(LoginRequiredMixin, TemplateView):
+class StudentUpdateView(LoginRequiredMixin, DetailView):
     template_name = 'student/update_student.html'
+    model = Student
+    context_object_name ='context_data'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        student_id = self.kwargs.get('pk')  # Assuming URL is like path('student/update/<int:pk>/')
-        student = get_object_or_404(Student, pk=student_id)
+        # student_id = self.kwargs.get('pk')  # Assuming URL is like path('student/update/<int:pk>/')
+        # student = get_object_or_404(Student, pk=student_id)
 
-        context['student'] = student
-        context['user'] = student.user
+        # context['student'] = student
+        # context['user'] = student.user
         context['batches'] = Batch.objects.all()
         return context
 
@@ -245,5 +247,88 @@ class StudentDeleteView(LoginRequiredMixin,DeleteMasterView):
     return_path = 'student_list'
 
 
-# class CaseStudiesArchiveTogglerView(LoginRequiredMixin,MasterArchiveTogglerView):
-#     model = CaseStudy
+
+# *********************************************************************************
+
+
+class ChapterListView(LoginRequiredMixin,ListView):
+    model = Chapter
+    template_name = 'chapter/list_chapter.html'
+    context_object_name = 'context_data'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset =  super().get_queryset()
+
+        search = self.request.GET.get("search")
+        sort = self.request.GET.get("sort")
+        category_filter = self.request.GET.get("filter")
+
+        if search:
+            queryset = queryset.filter(
+                Q(title__istartswith=search))
+        
+        if sort == "oldest":
+            queryset = queryset.order_by('id')
+        else:
+            queryset = queryset.order_by('-id')
+
+        # if category_filter:
+        #     queryset = queryset.filter(category=category_filter)
+
+        return queryset
+    
+
+class ChapterCreateView(LoginRequiredMixin, TemplateView):
+    template_name = 'chapter/create_chapter.html'
+
+    def post(self, request):
+
+        try:
+            Chapter.objects.create(
+                title=request.POST.get("title"),
+                thumbnail=request.FILES.get("thumbnail"),
+                description=request.POST.get("description"),
+                order=request.POST.get("order"),
+            )
+            messages.success(request, "Chapter created successfully.")
+            return redirect('chapter_list')
+
+        except Exception as e:
+            messages.error(request, f"Failed to create student: {str(e)}")
+            return redirect('chapter_list')
+
+        
+        
+class ChapterUpdateView(LoginRequiredMixin, DetailView):
+    template_name = 'student/update_student.html'
+    model = Student
+    context_object_name ='context_data'
+
+
+    def post(self, request, pk):
+        chapter = get_object_or_404(Chapter, pk=pk)
+
+        try:
+            # Update user details
+            chapter.title=request.POST.get("title")
+            chapter.description=request.POST.get("description")
+            chapter.order=request.POST.get("order")
+
+            # Update thumbnail if a new one is uploaded
+            if request.FILES.get("thumbnail"):
+                chapter.thumbnail = request.FILES.get("profile_image")
+
+            chapter.save()
+
+            messages.success(request, "Student details updated successfully.")
+            return redirect('chapter_list')
+
+        except Exception as e:
+            messages.error(request, f"Failed to update student: {str(e)}")
+            return redirect('chapter_list')
+        
+
+class ChapterDeleteView(LoginRequiredMixin,DeleteMasterView):
+    model = Chapter
+    return_path = 'chapter_list'
