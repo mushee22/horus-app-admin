@@ -8,43 +8,48 @@
 
     <div class="main-container">
         <div class="bread-crumb-container">
-            <a href="{% url 'student_list' %}"><span class="parent">Student</span></a>><span>Update</span>
+            <a href="{% url 'student_list' %}"><span class="parent">Student</span></a>><span>Create</span>
         </div>
-        <form method="POST" action="{% url 'update_chapter' pk=context_data.id %}" enctype="multipart/form-data"
-            id="CreateFormId">
+        <form method="POST" action="{% url 'create_student' %}" enctype="multipart/form-data" id="CreateFormId">
             {% csrf_token %}
-            {% if context_data.thumbnail %}
             <div class="mb-3">
-                <label for="title" class="form-label required">Current Image</label>
-                <td>
-                    <img class="flex-shrink-0" src="{{context_data.thumbnail.url}}" alt=""
-                    style="width: 40px; height: 40px;">
-                </td>
-            </div>
-            
-            {% else %}
-            <td><img class="flex-shrink-0" src="{% static 'images/default-image.jpg' %}" alt=""
-                    style="width: 40px; height: 40px;"></td>
-            {% endif %}
-            <div class="mb-3">
-                <div class="form-label required">Image</div>
-                <label for="ImageField" class="image-box" style="background-image: url(/static/images/default-image.jpg);/"></label>
-                <input type="file" id="ImageField" name="thumbnail" style="display: none;">
+                <label for="first_name" class="form-label required">First Name</label>
+                <input type="text" class="form-control" id="first_name" name="first_name">
             </div>
             <div class="mb-3">
-                <label for="title" class="form-label required">Title</label>
-                <input type="text" value="{{context_data.title}}" class="form-control" id="title" name="title">
+                <label for="last_name" class="form-label required">Last Name</label>
+                <input type="text" class="form-control" id="last_name" name="last_name">
             </div>
             <div class="mb-3">
-                <label for="order" class="form-label required">Order</label>
-                <input type="number" value="{{context_data.order}}" class="form-control" id="order" name="order">
+                <label for="email" class="form-label required">Email</label>
+                <input type="email" class="form-control" id="email" name="email">
             </div>
             <div class="mb-3">
-                <label for="description" class="form-label required">Description</label>
-                <textarea class="form-control" id="description" name="description"
-                    rows="4">{{context_data.description}}</textarea>
+                <label for="password" class="form-label required">Password</label>
+                <input type="text" class="form-control" id="password" name="password">
             </div>
-            <a href="{% url 'chapter_list' %}"><button type="button" class="btn btn-secondary">Cancel</button></a>
+            <div class="mb-3">
+                <label for="phone" class="form-label required">Phone</label>
+                <input type="text" class="form-control" id="phone" name="phone" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+            <div class="mb-3">
+                <label for="batch" class="form-label required">Batch</label>
+                <select class="form-control" name="batch" id="batch">
+                    <option value="">--select a Batch--</option>
+                    {% for item in batches %}
+                    <option value="{{item.id}}">{{item.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="start_date" class="form-label required">Start Date</label>
+                <input type="date" class="form-control" id="start_date" name="start_date">
+            </div>
+            <div class="mb-3">
+                <label for="end_date" class="form-label required">End Date</label>
+                <input type="date" class="form-control" id="end_date" name="end_date">
+            </div>
+            <a href="{% url 'student_list' %}"><button type="button" class="btn btn-secondary">Cancel</button></a>
             <button type="submit" class="btn btn-primary">Save</button>
         </form>
     </div>
@@ -56,7 +61,7 @@
 <script src="{% static 'js/showSelectedImage.js' %}"></script>
 <script src="{% static 'js/validationMessageGenerator.js' %}"></script>
 <script>
-    const handleSubmitForm = (e) => {
+    const handleSubmitForm = (e)=>{
         e.preventDefault();
         const ImageField = document.getElementById('ImageField');
         const ccccc = document.getElementById('first_name');
@@ -68,19 +73,18 @@
         const start_date = document.getElementById('start_date');
         const end_date = document.getElementById('end_date');
         const student_bio = document.getElementById('student_bio');
-
-        let update_image = ImageField ? ImageField.getAttribute("data-value") || "" : "";
-
-        if (!ImageField.value && !update_image.length > 0) {
-            showValidationError(ImageField, "Customer image is required")
-        }
+        
+        if(!ImageField.value){
+            showValidationError(ImageField,"Customer image is required")
+        } 
         else if (!first_name.value.trim()) {
             showValidationError(first_name, "First name is required");
         } else if (!last_name.value.trim()) {
             showValidationError(last_name, "Last name is required");
         } else if (!email.value.trim()) {
             showValidationError(email, "Email is required");
-
+        } else if (!password.value.trim()) {
+            showValidationError(password, "Password is required");
         } else if (!phone.value.trim()) {
             showValidationError(phone, "Phone number is required");
         } else if (!batch.value) {

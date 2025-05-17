@@ -160,21 +160,32 @@ class UpdateSubChapterProgressView(LoginRequiredMixin, APIView):
         except SubChapters.DoesNotExist:
             return Response({"message": "Subchapter not found", "resp_code": 0}, status=404)
 
-        progress, created = SubChapterProgress.objects.update_or_create(
+        progress, created = SubChapterProgress.objects.get_or_create(
             student=student,
             sub_chapter=sub_chapter,
             defaults={
                 'is_completed': is_completed,
-                'watched_duration': watched_duration,
+                'watched_duration': watched_duration
             }
         )
 
+        if created:
+            return Response({
+                "message": "Progress created",
+                "resp_code": 1
+            })
+
+        progress.watched_duration = watched_duration
+        if not progress.is_completed:
+            progress.is_completed = is_completed
+        progress.save()
+
+
         return Response({
-            "message": "Progress updated" if not created else "Progress created",
+            "message": "Progress updated",
             "resp_code": 1
         })
     
-
     
 class UpdateStudentProfileImageView(LoginRequiredMixin, APIView):
     parser_classes = [MultiPartParser, FormParser]
@@ -225,13 +236,18 @@ class TotalProgressView(LoginRequiredMixin, APIView):
                 student=student
             ).order_by('-last_watched_at').first()
 
+            if last_watched_sub_chapter:
+                sub_chapter = SubChapters.objects.get(id=last_watched_sub_chapter.sub_chapter.id)
+                serializer = SubChapterDetailSerializer(sub_chapter, context={'request': request})
+
+
             return Response({
                 "message": "success",
                 "resp_code": 1,
                 "data": {
                     "total_subchapters": total_subchapters,
                     "completed_subchapters": completed_subchapters,
-                    "last_watched_sub_chapter":last_watched_sub_chapter.sub_chapter.id
+                    "last_watched_sub_chapter": serializer.data if last_watched_sub_chapter else None
                 }
             }, status=status.HTTP_200_OK)
 

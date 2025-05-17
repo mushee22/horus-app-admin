@@ -8,43 +8,20 @@
 
     <div class="main-container">
         <div class="bread-crumb-container">
-            <a href="{% url 'student_list' %}"><span class="parent">Student</span></a>><span>Update</span>
+            <a href="{% url 'batch_list' %}"><span class="parent">Batch</span></a>><span>Update</span>
         </div>
-        <form method="POST" action="{% url 'update_chapter' pk=context_data.id %}" enctype="multipart/form-data"
+        <form method="POST" action="{% url 'update_batch' pk=context_data.id %}" enctype="multipart/form-data"
             id="CreateFormId">
             {% csrf_token %}
-            {% if context_data.thumbnail %}
             <div class="mb-3">
-                <label for="title" class="form-label required">Current Image</label>
-                <td>
-                    <img class="flex-shrink-0" src="{{context_data.thumbnail.url}}" alt=""
-                    style="width: 40px; height: 40px;">
-                </td>
-            </div>
-            
-            {% else %}
-            <td><img class="flex-shrink-0" src="{% static 'images/default-image.jpg' %}" alt=""
-                    style="width: 40px; height: 40px;"></td>
-            {% endif %}
-            <div class="mb-3">
-                <div class="form-label required">Image</div>
-                <label for="ImageField" class="image-box" style="background-image: url(/static/images/default-image.jpg);/"></label>
-                <input type="file" id="ImageField" name="thumbnail" style="display: none;">
+                <label for="name" class="form-label required">name</label>
+                <input type="text" value="{{context_data.name}}" class="form-control" id="name" name="name">
             </div>
             <div class="mb-3">
-                <label for="title" class="form-label required">Title</label>
-                <input type="text" value="{{context_data.title}}" class="form-control" id="title" name="title">
+                <label for="code" class="form-label required">code</label>
+                <input type="text" value="{{context_data.code}}" class="form-control" id="code" name="code">
             </div>
-            <div class="mb-3">
-                <label for="order" class="form-label required">Order</label>
-                <input type="number" value="{{context_data.order}}" class="form-control" id="order" name="order">
-            </div>
-            <div class="mb-3">
-                <label for="description" class="form-label required">Description</label>
-                <textarea class="form-control" id="description" name="description"
-                    rows="4">{{context_data.description}}</textarea>
-            </div>
-            <a href="{% url 'chapter_list' %}"><button type="button" class="btn btn-secondary">Cancel</button></a>
+            <a href="{% url 'batch_list' %}"><button type="button" class="btn btn-secondary">Cancel</button></a>
             <button type="submit" class="btn btn-primary">Save</button>
         </form>
     </div>

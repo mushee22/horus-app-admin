@@ -17,15 +17,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Icon Font Stylesheet -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Libraries Stylesheet -->
     <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
-    <link href="{% static 'lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css' %}" rel="stylesheet" /> 
+    <link href="{% static 'lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css' %}" rel="stylesheet" />
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
@@ -54,7 +56,7 @@
         <div class="sidebar pe-4 pb-3">
             <nav class="navbar bg-light navbar-light">
                 <a href="" class="navbar-brand mx-4 mb-3">
-                    <h4 class="text-primary"><i class="fa fa-hashtag me-2"></i>CATCHWEIGHT</h4>
+                    <h4 class="text-primary"><i class="fa fa-hashtag me-2"></i>HORUS</h4>
                 </a>
                 <div class="d-flex align-items-center ms-4 mb-4">
                     <div class="position-relative">
@@ -66,39 +68,75 @@
                     </div>
                 </div>
                 <div class="navbar-nav w-100">
-                    <a href="{% url 'student_list' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-user me-2"></i>Students</a>
-                    {% comment %} <a href="{% url 'case_studies' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-user me-2"></i>Case Studies</a>
-                    <a href="{% url 'cs_challenge' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-user me-2"></i>CS-Challenges</a>
-                    <a href="{% url 'cs_result' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-user me-2"></i>CS-Results</a>
-                    <a href="{% url 'cs_solution' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-user me-2"></i>CS-Solutions</a>
-                    <a href="{% url 'what_is_cw' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-user-tie me-2"></i>What is CW?</a>
-                    <a href="{% url 'problem_in_odoo' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-table me-2"></i>Problems in Odoo</a>
-                    <a href="{% url 'problem_solve' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-satellite me-2"></i>CW solve problem</a>
-                    <a href="{% url 'why_cw' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-list me-2"></i>Why choose CW</a>
-                    <a href="{% url 'blog' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-list me-2"></i>Blogs</a>
-                    <a href="{% url 'app_feature' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-list me-2"></i>App features</a>
-                    <a href="{% url 'app_module' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-list me-2"></i>App Modules</a>
-                    <a href="{% url 'our_app' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa-solid fa-grip"></i>Our Apps</a>
-                    <a href="{% url 'prfd_time' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-list me-2"></i>Preferred times</a>
-                    <a href="{% url 'purchase_form' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-list me-2"></i>Purchase Form</a>
-                    <a href="{% url 'customer' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-user me-2"></i>Customers</a>
-                    <a href="{% url 'happy_customer' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-user me-2"></i>Happy customers</a>
-                    <a href="{% url 'utc_timezone' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-user me-2"></i>UTC timezone</a>
-                    <a href="{% url 'country' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-user me-2"></i>Countries</a>
-                    <a href="{% url 'social_media' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-user me-2"></i>Social media</a>
-                    <a href="{% url 'contact_msg' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-user me-2"></i>Contact Messages</a>
-                    <a href="{% url 'industry' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-satellite me-2"></i>Industries</a>
-                    <a href="{% url 'in_benefit' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-satellite me-2"></i>Benefits</a>
-                    <a href="{% url 'in_challenge' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-satellite me-2"></i>Challenges</a>
-                    <a href="{% url 'in_solution' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-satellite me-2"></i>Solutions</a>
-                    <a href="{% url 'in_faq' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-satellite me-2"></i>Faq's</a>
-                    <a href="{% url 'trstd_cmpny' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-satellite me-2"></i>Trusted Companies</a>
-                    <a href="{% url 'trstd_cmpny_count' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-satellite me-2"></i>Trusted Companies count</a> {% endcomment %}
+                    <a href="{% url 'student_list' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-user me-2"></i>Students</a>
+                    <a href="{% url 'chapter_list' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-folder me-2"></i>Chapter</a>
+                            <a href="{% url 'sub_chapter_list' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-book me-2"></i>Sub Chapter</a>
+                    <a href="{% url 'batch_list' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-school me-2"></i>Batch</a>        
+                   
+                    {% comment %} <a href="{% url 'case_studies' %}" class="nav-item nav-link"
+                        onclick="clickMenu(this)"><i class="fa fa-solid fa-user me-2"></i>Case Studies</a>
+                    <a href="{% url 'cs_challenge' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-user me-2"></i>CS-Challenges</a>
+                    <a href="{% url 'cs_result' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-user me-2"></i>CS-Results</a>
+                    <a href="{% url 'cs_solution' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-user me-2"></i>CS-Solutions</a>
+                    <a href="{% url 'what_is_cw' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-user-tie me-2"></i>What is CW?</a>
+                    <a href="{% url 'problem_in_odoo' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-table me-2"></i>Problems in Odoo</a>
+                    <a href="{% url 'problem_solve' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-satellite me-2"></i>CW solve problem</a>
+                    <a href="{% url 'why_cw' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-list me-2"></i>Why choose CW</a>
+                    <a href="{% url 'blog' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-list me-2"></i>Blogs</a>
+                    <a href="{% url 'app_feature' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-list me-2"></i>App features</a>
+                    <a href="{% url 'app_module' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-list me-2"></i>App Modules</a>
+                    <a href="{% url 'our_app' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa-solid fa-grip"></i>Our Apps</a>
+                    <a href="{% url 'prfd_time' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-list me-2"></i>Preferred times</a>
+                    <a href="{% url 'purchase_form' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-list me-2"></i>Purchase Form</a>
+                    <a href="{% url 'customer' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-user me-2"></i>Customers</a>
+                    <a href="{% url 'happy_customer' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-user me-2"></i>Happy customers</a>
+                    <a href="{% url 'utc_timezone' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-user me-2"></i>UTC timezone</a>
+                    <a href="{% url 'country' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-user me-2"></i>Countries</a>
+                    <a href="{% url 'social_media' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-user me-2"></i>Social media</a>
+                    <a href="{% url 'contact_msg' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-user me-2"></i>Contact Messages</a>
+                    <a href="{% url 'industry' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-satellite me-2"></i>Industries</a>
+                    <a href="{% url 'in_benefit' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-satellite me-2"></i>Benefits</a>
+                    <a href="{% url 'in_challenge' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-satellite me-2"></i>Challenges</a>
+                    <a href="{% url 'in_solution' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-satellite me-2"></i>Solutions</a>
+                    <a href="{% url 'in_faq' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-satellite me-2"></i>Faq's</a>
+                    <a href="{% url 'trstd_cmpny' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-satellite me-2"></i>Trusted Companies</a>
+                    <a href="{% url 'trstd_cmpny_count' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-satellite me-2"></i>Trusted Companies count</a> {% endcomment %}
 
 
 
                     {% comment %} <!-- Notifictions  -->
-                    <!-- <a href="{% url 'dashboard' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-bell me-2"></i>Notifications</a> --> {% endcomment %}
+                    <!-- <a href="{% url 'dashboard' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i class="fa fa-solid fa-bell me-2"></i>Notifications</a> -->
+                    {% endcomment %}
 
 
                 </div>
@@ -110,7 +148,7 @@
         <!-- Content Start -->
         {% block content %}
         {% endblock %}
-        
+
         <!-- Content End -->
 
 
@@ -133,7 +171,7 @@
     <!-- Template Javascript -->
     <script src="{% static 'js/main.js' %}"></script>
     <script src="{% static 'js/sidebarClick.js' %}"></script>
-    
+
     {% block script %}
     {% endblock %}
 </body>

@@ -8,7 +8,7 @@
 
 <div class="main-container">
     <div class="top-container">
-        <form action="{% url 'chapter_list' %}" method="GET" id="searchSortForm">
+        <form action="{% url 'student_list' %}" method="GET" id="searchSortForm">
             <!-- search -->
             <input class="form-control border-1" type="search" placeholder="Search" name="search" id="searchBox" value="{{request.GET.search}}">
 
@@ -38,7 +38,7 @@
             {% endcomment %}
 
         </form>
-        <a href="{% url 'create_chapter' %}"><button type="submit" class="btn btn-primary">New +</button></a>
+        <a href="{% url 'create_student' %}"><button type="submit" class="btn btn-primary">New +</button></a>
     </div>
     
     {% include 'messages.html' %}
@@ -48,27 +48,31 @@
             <thead>
                 <tr>
                     <th scope="col">Sl No.</th>
-                    <th scope="col">Image</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Description</th>
+                    <th scope="col">Profile image</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Email</th>
+                     <th scope="col">Email</th>
                     <th scope="col">Actions</th>
-                    <!-- <th scope="col">Status</th> -->
+                    {% comment %} <th scope="col">Status</th> {% endcomment %}
                 </tr>
             </thead>
             <tbody>
                 {% for item in context_data %}
                 <tr>
                     <th scope="row">{{forloop.counter|add:page_obj.start_index|add:"-1"}}</th>
-                    {% if item.thumbnail %}
-                    <td><img class="flex-shrink-0" src="{{item.thumbnail.url}}" alt="" style="width: 40px; height: 40px;"></td>
+                    {% if item.profile_image %}
+                    <td><img class="flex-shrink-0" src="{{item.profile_image.url}}" alt="" style="width: 40px; height: 40px;"></td>
                     {% else %}
                     <td><img class="flex-shrink-0" src="{% static 'images/default-image.jpg' %}" alt="" style="width: 40px; height: 40px;"></td>
                     {% endif %}
-                    <td>{{item.title}}</td>
-                    <td>{{item.description}}</td>
+                    <td>{{item.user.first_name}}</td>
+                    <td>{{item.user.last_name}}</td>
+                    <td>{{item.user.email}}</td>
+                    <td>{{item.user.phone}}</td>
                     <td>
                         <div class="action-box">
-                            <a href="{% if item.id %}{% url 'update_chapter' pk=item.id %}{% endif %}">
+                            <a href="{% if item.id %}{% url 'update_student' pk=item.id %}{% endif %}">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                     <path d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"/>
                                 </svg>
@@ -83,7 +87,7 @@
                             </svg>
                         </div>
                     </td>
-                    <!-- <td>
+                    {% comment %} <td>
                         <div class="action-box">
                             <label for="{{item.id}}" class="toggler-outer">
                                 <div class="toggler-inner"></div>
@@ -94,7 +98,7 @@
                                 {% endif %}
                             </label>
                         </div>
-                    </td> -->
+                    </td> {% endcomment %}
                 </tr>
                 {% endfor %}
             </tbody>
@@ -125,7 +129,7 @@
     // // delete labour
     document.querySelector(".popup-delete-btn").addEventListener('click',()=>{
         var deleteItem = document.querySelector('input[name="delete_id"]').value;
-        window.location.href = `{% url 'delete_chapter' %}?pk=${deleteItem}`;
+        window.location.href = `{% url 'delete_student' %}?pk=${deleteItem}`;
     });
 
 

@@ -71,7 +71,7 @@
         </div>
         <div class="nav-item dropdown">
             <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" style="gap:10px;" data-bs-toggle="dropdown">
-                <div class="base-avatar">A</div>
+                <!-- <div class="base-avatar">A</div> -->
                 <span class="d-none d-lg-inline-flex">{{request.user.email}}</span>
             </a>
             <div class="dropdown-menu dropdown-menu-end bg-light border-2 rounded-0 rounded-bottom m-0">
@@ -84,27 +84,27 @@
 <!-- Navbar End -->
 
 <script>
-    {% comment %} window.addEventListener('load',()=>{
-        let mainNotification = document.getElementById("notification-main");
-        let purchaseNotification = document.getElementById("purchase_notification");
-        let contactNotification = document.getElementById("contact_notification");
+    // {% comment %} window.addEventListener('load',()=>{
+    //     let mainNotification = document.getElementById("notification-main");
+    //     let purchaseNotification = document.getElementById("purchase_notification");
+    //     let contactNotification = document.getElementById("contact_notification");
         
-        fetch(`{% url 'notification_count' %}`,{
-            'method':'GET'
-        }).then(resp=>resp.json()).then(data=>{
-            console.log(data)
-            if(data.total_noti_count){
-                mainNotification.innerHTML = data.total_noti_count
-                mainNotification.classList.remove('hide')
-            }
-            if(data.purchase_noti_count){
-                purchaseNotification.innerHTML = data.purchase_noti_count
-                purchaseNotification.classList.remove('hide')
-            }
-            if(data.contact_noti_count){
-                contactNotification.innerHTML = data.contact_noti_count
-                contactNotification.classList.remove('hide')
-            }
-        });
-    }) {% endcomment %}
+    //     fetch(`{% url 'notification_count' %}`,{
+    //         'method':'GET'
+    //     }).then(resp=>resp.json()).then(data=>{
+    //         console.log(data)
+    //         if(data.total_noti_count){
+    //             mainNotification.innerHTML = data.total_noti_count
+    //             mainNotification.classList.remove('hide')
+    //         }
+    //         if(data.purchase_noti_count){
+    //             purchaseNotification.innerHTML = data.purchase_noti_count
+    //             purchaseNotification.classList.remove('hide')
+    //         }
+    //         if(data.contact_noti_count){
+    //             contactNotification.innerHTML = data.contact_noti_count
+    //             contactNotification.classList.remove('hide')
+    //         }
+    //     });
+    // }) {% endcomment %}
 </script>

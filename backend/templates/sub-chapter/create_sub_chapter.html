@@ -8,58 +8,49 @@
 
     <div class="main-container">
         <div class="bread-crumb-container">
-            <a href="{% url 'student_list' %}"><span class="parent">Student</span></a>><span>Create</span>
+            <a href="{% url 'sub_chapter_list' %}"><span class="parent">Sub Chapter</span></a>><span>Create</span>
         </div>
-        <form method="POST" action="{% url 'create_student' %}" enctype="multipart/form-data" id="CreateFormId">
+        <form method="POST" action="{% url 'create_sub_chapter' %}" enctype="multipart/form-data" id="CreateFormId">
             {% csrf_token %}
             <div class="mb-3">
                 <div class="form-label required">Image</div>
                 <label for="ImageField" class="image-box" style="background-image: url(/static/images/default-image.jpg);/"></label>
-                <input type="file" id="ImageField" name="profile_image" style="display: none;">
+                <input type="file" id="ImageField" name="thumbnail" style="display: none;">
             </div>
             <div class="mb-3">
-                <label for="first_name" class="form-label required">First Name</label>
-                <input type="text" class="form-control" id="first_name" name="first_name">
+                <label for="title" class="form-label required">Title</label>
+                <input type="text" class="form-control" id="title" name="title">
             </div>
+           
             <div class="mb-3">
-                <label for="last_name" class="form-label required">Last Name</label>
-                <input type="text" class="form-control" id="last_name" name="last_name">
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label required">Email</label>
-                <input type="email" class="form-control" id="email" name="email">
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label required">Password</label>
-                <input type="text" class="form-control" id="password" name="password">
-            </div>
-            <div class="mb-3">
-                <label for="phone" class="form-label required">Phone</label>
-                <input type="text" class="form-control" id="phone" name="phone" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-            </div>
-            <div class="mb-3">
-                <label for="batch" class="form-label required">Batch</label>
-                <select class="form-control" name="batch" id="batch">
-                    <option value="">--select a Batch--</option>
-                    {% for item in batches %}
-                    <option value="{{item.id}}">{{item.name}}</option>
+                <label for="chapter" class="form-label required">Chapter</label>
+                <select class="form-control" name="chapter" id="chapter">
+                    <option value="">--select a Chapter--</option>
+                    {% for item in chapters %}
+                    <option value="{{item.id}}">{{item.title}}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="mb-3">
-                <label for="start_date" class="form-label required">Start Date</label>
-                <input type="date" class="form-control" id="start_date" name="start_date">
+                <label for="description" class="form-label required">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="4"></textarea>
             </div>
             <div class="mb-3">
-                <label for="end_date" class="form-label required">End Date</label>
-                <input type="date" class="form-control" id="end_date" name="end_date">
+                <div class="form-label required">Video</div>
+                {% comment %} <label for="video" class="image-box" style="background-image: url(/static/images/video-placeholder.jpg);/"></label> {% endcomment %}
+                <input type="file" id="video" name="video" >
+            </div>
+             <div class="mb-3">
+                <label for="order" class="form-label required">Order</label>
+                <input type="number" placeholder="Sub Chapter order" class="form-control" id="order" name="order"></textarea>
             </div>
             <div class="mb-3">
-                <label for="student_bio" class="form-label required">Student Bio</label>
-                <textarea class="form-control" id="student_bio" name="student_bio" rows="4"></textarea>
+                <label for="duration" class="form-label required">Duration</label>
+                <input type="number" placeholder="In seconds" class="form-control" id="duration" name="duration"/>
             </div>
-            <a href="{% url 'student_list' %}"><button type="button" class="btn btn-secondary">Cancel</button></a>
-            <button type="button" class="btn btn-primary" onclick="handleSubmitForm(event)">Save</button>
+
+            <a href="{% url 'chapter_list' %}"><button type="button" class="btn btn-secondary">Cancel</button></a>
+            <button type="submit" class="btn btn-primary">Save</button>
         </form>
     </div>
 </div>
