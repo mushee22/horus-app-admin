@@ -61,17 +61,47 @@ class ProfileUpdateView(LoginRequiredMixin,APIView):
         )
         if serializer.is_valid():
             serializer.save()
-            response = {"resp_code":1,
-                        "message":"Profile updated successfully.",
-                        "data":serializer.data
-                        }
+            return Response({
+                "resp_code":1,
+                "message":"Profile updated successfully.",
+                "data":serializer.data
+            },
+            status=status.HTTP_200_OK
+            )
+
         else:
-            response = {"resp_code":0,
-                        "message":serializer.errors,
-                        "data":{}
-                        }
-        return Response(response)
-        
+            return Response({
+               "resp_code":0,
+               "message":serializer.errors,
+            },
+            status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class UpdateUserPassword(LoginRequiredMixin, APIView):
+    def put(self, request):
+        serializer = CustomerPasswordUpdateSerializer(
+            data=request.data, 
+            context={'request': request}
+        )  
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "resp_code":1,
+                "message":"Password updated successfully.",
+                "data":serializer.data
+            },
+            status=status.HTTP_200_OK
+            )
+
+        else:
+            return Response({
+               "resp_code":0,
+               "message":serializer.errors,
+            },
+            status=status.HTTP_400_BAD_REQUEST
+            )
+       
         
 class ChapterListView(LoginRequiredMixin,APIView):
     def get(self, request):

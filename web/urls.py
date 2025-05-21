@@ -15,6 +15,7 @@ urlpatterns = [
     path('student-profile/', CustomerProfileView.as_view(), name='student-profile'),
     path('student-profile/update/', ProfileUpdateView.as_view(), name='student-profile-update'),
     path('student/update-profile-image/', UpdateStudentProfileImageView.as_view(), name='update-student-image'),
+    path('student/update-password/', UpdateUserPassword.as_view(), name="update-student-password"),
     # Chapters 
     path('chapters/', ChapterListView.as_view(), name='chapter-list'),
     path('chapters/<int:slug>/subchapters/', SubChapterListView.as_view(), name='subchapter-list'),

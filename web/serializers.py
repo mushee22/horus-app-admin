@@ -77,12 +77,32 @@ class CustomerUpdateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("A user with this phone number already exists. Try different.")
             else:
                 for attr,value in self.user_data.items():
-                    setattr(instance.user,attr,value)
+                    if attr == 'password':
+                        instance.user.set_password(value)
+                    else:
+                        setattr(instance.user,attr,value)
                 if self.user_data.get('email'):
                     instance.user.username = self.user_data.get('email')
                 instance.user.save()
         return super().update(instance, validated_data)
+
+class CustomerPasswordUpdateSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)
     
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Old password is not correct")
+        return value
+    
+    def save(self, **kwargs):
+        user = self.context['request'].user
+        new_password = self.validated_data['new_password']
+        user.set_password(new_password)
+        user.save()
+        return user
+
     
 class ProgressSerializer(serializers.ModelSerializer):
     class Meta:
