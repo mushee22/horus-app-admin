@@ -1,0 +1,474 @@
+.whole {
+    position: relative;
+    /* padding-bottom: 110px; */
+}
+.case-study-inner-whole{
+    padding-top: 91px;
+}
+.mobile-scroll-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+.fixed {
+    position: fixed;
+    right:8.43%;
+    top: 204px;
+    z-index: 1000; 
+}
+.fixed button,.font-size-btn{
+    border: 1.238px solid #D2D2D2;
+    border-radius: 50%;
+    height: 52px;
+    width: 52px;
+    margin-top: 31px;
+    background: rgba(255, 255, 255, 0.70);
+}
+.fixed-icon{
+    width: 32px;
+    height: 32px;
+}
+
+.clinet-overview-text{
+    margin-top: 91px;
+    margin-bottom: 18px;
+}
+.clinet-overview-para{
+    margin-bottom: 48px;
+}
+.mt-10{
+    margin-top: 10px;
+}
+.mt-56{
+    margin-top: 56px;
+}
+.round-svg{
+    width: 14px;
+    height: 14px;
+    margin-top: 3px;
+}
+.coma-container{
+    margin-top: 30px;
+}
+.coma-left{
+    top: -20px;
+    left: 0px;
+}
+.coma-left,.coma-right{
+    width: 44px;
+    height: 44px;
+    position: absolute;
+}
+.coma-right{
+    bottom: -10px;
+    right: 40px;
+}
+.coma-text{
+    margin-top: 10px;
+    padding: 0px 50px;
+}
+.related-cards{
+    padding-bottom: 137px;
+}
+.view-all{
+    width: 250px;
+    border-radius: 30px;
+    height: 54px;
+    margin-top: 32px;
+}
+
+/* fixed */
+.font-size-btn{
+    position: relative;
+}
+.fonts-container {
+    position: absolute;
+    right: 60px;
+    top: 0px;
+    width: 113px;
+    height: 78px;
+    border-radius: 5px;
+    background: #FFF;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.30);
+    padding: 5px;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s linear 0.2s, opacity 0.2s ease-in-out;
+}
+
+.fonts-container.show {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 0s;
+}
+.fonts-container span{
+    width: 100%;
+}
+.small-size{
+    border-bottom: 1px solid rgba(168, 164, 164, 0.562);
+    
+}
+.tick-mark {
+    display: none; 
+}
+
+.active .tick-mark {
+    display: inline-block; 
+}
+
+
+@media screen and (max-width: 1600px) {
+    .case-study-inner-whole{
+        padding-top: 81px;
+    }
+    .clinet-overview-text{
+        margin-top: 81px;
+        margin-bottom: 16px;
+    }
+    .clinet-overview-para{
+        margin-bottom: 43px;
+    }
+    .mt-10{
+        margin-top: 9px;
+    }
+    .mt-56{
+        margin-top: 50px;
+    }
+    .round-svg{
+        width: 13px;
+        height: 13px;
+        margin-top: 3px;
+    }
+    .coma-container{
+        height: 54px;
+        margin-top: 27px;
+    }
+    .coma-left{
+        top: 0px;
+        left: 0px;
+    }
+    .coma-left,.coma-right{
+        width: 28px;
+        height: 28px;
+    }
+    .coma-right{
+        bottom: -5px;
+        right: 20px;
+    }
+    .coma-text{
+        margin-top: 10px;
+        padding: 0px 45px;
+    }
+    .related-cards{
+        padding-bottom: 137px;
+        margin-top: 40px;
+    }
+    .view-all{
+        width: 220px;
+        border-radius: 27px;
+        height: 40px;
+        margin-top: 28px;
+    }
+    .fixed {
+        top: 210px;
+    }
+    .fixed button,.font-size-btn{
+        height: 45px;
+        width: 45px;
+        margin-top: 25px;
+    }
+    .fixed-icon{
+        width:28px;
+        height: 28px;
+    }
+    .fonts-container {
+        right: 55px;
+        width: 100px;
+        height: 72px;
+        padding: 5px;
+    }
+    .h-100{
+        height: 100%;
+    }
+    
+}
+@media screen and (max-width: 1400px) {
+    .case-study-inner-whole{
+        padding-top: 72px;
+    }
+    .clinet-overview-text{
+        margin-top: 81px;
+        margin-bottom: 16px;
+    }
+    .clinet-overview-para{
+        margin-bottom: 43px;
+    }
+    .mt-10{
+        margin-top: 9px;
+    }
+    .mt-56{
+        margin-top: 45px;
+    }
+    .round-svg{
+        width: 12px;
+        height: 12px;
+        margin-top: 2px;
+    }
+    .coma-container{
+        height: 49px;
+        margin-top: 24px;
+    }
+    .coma-left{
+        top: 0px;
+        left: 0px;
+    }
+    .coma-left,.coma-right{
+        width: 25px;
+        height: 25px;
+    }
+    .coma-right{
+        bottom: -5px;
+        right: 40px;
+    }
+    .coma-text{
+        margin-top: 10px;
+        padding: 0px 40px;
+    }
+    .related-cards{
+        padding-bottom: 122px;
+        margin-top: 36px;
+    }
+    .view-all{
+        width: 190px;
+        border-radius: 24px;
+        height: 36px;
+        margin-top: 25px;
+    }
+    .fixed {
+        top: 185px;
+        right: 5%;
+    }
+    .fixed button,.font-size-btn{
+        height: 40px;
+        width:40px;
+        margin-top: 20px;
+    }
+    .fixed-icon{
+        width:23px;
+        height: 23px;
+    }
+    .fonts-container {
+        right: 45px;
+        width: 90px;
+        height: 66px;
+        padding: 5px;
+    }
+}
+@media screen and (max-width: 1200px) {
+    .case-study-inner-whole{
+        padding-top: 50px;
+    }
+    .clinet-overview-text{
+        margin-top: 50px;
+        margin-bottom: 16px;
+    }
+    .clinet-overview-para{
+        margin-bottom: 43px;
+    }
+    .coma-left,.coma-right{
+        width: 20px;
+        height: 20px;
+    }
+    .coma-right{
+        bottom: -5px;
+        right: 20px;
+    }
+    .coma-text{
+        margin-top: 10px;
+        padding: 0px 30px;
+    }
+    .related-cards{
+        padding-bottom: 90px;
+        margin-top: 30px;
+    }
+    .view-all{
+        width: 170px;
+        border-radius: 22px;
+        height: 32px;
+        margin-top: 22px;
+    }
+    .fixed {
+        top: 185px;
+        right: 5%;
+    }
+    .fixed button,.font-size-btn{
+        height: 36px;
+        width:36px;
+        margin-top: 18px;
+    }
+    .fixed-icon{
+        width:20px;
+        height: 20px;
+    }
+}
+@media screen and (max-width: 992px) {
+    .case-study-inner-whole{
+        padding-top: 30px;
+    }
+    .clinet-overview-text{
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }
+    .clinet-overview-para{
+        margin-bottom: 30px;
+    }
+    .coma-left,.coma-right{
+        width: 15px;
+        height: 15px;
+    }
+    .coma-text{
+        margin-top: 10px;
+        padding: 0px 25px;
+    }
+    .related-cards{
+        padding-bottom: 70px;
+        margin-top: 23px;
+    }
+    .view-all{
+        width: 150px;
+        border-radius: 19px;
+        height: 28px;
+        margin-top: 18px;
+    }
+    .fixed {
+        top: 155px;
+        right: 5%;
+    }
+    .fixed button,.font-size-btn{
+        height: 30px;
+        width:30px;
+        margin-top: 14px;
+    }
+    .fixed-icon{
+        width:17px;
+        height: 17px;
+    }
+    .fonts-container {
+        right: 35px;
+        width: 80px;
+        height: 60px;
+        padding: 5px;
+    }
+}
+@media screen and (max-width: 768px) {
+    .case-study-inner-whole{
+        padding-top: 30px;
+    }
+
+    .clinet-overview{
+        width: 90% !important;
+        overflow: ov;
+    }
+    .clinet-overview-text{
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }
+    .clinet-overview-para{
+        margin-bottom: 30px;
+        width: 100%;
+    }
+    .coma-left,.coma-right{
+        width: 15px;
+        height: 15px;
+    }
+    .coma-right{
+        bottom: -30px;
+    }
+    .coma-text{
+        margin-top: 10px;
+        padding: 0px 25px;
+    }
+    .related-cards{
+        padding-bottom: 30px;
+        margin-top:30px;
+    }
+    .view-all{
+        width: 150px;
+        border-radius: 19px;
+        height: 28px;
+        margin-top: 18px;
+    }
+    .fixed {
+        top: 115px;
+        right: 5%;
+    }
+    .fixed button,.font-size-btn{
+        height: 30px;
+        width:30px;
+        margin-top: 0px;
+    }
+    .fixed-icon{
+        width:17px;
+        height: 17px;
+    }
+    .fonts-container {
+        right: 35px;
+        width: 80px;
+        height: 60px;
+        padding: 5px;
+    }
+    .fixed{
+        flex-direction: row !important;
+        top: 80px;
+        left: 0px;
+        padding-left: 20px;
+        gap: 10px;
+        align-items: center;
+        background-color: white;
+        width: 100%;
+    }
+    .fixed-icon{
+        height: 15px;
+        width: 15px;
+    }
+    .pt-67{
+        padding-top: 150px;
+    }
+    .fixed-mobile{
+        display: flex;
+        flex-direction: row;
+        align-items: center !important;
+        height: 56px;
+    }
+    .mt-200{
+        margin-top: 110px;
+    }
+    .point-svg{
+        width: 10px;
+        height: 10px;
+    }
+    .coma-container{
+        height: auto;
+    }
+
+
+    
+      .all-cards-container {
+        padding-bottom: 10px; /* optional spacing under scroll */
+      }
+      .cards-grid {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 16px; /* spacing between cards */
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+      }
+      
+      .case-card {
+        flex: 0 0 auto;
+        width: 280px; 
+        scroll-snap-align: start;
+      }
+      
+}

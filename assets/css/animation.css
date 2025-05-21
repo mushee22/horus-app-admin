@@ -1,0 +1,45 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: white;
+}
+
+.loader {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.circle {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    animation: rotateScale 2s infinite ease-in-out alternate;
+}
+
+.circle-1 {
+    background: yellow;
+    z-index: 2;
+    animation-delay: 0s;
+}
+
+.circle-2 {
+    background: black;
+    z-index: 1;
+    animation-delay: 1s;
+}
+
+@keyframes rotateScale {
+    0% {
+        transform: translateY(-20px) scale(1);
+    }
+    50% {
+        transform: translateY(20px) scale(0.6);
+    }
+    100% {
+        transform: translateY(-20px) scale(1);
+    }
+}

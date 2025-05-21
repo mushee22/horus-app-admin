@@ -1,0 +1,57 @@
+.case-studies-section,
+.blogs-section {
+    display: none;
+}
+.categoreis{
+    margin-bottom: 32px;
+}
+.categoreis button{
+    border-radius: 30px;
+    border: 1px solid #D9D9D9;
+    height: 47px;
+    background-color: transparent;
+    padding: 0px 30px;
+    position: relative;
+}
+.noti-count{
+    position: absolute;
+    top: -5px;
+    right: 0px;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+}
+.categoreis button.active {
+    background-color: #eecb986c; 
+    border-color: #ff9800;
+}
+@media screen and (max-width: 1400px) {
+    .categoreis{
+        margin-bottom: 26px;
+    }
+    .categoreis button{
+        border-radius: 24px;
+        height: 40px;
+        padding: 0px 24px;
+    }
+    .noti-count{
+        top: -5px;
+        width: 18px;
+        height: 18px;
+    }
+}
+@media screen and (max-width: 992px) {
+    .categoreis{
+        margin-bottom: 21px;
+    }
+    .categoreis button{
+        border-radius: 20px;
+        height: 35px;
+        padding: 0px 24px;
+    }
+    .noti-count{
+        top: -5px;
+        width: 18px;
+        height: 18px;
+    }
+}

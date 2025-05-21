@@ -1,0 +1,185 @@
+nav{
+    position: fixed;
+    z-index: 100;
+}
+.whole_container{
+    margin-top: 140px;
+}
+.nav-options.active {
+    color: orange !important;
+    font-weight: 600;
+    cursor: none !important;
+}
+.call-gif{
+    width: 32px;
+height: 32px;
+}
+.bg-tr{
+    background-color: transparent;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* Responsive adjustments */
+
+
+
+
+.for-mobile {
+    display: none !important;
+}
+.navbar-first{
+    padding: 11px 0px;
+}
+.navbar-social-icons img{
+    width: 18px;
+    height: 18px;
+}
+.nav-links-container{
+    height: 101px;
+    background: #FFF;
+    box-shadow: 0px 4px 21px 0px rgba(0, 0, 0, 0.05);
+}
+.notification-label{
+    position: relative;
+}
+.notification-count{
+    position: absolute;
+    top: -10px;
+    right: -8px;
+    border-radius: 50%;
+    /* padding: 1.5px 7px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 19px;
+    height: 19px;
+}
+.lets-talk{
+    border-radius: 30px;
+    background: var(--Primary-color, #F89923);
+    box-shadow: 0px 3px 4px 0px rgba(0, 0, 0, 0.26);
+    width: 145px;
+    height: 44px;
+    border: none;
+    font-family:Poppins;
+}
+a{
+    text-decoration: none;
+}
+.nav-open-link.active {
+    color: orange !important;
+}
+.ml-39{
+    margin-left: 39px;
+}
+.country-round{
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+}
+.unseenCount {
+    display: none;
+  }
+@media screen and (max-width: 1400px) {
+    .navbar-first{
+        padding: 8.8px 0px;
+    }
+    .navbar-social-icons img{
+        width: 17.6px;
+        height: 17.6px;
+    }
+    .nav-links-container{
+        height: 81px;
+    }
+    .notification-count{
+        top: -10px;
+        right: -5px;
+        padding: 2px 3px;
+    }
+    .lets-talk{
+        border-radius: 30px;
+        width: 116px;
+        height: 35.2px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .mobile-nav-icons{
+        width: 24px;
+        height: 24px;  
+    }
+ 
+    .whole_container{
+        margin-top: 90px;
+    }
+    .popup {
+        width: 95%;
+    }
+    
+    .popup-body {
+        padding: 20px;
+    }
+
+    .mobile-nav-open{
+        height: fit-content;
+        padding: 49px 18px;
+        background-color: white;
+        z-index: 1000;
+        position: fixed;
+        top: -20px !important;
+        left: 0;
+        width: 100%;
+        z-index: 10000;
+    }
+    .gap-mobile{
+        gap: 0.5rem;
+    }
+    .nav-open-link{
+        font-size: 16px;
+    }
+    .for-large-screen{
+        display: none !important;
+    }
+
+    .for-mobile {
+        display: flex !important;
+        top: 0;
+        width: 100%;
+    }
+    .mobile-navbar{
+        position: relative;
+    }
+    .for-mobile{
+        position: fixed;
+        top: 0;
+        z-index: 10000;
+        margin-bottom: 50px;
+    }
+    .mobile-letstalk-btn{
+        text-align: center;
+        width: 100%;
+        border-radius: 21.446px;
+        border: 0.715px solid #F89923;
+        display: flex;
+        height: 40.032px;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+        margin-top: 0.5rem;
+    }
+    .mob-nav-icon{
+        width: 22px;
+        height: 22px;
+        flex-shrink: 0;
+    }
+    .mobile-mt-20{
+        margin-top: 20px;
+    }
+
+}
