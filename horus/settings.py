@@ -36,6 +36,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "https://horus-web-app.vercel.app/",
+    
 ]
 
 #aws
@@ -95,6 +96,7 @@ TEMPLATES = [
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:3000",
+    "http://13.61.190.64:81"
 ]
 
 CORS_ALLOW_METHODS = (
