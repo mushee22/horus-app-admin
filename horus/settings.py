@@ -29,7 +29,8 @@ SECRET_KEY = "django-insecure-0@6qqoql7s84(z))u%0mk0rz(0aj(n@-+-^_2r#!00q=b=1e4p
 DEBUG = config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = [
-    "13.201.128.86"
+    "13.201.128.86",
+    "127.0.0.1"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -96,7 +97,7 @@ TEMPLATES = [
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:3000",
-    "http://13.61.190.64:81"
+    "http://13.201.128.86:81"
 ]
 
 CORS_ALLOW_METHODS = (
