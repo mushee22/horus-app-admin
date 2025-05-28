@@ -30,7 +30,8 @@ DEBUG = config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = [
     "13.201.128.86",
-    "127.0.0.1"
+    "127.0.0.1",
+    "admin.horuslearn.club"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -97,7 +98,8 @@ TEMPLATES = [
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:3000",
-    "http://13.201.128.86:81"
+    "http://13.201.128.86:81",
+    "https://horuslearn.club"
 ]
 
 CORS_ALLOW_METHODS = (
