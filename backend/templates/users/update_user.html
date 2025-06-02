@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="content">
+
+    {% include 'navbar.html' %}
+
+    <div class="main-container">
+         <div class="bread-crumb-container">
+            <a href="{% url 'admin_user_list' %}"><span class="parent">Users</span></a>><span>Create</span>
+        </div> 
+         {% include 'messages.html' %}
+        <form method="POST" action="{% url 'update_admin_user' pk=context_data.id %}" enctype="multipart/form-data" id="CreateFormId">
+            {% csrf_token %}
+             
+            <div class="mb-3">
+                <label for="first_name" class="form-label required">First Name</label>
+                 <input type="text" class="form-control" id="first_name" name="first_name" value="{{context_data.first_name}}">
+            </div>  
+            <div class="mb-3">
+                <label for="last_name" class="form-label required">Last Name</label>
+                 <input type="text" class="form-control" id="last_name" name="last_name" value="{{context_data.last_name}}">
+            </div>  
+            <div class="mb-3">
+                <label for="email" class="form-label required">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{context_data.email}}">
+            </div>  
+            <div class="mb-3">
+                <label for="phone" class="form-label required">Phone</label>
+                <input type="text" class="form-control" id="phone" name="phone" oninput="this.value = this.value.replace(/[^0-9]/g, '')" value="{{context_data.phone}}">
+            </div>  
+            <div class="mb-3">
+                <label for="password" class="form-label required">Password</label>
+                <input type="text" class="form-control" id="password" name="password">
+            </div>  
+
+             <a href="{% url 'admin_user_list' %}"><button type="button" class="btn btn-secondary">Cancel</button></a> 
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/showSelectedImage.js' %}"></script>
+<script src="{% static 'js/validationMessageGenerator.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        $("#CreateFormId").validate({
+            rules: {
+                first_name: {
+                    required: true
+                },
+                last_name: {
+                    required: true
+                },
+                email: {
+                    required: true,
+                    email: true
+                },
+                phone: {
+                    required: true,
+                    digits: true
+                },
+               
+                
+            },
+            messages: {
+                first_name: "Please enter your first name",
+                last_name: "Please enter your last name",
+                email: "Please enter a valid email address",
+                phone: "Please enter a valid phone number",
+                password: "Please enter a password",
+                confirm_password: "Please confirm your password"
+            },
+            errorClass: "text-danger",
+            errorElement: "small",
+            highlight: function (element) {
+                $(element).addClass("is-invalid");
+            },
+            unhighlight: function (element) {
+                $(element).removeClass("is-invalid");
+            },
+            submitHandler: function (form) {
+                form.submit();
+            }
+        });
+    });
+</script>
+{% endblock %}

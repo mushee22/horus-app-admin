@@ -16,13 +16,12 @@ class Student(BasemodelMixin):
     profile_image = models.ImageField(null=True,blank=True,upload_to='students')
     student_bio = models.TextField(null=True,blank=True)
     batch = models.ForeignKey(Batch,on_delete=models.CASCADE)
+    package = models.ForeignKey('Package', on_delete=models.CASCADE, null=True, blank=True)
     start_date = models.DateField(null=True,blank=True)
     end_date = models.DateField(null=True,blank=True)
 
     # def __str__(self):
     #     return f"{self.user}"
-
-
 
 class Chapter(BasemodelMixin):
     title = models.CharField(max_length=200)
@@ -42,7 +41,6 @@ class SubChapters(BasemodelMixin):
     thumbnail = models.ImageField(upload_to='chapters/subchapters')
     duration = models.IntegerField(null=True,blank=True)
     order = models.IntegerField()
-
 
 class Features(BasemodelMixin):
     name = models.CharField(max_length=200)

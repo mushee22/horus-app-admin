@@ -10,6 +10,7 @@
         <div class="bread-crumb-container">
             <a href="{% url 'student_list' %}"><span class="parent">Student</span></a>><span>Create</span>
         </div>
+        {% include 'messages.html' %}
         <form method="POST" action="{% url 'create_student' %}" enctype="multipart/form-data" id="CreateFormId">
             {% csrf_token %}
             <div class="mb-3">
@@ -41,6 +42,24 @@
                     {% endfor %}
                 </select>
             </div>
+            {% comment %} <div class="mb-3">
+                <label for="batch" class="form-label required">Batch</label>
+                <select class="form-control" name="batch" id="batch">
+                    <option value="">--select a Batch--</option>
+                    {% for item in batches %}
+                    <option value="{{item.id}}">{{item.name}}</option>
+                    {% endfor %}
+                </select>
+            </div> {% endcomment %}
+            <div class="mb-3">
+                <label for="batch" class="form-label required">Course</label>
+                <select class="form-control" name="package" id="package">
+                    <option value="">--select a Course--</option>
+                    {% for item in packages %}
+                    <option value="{{item.id}}">{{item.title}}</option>
+                    {% endfor %}
+                </select>
+            </div>
             <div class="mb-3">
                 <label for="start_date" class="form-label required">Start Date</label>
                 <input type="date" class="form-control" id="start_date" name="start_date">
@@ -58,47 +77,62 @@
 {% endblock %}
 
 {% block script %}
-<script src="{% static 'js/showSelectedImage.js' %}"></script>
-<script src="{% static 'js/validationMessageGenerator.js' %}"></script>
+{% comment %} <script src="{% static 'js/showSelectedImage.js' %}"></script> {% endcomment %}
+{% comment %} <script src="{% static 'js/validationMessageGenerator.js' %}"></script> {% endcomment %}
+{% comment %} <script src="https://cdn.jsdelivr.net/jquery.validation/1.19.5/jquery.validate.min.js"></script> {% endcomment %}
 <script>
-    const handleSubmitForm = (e)=>{
-        e.preventDefault();
-        const ImageField = document.getElementById('ImageField');
-        const ccccc = document.getElementById('first_name');
-        const last_name = document.getElementById('last_name');
-        const email = document.getElementById('email');
-        const password = document.getElementById('password');
-        const phone = document.getElementById('phone');
-        const batch = document.getElementById('batch');
-        const start_date = document.getElementById('start_date');
-        const end_date = document.getElementById('end_date');
-        const student_bio = document.getElementById('student_bio');
-        
-        if(!ImageField.value){
-            showValidationError(ImageField,"Customer image is required")
-        } 
-        else if (!first_name.value.trim()) {
-            showValidationError(first_name, "First name is required");
-        } else if (!last_name.value.trim()) {
-            showValidationError(last_name, "Last name is required");
-        } else if (!email.value.trim()) {
-            showValidationError(email, "Email is required");
-        } else if (!password.value.trim()) {
-            showValidationError(password, "Password is required");
-        } else if (!phone.value.trim()) {
-            showValidationError(phone, "Phone number is required");
-        } else if (!batch.value) {
-            showValidationError(batch, "Batch is required");
-        } else if (!start_date.value) {
-            showValidationError(start_date, "Start date is required");
-        } else if (!end_date.value) {
-            showValidationError(end_date, "End date is required");
-        } else if (!student_bio.value.trim()) {
-            showValidationError(student_bio, "Student bio is required");
-        } else {
-            document.getElementById("CreateFormId").submit();
-        }
-    }
+     $(document).ready(function () {
+    // Custom method to check start_date < end_date
+    $.validator.addMethod("startBeforeEnd", function(value, element) {
+      var startDate = $('#start_date').val();
+      var endDate = $('#end_date').val();
+      if (!startDate || !endDate) {
+        // If missing, don't validate here, other required rules handle it
+        return true;
+      }
+      return new Date(startDate) < new Date(endDate);
+    }, "Start date must be before end date");
+
+    // Initialize validation
+    $("#CreateFormId").validate({
+      rules: {
+        first_name: { required: true },
+        last_name: { required: true },
+        email: { required: true, email: true },
+        password: { required: true },
+        phone: { required: true, digits: true },
+        batch: { required: true },
+        package: { required: true },
+        start_date: { required: true, startBeforeEnd: true },
+        end_date: { required: true }
+      },
+      messages: {
+        first_name: "Please enter first name",
+        last_name: "Please enter last name",
+        email: "Please enter a valid email",
+        password: "Please enter a password",
+        phone: "Please enter phone number",
+        batch: "Please select a batch",
+        package: "Please select a course",
+        start_date: {
+          required: "Please enter start date",
+          startBeforeEnd: "Start date must be before end date"
+        },
+        end_date: "Please enter end date"
+      },
+      errorClass: "text-danger",
+      errorElement: "small",
+      highlight: function (element) {
+        $(element).addClass("is-invalid");
+      },
+      unhighlight: function (element) {
+        $(element).removeClass("is-invalid");
+      },
+      submitHandler: function (form) {
+        form.submit();
+      }
+    });
+  });
 
 </script>
 {% endblock %}

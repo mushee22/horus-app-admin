@@ -4,12 +4,14 @@ from django.shortcuts import redirect,get_object_or_404
 from datetime import datetime
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.views.generic import View,TemplateView,ListView,DetailView,UpdateView
+from django.views.generic import View,TemplateView,ListView,DetailView,CreateView
 from django.contrib import messages
 from django.contrib.auth import authenticate,login
 from django.http import JsonResponse
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q,Sum,Case,When,IntegerField
+from .forms import AdminUserCreationForm
+from django.urls import reverse_lazy
 
 # Models Import
 from web.models import *
@@ -63,7 +65,6 @@ class MasterArchiveTogglerView(View):
             response = {'resp_code':0}
         return JsonResponse(response)
 
-
 class LoginView(TemplateView):
     template_name = "login.html"
     
@@ -72,8 +73,12 @@ class LoginView(TemplateView):
         password = request.POST.get('password')
         user = authenticate(request,username=email,password=password)
         if user is not None:
-            login(request,user)
-            return redirect('student_list')
+            if user.is_admin:
+                login(request,user)
+                return redirect('student_list')
+            else:
+                messages.error(request, "Access denied. Not an admin user.")
+                return redirect('admin_login')
         else:
             messages.error(request,"User not found")
             return redirect('admin_login')
@@ -81,7 +86,6 @@ class LoginView(TemplateView):
 def logout_view(request):
     auth.logout(request)
     return redirect('admin_login')
-
 
 class AdminView(LoginRequiredMixin,TemplateView):
     template_name = 'dashboard.html'
@@ -102,7 +106,95 @@ class AdminView(LoginRequiredMixin,TemplateView):
         # context['purchase_count'] = self.count_setting(purchase_count)
         # context['total_count'] = self.count_setting(contact_count+purchase_count)
         return context
+
+#*********************************************************************************
+
+class AdminListView(LoginRequiredMixin, ListView):
+    model = CustomUser
+    template_name = 'users/list_users.html'
+    context_object_name = 'context_data'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(is_admin=True)  # Filter to show only admin users
+        queryset = queryset.exclude(id=self.request.user.id)
+        queryset = queryset.exclude(is_superuser=True)  # Exclude superusers if needed
+       # Exclude superusers if needed
+        return queryset
     
+
+class CreateAdminView(LoginRequiredMixin, TemplateView):
+    template_name = 'users/create_user.html'
+    
+    def post(self, request):
+
+        if CustomUser.objects.filter(username=request.POST.get("email")).exists():
+            messages.error(request, "A user with this email already exists. Try a different one.")
+            return redirect('create_admin_user')
+        if CustomUser.objects.filter(phone=request.POST.get("phone")).exists():
+            messages.error(request, "A user with this phone number already exists. Try a different one.")
+            return redirect('create_admin_user')
+
+        try:
+            user = CustomUser(
+                first_name=request.POST.get("first_name"),
+                last_name=request.POST.get("last_name"),
+                username=request.POST.get("email"),
+                email=request.POST.get("email"),
+                phone=request.POST.get("phone"),
+                is_admin=True,  # Set the user as admin
+            )
+            user.set_password(request.POST.get("password"))  # Hash the password
+            user.save()
+            messages.success(request, "Admin user created successfully.")
+            return redirect('admin_user_list')
+        except Exception as e:
+            messages.error(request, f"Failed to create admin user: {str(e)}")
+            return redirect('create_admin_user')   
+
+class AdminUpdateView(LoginRequiredMixin, DetailView):
+    template_name = 'users/update_user.html'
+    model = CustomUser
+    context_object_name = 'context_data'
+
+    def post(self, request, pk):
+        user = get_object_or_404(CustomUser, pk=pk)
+
+        if CustomUser.objects.filter(username=request.POST.get("email")).exclude(id=user.id).exists():
+            messages.error(request, "A user with this email already exists. Try a different one.")
+            return redirect('update_admin_user', pk=pk)
+        if CustomUser.objects.filter(phone=request.POST.get("phone")).exclude(id=user.id).exists():
+            messages.error(request, "A user with this phone number already exists. Try a different one.")
+            return redirect('update_admin_user', pk=pk)
+
+        try:
+            user.first_name = request.POST.get("first_name")
+            user.last_name = request.POST.get("last_name")
+            user.email = request.POST.get("email")
+            user.username = request.POST.get("email")
+            user.phone = request.POST.get("phone")
+
+            # Only update password if provided
+            new_password = request.POST.get("password")
+
+            if new_password:
+                user.set_password(new_password)
+
+            user.save()
+            messages.success(request, "Admin user updated successfully.")
+            return redirect('admin_user_list')
+
+        except Exception as e:
+            messages.error(request, f"Failed to update admin user: {str(e)}")
+            return redirect('update_admin_user', pk=pk)
+
+class AdminDeleteView(LoginRequiredMixin, DeleteMasterView):
+    model = CustomUser
+    return_path = 'admin_user_list'  
+   
+
+#*********************************************************************************
 
 class StudentListView(LoginRequiredMixin,ListView):
     model = Student
@@ -133,21 +225,30 @@ class StudentListView(LoginRequiredMixin,ListView):
 
         return queryset
     
-
 class StudentCreateView(LoginRequiredMixin, TemplateView):
     template_name = 'student/create_student.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['batches'] = Batch.objects.all()
+        context['packages'] = Package.objects.all()
         return context
 
     def post(self, request):
+        if not request.POST.get("batch") or not request.POST.get("package"):
+            messages.error(request, "Batch and Package are required.")
+            return redirect('create_student')
+        
         try:
             batch = Batch.objects.get(id=request.POST.get("batch"))
         except Batch.DoesNotExist:
             messages.error(request, "Batch does not exist.")
-            return redirect('student_list')
+            return redirect('create_student')
+        try:
+            package = Package.objects.get(id=request.POST.get("package"))
+        except Package.DoesNotExist:
+            messages.error(request, "Package does not exist.")
+            return redirect('create_student')
 
         try:
             # Create user and hash the password properly
@@ -156,7 +257,8 @@ class StudentCreateView(LoginRequiredMixin, TemplateView):
                 last_name=request.POST.get("last_name"),
                 username=request.POST.get("email"),
                 email=request.POST.get("email"),
-                phone=request.POST.get("phone")
+                phone=request.POST.get("phone"),
+                is_admin=False, 
             )
             user.set_password(request.POST.get("password"))  # ✅ Hash the password
             user.save()
@@ -168,6 +270,7 @@ class StudentCreateView(LoginRequiredMixin, TemplateView):
                 user=user,
                 profile_image=profile_image,
                 batch=batch,
+                package=package,
                 start_date=request.POST.get("start_date"),
                 end_date=request.POST.get("end_date"),
                 student_bio=request.POST.get("student_bio")
@@ -179,9 +282,7 @@ class StudentCreateView(LoginRequiredMixin, TemplateView):
         except Exception as e:
             messages.error(request, f"Failed to create student: {str(e)}")
             return redirect('student_list')
-
-        
-        
+       
 class StudentUpdateView(LoginRequiredMixin, DetailView):
     template_name = 'student/update_student.html'
     model = Student
@@ -195,6 +296,7 @@ class StudentUpdateView(LoginRequiredMixin, DetailView):
         # context['student'] = student
         # context['user'] = student.user
         context['batches'] = Batch.objects.all()
+        context['packages'] = Package.objects.all()
         return context
 
     def post(self, request, pk):
@@ -206,6 +308,12 @@ class StudentUpdateView(LoginRequiredMixin, DetailView):
         except Batch.DoesNotExist:
             messages.error(request, "Batch does not exist.")
             return redirect('student_list')
+        
+        try:
+            package = Package.objects.get(id=request.POST.get("package"))
+        except Package.DoesNotExist:
+            messages.error(request, "Course does not exist.")
+            return redirect('student_list')
 
         try:
             # Update user details
@@ -214,6 +322,7 @@ class StudentUpdateView(LoginRequiredMixin, DetailView):
             user.email = request.POST.get("email")
             user.username = request.POST.get("email")
             user.phone = request.POST.get("phone")
+            user.is_admin = False  # Ensure the user is not an admin
 
             # Only update password if provided
             new_password = request.POST.get("password")
@@ -224,6 +333,7 @@ class StudentUpdateView(LoginRequiredMixin, DetailView):
 
             # Update student details
             student.batch = batch
+            student.package = package
             start_date = request.POST.get("start_date")
             end_date = request.POST.get("end_date")
             if start_date:
@@ -240,7 +350,6 @@ class StudentUpdateView(LoginRequiredMixin, DetailView):
             messages.error(request, f"Failed to update student: {str(e)}")
             return redirect('student_list')
         
-
 class StudentDeleteView(LoginRequiredMixin,DeleteMasterView):
     model = Student
     return_path = 'student_list'
@@ -335,6 +444,21 @@ class BatchListView(LoginRequiredMixin,ListView):
     template_name = 'batch/list_batch.html'
     context_object_name = 'context_data'
     paginate_by = 10
+
+class BatchStudentListView(LoginRequiredMixin, ListView):
+    model = Student
+    template_name = 'batch/list_student.html'
+    context_object_name = 'context_data'
+    paginate_by = 10
+
+    def get_queryset(self):
+        batch_id = self.kwargs['pk']
+        return Student.objects.filter(batch_id=batch_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['batch'] = Batch.objects.get(pk=self.kwargs['pk'])
+        return context  
 
 class BatchCreateView(LoginRequiredMixin, TemplateView):
 
@@ -448,4 +572,102 @@ class SubChapterUpdateView(LoginRequiredMixin, DetailView):
         
 class SubChapterDeleteView(LoginRequiredMixin,DeleteMasterView):
     model = SubChapters
-    return_path = 'sub_chapter_list'        
+    return_path = 'sub_chapter_list'  
+
+#*********************************************************************************
+
+class PackageListView(LoginRequiredMixin, ListView):
+    model = Package
+    template_name = 'package/list_package.html'
+    context_object_name = 'context_data'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset =  super().get_queryset()
+
+        search = self.request.GET.get("search")
+        sort = self.request.GET.get("sort")
+        category_filter = self.request.GET.get("filter")
+
+        if search:
+            queryset = queryset.filter(
+                Q(title__istartswith=search))
+        
+        if sort == "oldest":
+            queryset = queryset.order_by('id')
+        else:
+            queryset = queryset.order_by('-id')
+
+        # if category_filter:
+        #     queryset = queryset.filter(category=category_filter)
+
+        return queryset      
+
+class PackageStudentListView(LoginRequiredMixin, ListView):
+    model = Student
+    template_name = 'package/list_student.html'
+    context_object_name = 'context_data'
+    paginate_by = 10
+
+    def get_queryset(self):
+        package_id = self.kwargs['pk']
+        return Student.objects.filter(package_id=package_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['package'] = Package.objects.get(pk=self.kwargs['pk'])
+        return context
+
+class PackageCreateView(LoginRequiredMixin, TemplateView):
+    template_name = 'package/create_package.html'
+
+    def post(self, request):
+        try:
+            package = Package.objects.create(
+                title=request.POST.get("title"),
+                thumbnail=request.FILES.get("thumbnail"),
+                # price=request.POST.get("price"),
+                # offer=request.POST.get("offer")
+            )
+            # features = request.POST.getlist("features")
+            # for feature in features:
+            #     feature_obj = Features.objects.get(id=feature)
+            #     package.features.add(feature_obj)
+
+            messages.success(request, "Package created successfully.")
+            return redirect('package_list')
+
+        except Exception as e:
+            messages.error(request, f"Failed to create package: {str(e)}")
+            return redirect('package_list')   
+
+class PackageUpdateView(LoginRequiredMixin, DetailView):
+    template_name = 'package/update_package.html'
+    model = Package
+    context_object_name ='context_data'
+
+    def post(self, request, pk):
+        package = get_object_or_404(Package, pk=pk)
+
+        try:
+            package.title = request.POST.get("title")
+
+            if request.FILES.get("thumbnail"):
+                package.thumbnail = request.FILES.get("thumbnail")
+
+            package.save()
+
+            messages.success(request, "Package updated successfully.")
+            return redirect('package_list')
+
+        except Exception as e:
+            messages.error(request, f"Failed to update package: {str(e)}")
+            return redirect('package_list')    
+
+class PackageDeleteView(LoginRequiredMixin,DeleteMasterView):
+    model = Package
+    return_path = 'package_list'
+
+
+
+#*********************************************************************************             

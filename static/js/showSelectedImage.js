@@ -1,5 +1,5 @@
 let imageField = document.getElementById("ImageField");
-imageField.addEventListener('change',(e)=>{
+imageField?.addEventListener('change',(e)=>{
     var file = e.target.files[0];
     if(file){
         url = URL.createObjectURL(file);
@@ -7,6 +7,6 @@ imageField.addEventListener('change',(e)=>{
     }
 });
 
-if (imageField.getAttribute("data-value")){
+if (imageField?.getAttribute("data-value")){
     imageField.parentNode.querySelector(".image-box").style.backgroundImage = `url(${imageField.getAttribute("data-value")})`;
 }
