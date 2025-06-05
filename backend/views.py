@@ -12,9 +12,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q,Sum,Case,When,IntegerField
 from .forms import AdminUserCreationForm
 from django.urls import reverse_lazy
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+from django.apps import apps
+from django.core.files.storage import default_storage
+from .tasks import upload_subchapter_video_to_s3
+
+
 
 # Models Import
 from web.models import *
+from backend.models import Role, BackgroundTaskStatus
 
 
 # Create your views here.
@@ -123,7 +131,6 @@ class AdminListView(LoginRequiredMixin, ListView):
        # Exclude superusers if needed
         return queryset
     
-
 class CreateAdminView(LoginRequiredMixin, TemplateView):
     template_name = 'users/create_user.html'
     
@@ -192,8 +199,67 @@ class AdminUpdateView(LoginRequiredMixin, DetailView):
 class AdminDeleteView(LoginRequiredMixin, DeleteMasterView):
     model = CustomUser
     return_path = 'admin_user_list'  
-   
 
+#*********************************************************************************
+
+class RoleListView(LoginRequiredMixin, ListView):
+    model = Role
+    template_name = 'role/list_role.html'
+    context_object_name = 'context_data'
+    paginate_by = 10    
+
+class RoleCreateView(LoginRequiredMixin, TemplateView):
+    template_name = 'role/create_role.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)  
+
+        models = apps.get_models()
+
+        print(models)
+
+        models_to_include = [
+            "web.chapter",
+            "web.subchapters",
+            "web.student",
+            "web.purchase",
+            "web.package",
+            "web.batch",
+        ]
+
+        content_types = ContentType.objects.filter(
+            app_label__in = [ model.split('.')[0] for model in models_to_include ],
+            model__in = [ model.split('.')[1] for model in models_to_include ]
+        )
+
+
+        model_permissions = Permission.objects.filter(
+            content_type__in=content_types,
+            codename__regex=r'^(add|change|delete|view)_'
+        ).order_by('content_type__model', 'codename')
+
+        grouped_permissions = {}
+        for perm in model_permissions:
+            model = perm.content_type.model
+            grouped_permissions.setdefault(model, []).append(perm)
+
+        context['grouped_permissions'] = grouped_permissions
+
+        return context
+           
+    
+
+    def post(self, request):
+        try:
+            role = Role.objects.create(
+                name=request.POST.get("name")
+            )
+            messages.success(request, "Role created successfully.")
+            return redirect('role_list')
+        except Exception as e:
+            messages.error(request, f"Failed to create role: {str(e)}")
+            return redirect('role_list')
+   
 #*********************************************************************************
 
 class StudentListView(LoginRequiredMixin,ListView):
@@ -354,8 +420,6 @@ class StudentDeleteView(LoginRequiredMixin,DeleteMasterView):
     model = Student
     return_path = 'student_list'
 
-
-
 # *********************************************************************************
 
 
@@ -514,17 +578,32 @@ class SubChapterCreatView(LoginRequiredMixin, TemplateView):
     def post(self, request):
         try:
             
+            video_file = request.FILES.get("video")
+
             chapter = Chapter.objects.get(id=request.POST.get("chapter"))
 
-            SubChapters.objects.create(
+            # Save temporarily
+            temp_path = default_storage.save(f'temp_subchapters/{video_file.name}', video_file)
+
+            subchapter = SubChapters.objects.create(
                 title=request.POST.get("title"),
                 order=request.POST.get("order"),
                 duration=request.POST.get("duration"),
                 description=request.POST.get("description"),
                 thumbnail=request.FILES.get("thumbnail"),
-                video=request.FILES.get("video"),
                 chapter=chapter
             )
+
+            # Create a background task to upload the video to S3
+
+            task = BackgroundTaskStatus.objects.create(
+                name = f"ADDINING {subchapter.title}",
+                status = 'pending',
+                model_id = f"subchapter_{subchapter.id}",
+            )
+             
+            upload_subchapter_video_to_s3.delay(subchapter.id, temp_path, task.id)
+
             messages.success(request, "Sub Chapter created successfully.")
             return redirect('sub_chapter_list')
         except Exception as e:
@@ -559,7 +638,16 @@ class SubChapterUpdateView(LoginRequiredMixin, DetailView):
             if request.FILES.get("thumbnail"):
                 subChapter.thumbnail = request.FILES.get("thumbnail")
             if request.FILES.get("video"):
-                subChapter.video= request.FILES.get("video")
+                 video_file = request.FILES.get("video")
+                 temp_path = default_storage.save(f'temp_subchapters/{video_file.name}', video_file)
+                 task = BackgroundTaskStatus.objects.create(
+                    name = f"UPDATING {subChapter.title}",
+                    status = 'pending',
+                    model_id = f"subchapter_{subChapter.id}",
+                )
+                 upload_subchapter_video_to_s3.delay(subChapter.id, temp_path, task.id)
+                
+                # subChapter.video= request.FILES.get("video")
 
             subChapter.save()        
 
@@ -668,6 +756,16 @@ class PackageDeleteView(LoginRequiredMixin,DeleteMasterView):
     model = Package
     return_path = 'package_list'
 
+class UploadStatusView(LoginRequiredMixin, TemplateView):
+    template_name = "sub-chapter/task_list.html"
+    context_object_name = 'context_data'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        all_tasks = BackgroundTaskStatus.objects.all()
+        context['all_tasks'] = all_tasks
+        print(f'all tasks ${all_tasks}')
+        return context
 
 
 #*********************************************************************************             

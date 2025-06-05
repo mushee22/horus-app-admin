@@ -11,6 +11,11 @@ urlpatterns = [
     path('users/create/',CreateAdminView.as_view(),name="create_admin_user"),
     path('users/update/<int:pk>/',AdminUpdateView.as_view(),name="update_admin_user"),
     path('users/delete', AdminDeleteView.as_view(), name="delete_admin_user"),
+
+    # Role
+    path('role',RoleListView.as_view(),name="role_list"),
+    path('role/create/',RoleCreateView.as_view(),name="create_role"),
+
     # Students
     path('',StudentListView.as_view(),name="student_list"),
     path('student/create/',StudentCreateView.as_view(),name="create_student"),
@@ -26,6 +31,7 @@ urlpatterns = [
     path('sub-chapter/create/',SubChapterCreatView.as_view(),name="create_sub_chapter"),
     path('sub-chapter/update/<int:pk>/',SubChapterUpdateView.as_view(),name="update_sub_chapter"),
     path('sub-chapter/delete',SubChapterDeleteView.as_view(),name="delete_sub_chapter"),
+    path('sub-chapter/upload-status',UploadStatusView.as_view(),name="upload_status"),
     #batch
     path('batch',BatchListView.as_view(),name="batch_list"),
     path('batch/create/',BatchCreateView.as_view(),name="create_batch"),

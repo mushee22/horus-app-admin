@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="content">
+
+{% include 'navbar.html' %}
+
+<div class="main-container">
+    <div class="table-responsive">
+        <table class="table">
+
+            <thead>
+                <tr>
+                    <th>Task ID</th>
+      <th>Task Name</th>
+      <th>Status</th>
+      
+
+            </thead>
+            <tbody>
+                {% for task in all_tasks %}
+      <tr>
+        <td>{{ task.id }}</td>
+        <td>{{ task.name }}</td>
+        <td>{{ task.status }}</td>
+    
+      </tr>
+    {% empty %}
+      <tr><td colspan="5">No tasks found.</td></tr>
+    {% endfor %}
+            </tbody>
+        </table>
+    </div>  
+</div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    
+   
+</script>
+{% endblock %}

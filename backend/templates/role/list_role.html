@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="content">
+
+{% include 'navbar.html' %}
+
+<div class="main-container">
+    <div class="top-container">
+        <form action="{% url 'chapter_list' %}" method="GET" id="searchSortForm">
+            <!-- search -->
+            <input class="form-control border-1" type="search" placeholder="Search" name="search" id="searchBox" value="{{request.GET.search}}">
+
+            <!-- sort -->
+            <select class="form-control border-1 action-form-field" name="sort" id="sortBox">
+                {% if request.GET.sort == "oldest" %}
+                <option value="newest">Newest</option>
+                <option value="oldest" selected >Oldest</option>
+                {% else %}
+                <option value="newest" selected >Newest</option>
+                <option value="oldest">Oldest</option>
+                {% endif %}
+            </select>
+
+            {% comment %}
+            <!-- filter -->
+            <select class="form-control border-1 action-form-field" name="filter" id="filterBox">
+                <option value="">All</option>
+                {% for category in categories %}
+                {% if category.id|stringformat:"s" == request.GET.filter %}
+                <option value="{{category.id}}" selected >{{category.name}}</option>
+                {% else %}
+                <option value="{{category.id}}">{{category.name}}</option>
+                {% endif %}
+                {% endfor%}
+            </select>
+            {% endcomment %}
+
+        </form>
+        <a href="{% url 'create_role' %}"><button type="submit" class="btn btn-primary">New +</button></a>
+    </div>
+    
+    {% include 'messages.html' %}
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Sl No.</th>
+                    <th scope="col">Name</th>
+                    {% comment %} <th scope="col">Code</th> {% endcomment %}
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in context_data %}
+                <tr>
+                    <th scope="row">{{forloop.counter|add:page_obj.start_index|add:"-1"}}</th>
+                   
+                    <td>{{item}}</td>
+                    {% comment %} <td>{{item.code}}</td> {% endcomment %}
+                    <td>
+                        <div class="action-box">
+                            <a href="{% if item.id %}{% url 'update_batch' pk=item.id %}{% endif %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"/>
+                                </svg>
+                            </a>
+                            
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" onclick="showDeletePopup('{{item.id}}','{{item.user.first_name}} {{item.user.last_name}}')">
+                                <path d="M135.2 17.7L128 32 32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0-7.2-14.3C307.4 6.8 296.3 0 284.2 0L163.8 0c-12.1 0-23.2 6.8-28.6 17.7zM416 128L32 128 53.2 467c1.6 25.3 22.6 45 47.9 45l245.8 0c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                            </svg>
+                            <a href="{% if item.id %}{% url 'list_batch_student' pk=item.id %}{% endif %}" title="View Students">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                    <path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>  
+</div>
+
+
+<!-- pagination -->
+{% include 'pagination.html' %}
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    
+    const handleSubmit = ()=>{
+        document.getElementById("searchSortForm").submit();
+    }
+
+    document.getElementById("searchBox").addEventListener('change',handleSubmit);
+    document.getElementById("sortBox").addEventListener('change',handleSubmit);
+    // document.getElementById("filterBox").addEventListener('change',handleSubmit);
+
+
+    // // delete labour
+    document.querySelector(".popup-delete-btn").addEventListener('click',()=>{
+        var deleteItem = document.querySelector('input[name="delete_id"]').value;
+        window.location.href = `{% url 'delete_batch' %}?pk=${deleteItem}`;
+    });
+
+
+    // labour status toggler function
+    {% comment %} let togglers = document.querySelectorAll(".status-toggle");
+    togglers.forEach(toggler=>{
+        toggler.addEventListener('change',(e)=>{
+            fetch(`{% url 'archive_case_studies' %}?pk=${e.target.id}`,{
+                'method':'GET'
+            }).then(resp=>resp.json()).then(data=>{
+                if(data.resp_code != 1){
+                    alert("Failed!!")
+                }
+            })
+        });
+    }); {% endcomment %}
+</script>
+{% endblock %}

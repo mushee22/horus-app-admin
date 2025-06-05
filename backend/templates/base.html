@@ -70,6 +70,8 @@
                 <div class="navbar-nav w-100">
                    <a href="{% url 'admin_user_list' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
                             class="fa fa-solid fa-user me-2"></i>Users</a> 
+                    <a href="{% url 'role_list' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                            class="fa fa-solid fa-tachometer-alt me-2"></i>Role</a>        
                     <a href="{% url 'student_list' %}" class="nav-item nav-link" onclick="clickMenu(this)">
                         <i class="fa-solid fa-user-tie"></i>Students</a>
                     <a href="{% url 'chapter_list' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
@@ -79,7 +81,9 @@
                     <a href="{% url 'batch_list' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
                             class="fa fa-solid fa-school me-2"></i>Batch</a>        
                      <a href="{% url 'package_list' %}" class="nav-item nav-link" onclick="clickMenu(this)">
-                        <i class="fa-solid fa-graduation-cap"></i>Course</a>           
+                        <i class="fa-solid fa-graduation-cap"></i>Course</a>  
+                        <a href="{% url 'upload_status' %}" class="nav-item nav-link" onclick="clickMenu(this)"><i
+                                class="fa fa-solid fa-bell me-2"></i>Upload Status</a>         
                    
                             
                     {% comment %} <a href="{% url 'case_studies' %}" class="nav-item nav-link"

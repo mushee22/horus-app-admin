@@ -48,14 +48,12 @@ class Features(BasemodelMixin):
     def __str__(self):
         return f"{self.name}"
 
-
 class Package(BasemodelMixin):
     title = models.CharField(max_length=200)
     thumbnail =  models.ImageField(upload_to='packages')
     price = models.FloatField(default=0)
     offer = models.FloatField(default=0)
     features= models.ManyToManyField(Features,related_name="package_features")
-
 
 class Purchase(BasemodelMixin):
     payment_status = [

@@ -35,7 +35,6 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-
 class CustomUser(AbstractUser,BasemodelMixin):
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=200)
@@ -53,7 +52,6 @@ class CustomUser(AbstractUser,BasemodelMixin):
     def __str__(self):
         return str(self.username)
     
-
 class OTP(models.Model):
     email = models.EmailField(null=True)
     mobile = models.CharField(max_length=200,null=True)
@@ -65,6 +63,13 @@ class OTP(models.Model):
         self.expire_time = expiry
         super().save(*args,**kwargs)
 
+class BackgroundTaskStatus(models.Model):
+    model_id = models.CharField(max_length=200, unique=False)
+    name = models.CharField(max_length=200)
+    status = models.CharField(max_length=50, choices=[('pending', 'Pending'),  ('completed', 'Completed'), ('failed', 'Failed')], default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-
+    def __str__(self):
+        return f"{self.model_id} - {self.status}"
 

@@ -62,7 +62,8 @@ INSTALLED_APPS = [
     "backend",
     "web",
     "storages",
-    "whitenoise.runserver_nostatic"
+    "whitenoise.runserver_nostatic",
+    "django_celery_results"
 ]
 
 MIDDLEWARE = [
@@ -209,6 +210,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
+
+# CELERY
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
 
 if not DEBUG:
     AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
