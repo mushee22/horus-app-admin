@@ -24,5 +24,7 @@ urlpatterns = [
     path('total/progress/', TotalProgressView.as_view(), name='total-progress'),
     # Packages
     path('packages/', PackageListView.as_view(), name='package-list'),
+    # Chats 
+    path('messages/', MessageCreateView.as_view(), name='messages-create'),
 
 ]

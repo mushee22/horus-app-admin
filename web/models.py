@@ -84,3 +84,24 @@ class SubChapterProgress(BasemodelMixin):
 
 
 
+class Community(models.Model):
+    name = models.CharField(max_length=200)
+    type = models.CharField(max_length=50, choices=[("global", "Global"), ("batch", "Batch"), ("package", "Package")])
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE, null=True, blank=True)
+    package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.type})"
+    
+
+class Message(models.Model):
+    sender = models.ForeignKey(Student, on_delete=models.CASCADE)
+    community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name="messages")
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.user.first_name}: {self.content[:20]}"
+
+
+

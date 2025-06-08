@@ -288,3 +288,27 @@ class TotalProgressView(LoginRequiredMixin, APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
+class MessageCreateView(LoginRequiredMixin,APIView):
+
+    def post(self,request):
+        student_id = request.data.get('user')
+        community_id= request.data.get('community')
+        content = request.data.get('content')
+
+        try:
+            community = Community.objects.get(id=community_id)
+            student = Student.objects.get(id=student_id)
+
+            Message.objects.create(
+                sender = student, 
+                community=community,
+                content = content
+            )
+            return Response({'resp_code':1,'message':"Success"})
+        except (Community.DoesNotExist, Student.DoesNotExist):
+            return Response({'resp_code': 0, 'message': "Community or Student not found"})
+        except Exception as e:
+            return Response({'resp_code':0,'message':"failed to create message"})
+
+
+
