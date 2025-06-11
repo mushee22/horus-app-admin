@@ -31,7 +31,8 @@ DEBUG = config('DEBUG', cast=bool)
 ALLOWED_HOSTS = [
     "13.201.128.86",
     "127.0.0.1",
-    "admin.horuslearn.club"
+    "admin.horuslearn.club",
+    "localhost"
 ]
 
 CSRF_TRUSTED_ORIGINS = [

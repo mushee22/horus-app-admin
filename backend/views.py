@@ -403,9 +403,9 @@ class StudentUpdateView(LoginRequiredMixin, DetailView):
             start_date = request.POST.get("start_date")
             end_date = request.POST.get("end_date")
             if start_date:
-               student.start_date = start_date
+                student.start_date = start_date
             if end_date:
-               student.end_date = end_date
+                student.end_date = end_date
 
             student.save()
 
@@ -468,7 +468,8 @@ class ChapterCreateView(LoginRequiredMixin, TemplateView):
         except Exception as e:
             messages.error(request, f"Failed to create student: {str(e)}")
             return redirect('chapter_list')
-   
+
+
 class ChapterUpdateView(LoginRequiredMixin, DetailView):
     template_name = 'chapter/update_chapter.html'
     model = Chapter
@@ -768,4 +769,9 @@ class UploadStatusView(LoginRequiredMixin, TemplateView):
         return context
 
 
-#*********************************************************************************             
+class CommunityListView(LoginRequiredMixin,ListView):
+    model = Community
+    template_name = 'community/list_community.html'
+    context_object_name = 'context_data'
+    paginate_by = 10
+    
