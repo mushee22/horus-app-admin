@@ -26,5 +26,6 @@ urlpatterns = [
     path('packages/', PackageListView.as_view(), name='package-list'),
     # Chats 
     path('messages/', MessageCreateView.as_view(), name='messages-create'),
+    path('chat-message/',ListMessagesView.as_view(),name="chat_message"),
 
 ]

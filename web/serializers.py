@@ -3,6 +3,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.apps import apps
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import AuthenticationFailed
+from datetime import datetime
 # model imports
 from web.models import *
 
@@ -271,5 +272,22 @@ class PackageSerializer(serializers.ModelSerializer):
         model = Package
         fields = ['id', 'title', 'thumbnail', 'price', 'offer', 'features']
 
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = ['id','sender','community','content']
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['time'] = datetime.strftime(instance.timestamp,"%I:%M %p")
+        data['date'] = datetime.strftime(instance.timestamp,"%d-%B-%Y")
+        return data
+
+
+class CommunityMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Community
+        fields = '__all__'
         
 

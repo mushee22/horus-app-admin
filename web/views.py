@@ -11,6 +11,16 @@ from baseapp.mixins import LoginRequiredMixin
 
 # Create your views here.
 
+def mark_messages_read(messages,sender):
+    """
+    this function recieves a list of message objects as parameter and change
+    the status of all messages as read.
+    """
+    for message in messages:
+        if message.sender.id != sender.id:
+            message.is_read = True
+            message.save()
+
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
@@ -288,7 +298,7 @@ class TotalProgressView(LoginRequiredMixin, APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
-class MessageCreateView(LoginRequiredMixin,APIView):
+class MessageCreateView(APIView):
 
     def post(self,request):
         student_id = request.data.get('user')
@@ -310,5 +320,69 @@ class MessageCreateView(LoginRequiredMixin,APIView):
         except Exception as e:
             return Response({'resp_code':0,'message':"failed to create message"})
 
+
+
+class ListMessagesView(APIView):
+    def post(self,request):
+        user = int(request.data.get('user'))
+        community_id = request.data.get('community_id')
+        try:
+            student = Student.objects.get(user=user)
+            community = Community.objects.get(id=community_id)
+            
+            
+            messages = Message.objects.filter(community=community).order_by('id')
+
+            serializer = MessageSerializer(messages,many=True)
+
+            arranged_messages = self.arranage_message_by_date(serializer.data)
+
+            community_serializer = CommunityMiniSerializer(community)
+            
+            if room.sender.user.id == user:
+                sender = room.sender
+                reciever = room.receiver
+            else:
+                sender = room.receiver
+                reciever = room.sender
+            
+            reciever_serializer = CustomerUserSerializer(reciever)
+
+            reciever_profile_pic = CustomerPhotos.objects.filter(
+                customer=reciever,is_profile_pic=True
+            ).order_by('-id').first()
+
+            sender_profile_pic = CustomerPhotos.objects.filter(
+                customer=sender,is_profile_pic=True
+            ).order_by('-id').first()
+
+            mark_messages_read(messages,sender)
+
+
+            return Response({'resp_code':1,'data':arranged_messages,
+                        'sender_pic':sender_profile_pic.photo.url if sender_profile_pic else "",
+                        'community': community_serializer.data,
+                        'message':"Success"})
+        except Exception as e:
+            return Response({'resp_code':0,'message':str(e)})
+    
+
+    def arranage_message_by_date(self,data):
+        message_date_list = []
+        for message in data:
+            if message['date'] not in message_date_list:
+                message_date_list.append(message['date'])
+        df = pd.DataFrame(data)
+        arranged_list = []
+        message_data = {}
+        for date in message_date_list:
+            message_data['date'] = date
+            messages = df.loc[df['date']==date]
+            message_list = messages.to_dict(orient='records')
+            message_data['messages'] = message_list
+            arranged_list.append(message_data)
+            message_data = {}
+        
+        return arranged_list
 
 

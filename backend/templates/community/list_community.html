@@ -1,103 +1,588 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/chatpage.css' %}">
+{% endblock %}
+
 {% block content %}
 
 <div class="content">
 
 {% include 'navbar.html' %}
 
-<div class="main-container">
-    <div class="top-container">
-        <form action="{% url 'community_list' %}" method="GET" id="searchSortForm">
-            <!-- search -->
-            <input class="form-control border-1" type="search" placeholder="Search" name="search" id="searchBox" value="{{request.GET.search}}">
-
-            <!-- sort -->
-            <select class="form-control border-1 action-form-field" name="sort" id="sortBox">
-                {% if request.GET.sort == "oldest" %}
-                <option value="newest">Newest</option>
-                <option value="oldest" selected >Oldest</option>
-                {% else %}
-                <option value="newest" selected >Newest</option>
-                <option value="oldest">Oldest</option>
-                {% endif %}
-            </select>
-
-            {% comment %}
-            <!-- filter -->
-            <select class="form-control border-1 action-form-field" name="filter" id="filterBox">
-                <option value="">All</option>
-                {% for category in categories %}
-                {% if category.id|stringformat:"s" == request.GET.filter %}
-                <option value="{{category.id}}" selected >{{category.name}}</option>
-                {% else %}
-                <option value="{{category.id}}">{{category.name}}</option>
-                {% endif %}
-                {% endfor%}
-            </select>
-            {% endcomment %}
-
-        </form>
-        <a href="{% url 'create_batch' %}"><button type="submit" class="btn btn-primary">New +</button></a>
-    </div>
-    
-    {% include 'messages.html' %}
-
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Sl No.</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Batch</th>
-                    <th scope="col">Package</th>
-                    <th scope="col">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in context_data %}
-                <tr>
-                    <th scope="row">{{forloop.counter|add:page_obj.start_index|add:"-1"}}</th>
-                   
-                    <td>{{item.name}}</td>
-                    <td>{{item.get_type_display}}</td>
-                    <td>{{item.batch.name}}</td>
-                    <td>{{item.package.title}}</td>
-                    <td>
-                        <div class="action-box">
-                            <a href="#">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                                    <path d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"/>
-                                </svg>
-                            </a>
-                            
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" onclick="showDeletePopup('{{item.id}}','{{item.user.first_name}} {{item.user.last_name}}')">
-                                <path d="M135.2 17.7L128 32 32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0-7.2-14.3C307.4 6.8 296.3 0 284.2 0L163.8 0c-12.1 0-23.2 6.8-28.6 17.7zM416 128L32 128 53.2 467c1.6 25.3 22.6 45 47.9 45l245.8 0c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+<div class="chat-main-container w-100">
+    <div class="chat-sub-container">
+        <div class="chat-left-container" id="chat-left-container-id">
+            <form action="#" method="GET" id="chatFilterSortSearchForm">
+                <div class="chat-left-1 w-100">
+                    <span>Community</span>
+                </div>
+                <div class="chat-left-2 w-100">
+                    <label class="position-relative chat-button">
+                        <span class="c-tag {% if request.GET.chat_filter_bttons == '' or not request.GET.chat_filter_bttons %}selected{% endif %}">All</span>
+                        <span class="chat-notification position-absolute hide">5</span>
+                        <input type="radio" name="chat_filter_bttons" id="" value="" style="display: none;" {% if request.GET.chat_filter_bttons == '' or not request.GET.chat_filter_bttons %}checked{% endif %}>
+                    </label> 
+                    <label class="position-relative chat-button chat-unread">
+                        <span class="c-tag {% if request.GET.chat_filter_bttons == 'unread' %}selected{% endif %}">Unread</span>
+                        <span class="chat-notification position-absolute hide"></span>
+                        <input type="radio" name="chat_filter_bttons" id="" value="unread" style="display: none;" {% if request.GET.chat_filter_bttons == 'unread' %}checked{% endif %}>
+                    </label>
+                    <label class="position-relative chat-button">
+                        <span class="c-tag {% if request.GET.chat_filter_bttons == 'sent' %}selected{% endif %}">Sent</span>
+                        <span class="chat-notification position-absolute hide">5</span>
+                        <input type="radio" name="chat_filter_bttons" id="" value="sent" style="display: none;" {% if request.GET.chat_filter_bttons == 'sent' %}checked{% endif %}>
+                    </label>
+                    <label class="position-relative chat-button">
+                        <span class="c-tag {% if request.GET.chat_filter_bttons == 'received' %}selected{% endif %}">Received</span>
+                        <span class="chat-notification position-absolute hide">5</span>
+                        <input type="radio" name="chat_filter_bttons" id="" value="received" style="display: none;" {% if request.GET.chat_filter_bttons == 'received' %}checked{% endif %}>
+                    </label>
+                </div>
+                <div class="chat-left-3 w-100">
+                    <div class="chat-search-container position-relative">
+                        <input class="chat-search-box" id="chat-search-1" name="chat_search" placeholder="Search name" value="{{request.GET.chat_search}}"></input>
+                        <div class="chat-search-svg-container position-absolute">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M14.8166 14.6935L11.5709 11.4478M11.5709 11.4478C12.1261 10.8926 12.5665 10.2335 12.867 9.50807C13.1674 8.78267 13.3221 8.0052 13.3221 7.22003C13.3221 6.43487 13.1674 5.6574 12.867 4.932C12.5665 4.20661 12.1261 3.5475 11.5709 2.9923C11.0157 2.43711 10.3566 1.99671 9.6312 1.69624C8.90581 1.39577 8.12833 1.24112 7.34317 1.24112C6.55801 1.24112 5.78054 1.39577 5.05514 1.69624C4.32975 1.99671 3.67063 2.43711 3.11544 2.9923C1.99418 4.11357 1.36426 5.63433 1.36426 7.22003C1.36426 8.80574 1.99418 10.3265 3.11544 11.4478C4.2367 12.569 5.75747 13.1989 7.34317 13.1989C8.92888 13.1989 10.4496 12.569 11.5709 11.4478Z" stroke="#616161" stroke-width="1.68155" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
-                            <a href="#" title="View Students">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
-                                    <path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/>
-                                </svg>
-                            </a>
                         </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>  
+                    </div>
+                    <label class="chat-sortby-container">
+                        {% if request.GET.chat_sort == 'on' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="12" viewBox="0 0 16 12" fill="none">
+                            <path d="M7.25 3.75H14V5.25H7.25V3.75ZM7.25 6.75H12.5V8.25H7.25V6.75ZM7.25 0.75H15.5V2.25H7.25V0.75ZM7.25 9.75H11V11.25H7.25V9.75ZM2.75 12H4.25V3H6.5L3.5 0L0.5 3H2.75V12Z" fill="black"/>
+                        </svg>
+                        {% else %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <path d="M4.5 15L7.5 12H5.25V3H3.75V12H1.5L4.5 15ZM8.25 6H15V7.5H8.25V6ZM8.25 9H13.5V10.5H8.25V9ZM8.25 3H16.5V4.5H8.25V3ZM8.25 12H12V13.5H8.25V12Z" fill="black"/>
+                        </svg>
+                        {% endif %}
+                        <input type="checkbox" name="chat_sort" id="chatSort" {% if request.GET.chat_sort == 'on' %}checked{% endif %} style="display: none;">
+                    </label>
+                </div>
+            </form>
+            <div class="chat-left-4 w-100">
+                <div class="chat-personal-section w-100">
+                    {% comment %} Start the iteration for chat-person 2 person {% endcomment %}
+                    {% for chat in context_data %}
+                    <div class="pc-tag w-100" onclick="showTheirMessages(this,'{{chat.id}}')">
+                        <div class="chat-image-and-name">
+                            <div class="chat-person-img-box-1 position-relative">
+                                <!-- <img src="{% if customer.id == chat.sender.id %}{% for pic in chat.receiver.customerphotos_set.all %}{% if pic.is_profile_pic == True %}{{pic.photo.url}}{% else %}{% static 'img/male.webp' %}{% endif %}{% endfor %}{% else %}{% for pic in chat.sender.customerphotos_set.all %}{% if pic.is_profile_pic == True %}{{pic.photo.url}}{% else %}{% static 'img/male.webp' %}{% endif %}{% endfor %}{% endif %}" alt=""> -->
+                                {% if chat.chat_profile_pic %}
+                                    <img src="{{chat.chat_profile_pic.url}}" alt="">
+                                {% else %}
+                                    {% if chat.gender == male %}
+                                        <img src="{% static 'img/male.webp' %}" alt="">
+                                    {% else %}
+                                        <img src="{% static 'img/female.webp' %}" alt="">
+                                    {% endif %}
+                                {% endif %}
+                                
+
+
+                                {% if customer.is_prime %}
+                                <div class="chat-image-premium-svg position-absolute">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="15" viewBox="0 0 14 15" fill="none">
+                                        <rect x="0.404297" y="0.45575" width="12.6116" height="13.9105" rx="3.36309" fill="#EF9D22"/>
+                                        <path d="M3.6535 9.65158L2.80566 3.86529L5.13722 6.49542L6.62094 3.33926L8.10465 6.49542L10.4362 3.86529L9.58837 9.65158H3.6535ZM9.58837 11.2297C9.58837 11.5453 9.4188 11.7557 9.16445 11.7557H4.07742C3.82307 11.7557 3.6535 11.5453 3.6535 11.2297V10.7036H9.58837V11.2297Z" fill="white"/>
+                                    </svg>
+                                </div>
+                                {% endif %}
+                            </div>
+                        
+                            <div class="chat-chat-message-simple">
+                                <span class="person-name-1">{% if customer.id == chat.sender.id %}{{chat.receiver.user.full_name}}{% else %}{{chat.sender.user.full_name}}{% endif %}</span>
+                                <!-- <span>{% if chat.last_message_content %}{{chat.last_message_content}}{% else %}No message{% endif %}</span> -->
+                                <span class="last-message-content">{% if chat.last_message_content %}{{chat.last_message_content}}{% else %}No message{% endif %}</span>
+                            </div>
+                        </div>
+                        <div class="time-and-count">
+                            <span class="chat-time-mini">{{chat.formatted_last_message_time}}</span>
+                            {% if chat.unread_msg > 0 %}
+                            <span class="chat-notification-2">{{chat.unread_msg}}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+
+
+                </div>
+            </div>
+        </div>
+        <div class="chat-right-container" id="chat-right-container-id">
+            <div class="empty-chat-container">
+                <img src="{% static 'images/Letter.png' %}" alt="">
+                <div class="d-flex flex-column align-items-center">
+                    <div>Looking quiet here...</div>
+                    <div>Tap on some commmunity to say hello!</div>
+                </div>
+            </div>
+            <div class="chat-personal-detail-main hide">
+                <div class="chat-personal-detail-super w-100">
+                    <div class="image-details-whole-box w-100">
+                        <div class="chat-person-img-box-2">
+                            <img class="chat-person-img" src="{% static 'img/male.webp' %}" alt="">
+                        </div>
+                        
+                        <div class="name-age-online">
+                            <div class="chat-name-age-box" >
+                                <span class="chat-name-age-text person-name-1"></span>
+                                <div class="chat-if-online d-flex gap-1 align-items-baseline hide" style="padding-top: 2px;">
+                                    <div class="chat-if-online-svg-box">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" fill="none">
+                                            <circle cx="4" cy="4" r="4" fill="#009B47"/>
+                                        </svg>
+                                    </div>
+                                    <span class="chat-if-online-text similar-text-2">Online</span>
+                                </div>
+                            </div>
+                            <div class="chat-height-place-box" >
+                                <span class="chat-height-place-text similar-text-2"></span>
+                                <div class="chat-if-varified d-flex gap-2">
+                                    <div class="chat-if-varified-svg-box">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M8.21168 0.633479C8.08537 0.470862 7.91152 0.35167 7.7143 0.292496C7.51709 0.233322 7.30634 0.237109 7.11139 0.303331L5.72765 0.772634C5.58584 0.82075 5.43497 0.836068 5.28638 0.817436L3.83656 0.63583C3.63227 0.610144 3.42506 0.648793 3.24377 0.746398C3.06248 0.844002 2.91612 0.995705 2.82508 1.18039L2.178 2.49127C2.11201 2.62535 2.01643 2.74254 1.89844 2.83493L0.744453 3.73232C0.582137 3.8585 0.463128 4.03209 0.403944 4.22899C0.34476 4.42588 0.348338 4.63632 0.41418 4.8311L0.883631 6.2165C0.9316 6.35808 0.94689 6.50868 0.928356 6.65701L0.74686 8.10771C0.721344 8.31188 0.760065 8.51892 0.857641 8.70007C0.955217 8.88121 1.1068 9.02746 1.29132 9.11847L2.60212 9.76561C2.7362 9.83161 2.85338 9.9272 2.94576 10.0452L3.84311 11.1993C4.10141 11.5321 4.54318 11.6648 4.94262 11.5295L6.32635 11.0602C6.46816 11.0121 6.61903 10.9968 6.76762 11.0154L8.21823 11.1969C8.42238 11.2224 8.62941 11.1837 8.81055 11.0861C8.99168 10.9886 9.13791 10.837 9.22892 10.6524L9.876 9.34156C9.942 9.20747 10.0376 9.09029 10.1556 8.99869L11.3104 8.10122C11.4729 7.97481 11.5919 7.80091 11.6509 7.60371C11.7099 7.40651 11.706 7.19582 11.6397 7.00094L11.1712 5.61703C11.1231 5.47521 11.1078 5.32433 11.1264 5.17574L11.3079 3.72504C11.3335 3.52094 11.2949 3.31394 11.1975 3.13279C11.1001 2.95164 10.9486 2.80533 10.7643 2.71419L9.45267 2.06714C9.31875 2.00097 9.20154 1.90536 9.10982 1.78747L8.21168 0.633479ZM8.14553 3.9259C8.18516 3.83133 8.18657 3.72507 8.14946 3.62947C8.11235 3.53388 8.03961 3.45641 7.94654 3.41336C7.85348 3.37031 7.74734 3.36504 7.65047 3.39865C7.5536 3.43227 7.47354 3.50215 7.42714 3.5936L5.72071 7.29061L4.35552 6.22545C4.31476 6.19129 4.26754 6.1657 4.21668 6.15019C4.16581 6.13468 4.11235 6.12957 4.05947 6.13517C4.00659 6.14077 3.95537 6.15697 3.90889 6.18279C3.8624 6.20862 3.82159 6.24354 3.78889 6.28548C3.75619 6.32741 3.73228 6.37551 3.71856 6.42689C3.70485 6.47827 3.70163 6.53189 3.70909 6.58454C3.71655 6.6372 3.73453 6.68781 3.76197 6.73336C3.78941 6.77892 3.82574 6.81848 3.8688 6.84969L5.62748 8.22282C5.67454 8.25948 5.72928 8.28504 5.7876 8.29758C5.84592 8.31012 5.90632 8.30933 5.9643 8.29525C6.02227 8.28117 6.07631 8.25418 6.12238 8.21629C6.16846 8.17839 6.20538 8.13058 6.23039 8.07642L8.14553 3.9259Z" fill="#EF9D22"/>
+                                        </svg>
+                                    </div>
+                                    <span class="chat-if-varified-text similar-text-2">Verified</span>
+                                </div>
+                            </div>
+    
+                            <div class="chat-occupation-details" >
+                                <div class="chat-degree d-flex gap-1">
+                                    <div class="chat-degree-svg-box icon-3-svg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="11" viewBox="0 0 13 11" fill="none">
+                                            <path d="M9.65032 8.28757L6.55325 10.0013L3.45617 8.28757V6.47695L2.57129 5.99335V8.79663L6.55325 11L10.5352 8.79663V5.99335L9.65032 6.47695V8.28757Z" fill="#616161"/>
+                                            <path d="M6.55353 0L0.359375 3.15947V3.91389L6.55353 7.29895L11.8628 4.39749V6.80115H12.7477V3.15947L6.55353 0ZM10.9779 3.8853L10.093 4.36888L6.55353 6.30336L3.01401 4.36888L2.12913 3.8853L1.51583 3.55012L6.55353 0.980527L11.5912 3.55012L10.9779 3.8853Z" fill="#616161"/>
+                                        </svg>
+                                    </div>
+                                    <span class="similar-text-1 similar-text-2 chat-profile-education"></span>
+                                </div>
+                                <div class="chat-if-working d-flex gap-1">
+                                    <div class="chat-if-working-svg-box icon-3-svg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="12" viewBox="0 0 15 12" fill="none">
+                                            <path d="M4.5 11V3.08333M10.5 11V3.08333M5 3.08333C5 2.5308 5.26339 2.00089 5.73223 1.61019C6.20107 1.21949 6.83696 1 7.5 1C8.16304 1 8.79893 1.21949 9.26777 1.61019C9.73661 2.00089 10 2.5308 10 3.08333M12 3.08333H3C2.46957 3.08333 1.96086 3.25893 1.58579 3.57149C1.21071 3.88405 1 4.30797 1 4.75V9.33333C1 9.77536 1.21071 10.1993 1.58579 10.5118C1.96086 10.8244 2.46957 11 3 11H12C12.5304 11 13.0391 10.8244 13.4142 10.5118C13.7893 10.1993 14 9.77536 14 9.33333V4.75C14 4.30797 13.7893 3.88405 13.4142 3.57149C13.0391 3.25893 12.5304 3.08333 12 3.08333Z" stroke="#616161" stroke-width="0.7675" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                    <span class="similar-text-1 similar-text-2 chat-profile-job"></span>
+                                </div>
+                                <div class="chat-salary d-flex gap-1">
+                                    <div class="chat-salary-svg-box icon-3-svg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none">
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M5.4734 0H5.5266C5.98656 0 6.36977 2.28715e-08 6.67367 0.0409303C6.99498 0.083907 7.28507 0.17907 7.51786 0.41186C7.75116 0.645163 7.84633 0.935256 7.8893 1.25605C7.92 1.48116 7.92767 1.74926 7.92972 2.0593C8.26126 2.07005 8.55698 2.09 8.81995 2.12479C9.41958 2.20563 9.90512 2.37549 10.2883 2.75819C10.671 3.1414 10.8409 3.62693 10.9217 4.22656C11 4.80981 11 5.55423 11 6.49461V6.55191C11 7.49228 11 8.23721 10.9217 8.81995C10.8409 9.41958 10.671 9.90512 10.2883 10.2883C9.90512 10.671 9.41958 10.8409 8.81995 10.9217C8.2367 11 7.49228 11 6.55191 11H4.44809C3.50772 11 2.76279 11 2.18005 10.9217C1.58042 10.8409 1.09488 10.671 0.711674 10.2883C0.328977 9.90512 0.159116 9.41958 0.0782791 8.81995C0 8.2367 0 7.49228 0 6.55191V6.49461C0 5.55423 0 4.8093 0.0782791 4.22656C0.159116 3.62693 0.328977 3.1414 0.711674 2.75819C1.09488 2.37549 1.58042 2.20563 2.18005 2.12479C2.47552 2.08821 2.77263 2.06635 3.07028 2.0593C3.07233 1.74926 3.08051 1.48116 3.1107 1.25605C3.15367 0.935256 3.24884 0.645163 3.48163 0.41186C3.71493 0.17907 4.00502 0.0844186 4.32581 0.0409303C4.63023 2.28715e-08 5.01395 0 5.4734 0ZM3.83823 2.04753C4.03163 2.04651 4.23474 2.04651 4.44809 2.04651H6.55191C6.76526 2.04651 6.96837 2.04651 7.16177 2.04753C7.15972 1.75591 7.15256 1.53591 7.12902 1.35837C7.09679 1.12251 7.04205 1.02121 6.97553 0.954698C6.90902 0.888186 6.80772 0.833442 6.57135 0.801209C6.32474 0.768465 5.99321 0.767442 5.5 0.767442C5.00679 0.767442 4.67526 0.768465 4.42814 0.801721C4.19228 0.833442 4.09098 0.888186 4.02447 0.955209C3.95795 1.02172 3.90321 1.12251 3.87098 1.35837C3.84744 1.5354 3.84028 1.7554 3.83823 2.04753ZM2.28186 2.88558C1.76716 2.95465 1.47042 3.0846 1.25349 3.30102C1.03758 3.51744 0.907628 3.81419 0.838558 4.32888C0.767953 4.85433 0.76693 5.54758 0.76693 6.52326C0.76693 7.49893 0.767953 8.19219 0.838558 8.71814C0.907628 9.23233 1.03758 9.52907 1.254 9.74549C1.47042 9.96191 1.76716 10.0919 2.28186 10.1609C2.80781 10.2315 3.50056 10.2326 4.47623 10.2326H6.52274C7.49842 10.2326 8.19167 10.2315 8.71763 10.1609C9.23181 10.0919 9.52856 9.96191 9.74498 9.74549C9.9614 9.52907 10.0913 9.23233 10.1604 8.71763C10.231 8.19219 10.232 7.49893 10.232 6.52326C10.232 5.54758 10.231 4.85484 10.1604 4.32837C10.0913 3.81419 9.9614 3.51744 9.74498 3.30102C9.52856 3.0846 9.23181 2.95465 8.71712 2.88558C8.19167 2.81498 7.49842 2.81395 6.52274 2.81395H4.47623C3.50056 2.81395 2.80833 2.81498 2.28186 2.88558ZM5.5 4.09302C5.60177 4.09302 5.69937 4.13345 5.77133 4.20541C5.84329 4.27737 5.88372 4.37498 5.88372 4.47674V4.48186C6.44088 4.62205 6.90698 5.06153 6.90698 5.67037C6.90698 5.77214 6.86655 5.86974 6.79459 5.9417C6.72263 6.01367 6.62502 6.05409 6.52326 6.05409C6.42149 6.05409 6.32389 6.01367 6.25192 5.9417C6.17996 5.86974 6.13953 5.77214 6.13953 5.67037C6.13953 5.47391 5.92158 5.20172 5.5 5.20172C5.07842 5.20172 4.86047 5.47391 4.86047 5.67037C4.86047 5.86684 5.07842 6.13953 5.5 6.13953C6.2086 6.13953 6.90698 6.6307 6.90698 7.37614C6.90698 7.98498 6.44088 8.42395 5.88372 8.56465V8.56977C5.88372 8.67154 5.84329 8.76914 5.77133 8.8411C5.69937 8.91306 5.60177 8.95349 5.5 8.95349C5.39823 8.95349 5.30063 8.91306 5.22867 8.8411C5.15671 8.76914 5.11628 8.67154 5.11628 8.56977V8.56465C4.55912 8.42447 4.09302 7.98498 4.09302 7.37614C4.09302 7.27437 4.13345 7.17677 4.20541 7.10481C4.27737 7.03285 4.37498 6.99242 4.47674 6.99242C4.57851 6.99242 4.67611 7.03285 4.74808 7.10481C4.82004 7.17677 4.86047 7.27437 4.86047 7.37614C4.86047 7.5726 5.07842 7.84479 5.5 7.84479C5.92158 7.84479 6.13953 7.5726 6.13953 7.37614C6.13953 7.17967 5.92158 6.90698 5.5 6.90698C4.7914 6.90698 4.09302 6.41581 4.09302 5.67037C4.09302 5.06153 4.55912 4.62205 5.11628 4.48186V4.47674C5.11628 4.37498 5.15671 4.27737 5.22867 4.20541C5.30063 4.13345 5.39823 4.09302 5.5 4.09302Z" fill="#616161"/>
+                                        </svg>
+                                    </div>
+                                    <span class="similar-text-1 similar-text-2  chat-profile-income"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ************************8 -->
+
+
+                        <div class="options-box">
+                            <div class="action_icon">
+                                <svg viewBox="0 0 448 512" height="17" width="17">
+                                    <path fill="#717171" d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/>
+                                </svg>
+                                <div class="action_options">
+                                    <div class="option" id="delete-current-chat" data-option="dont-show" data-value="" onclick="deleteCurrentChat(this)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
+                                            <g transform="rotate(-90, 9.5, 9.5)">
+                                                <rect width="19" height="19" rx="3" fill="#FF0000"/>
+                                                <path d="M4.625 6.25H14.375" stroke="white" stroke-width="0.65" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M13.2913 6.25V13.8333C13.2913 14.375 12.7497 14.9167 12.208 14.9167H6.79134C6.24967 14.9167 5.70801 14.375 5.70801 13.8333V6.25" stroke="white" stroke-width="0.65" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M7.33301 6.24992V5.16659C7.33301 4.62492 7.87467 4.08325 8.41634 4.08325H10.583C11.1247 4.08325 11.6663 4.62492 11.6663 5.16659V6.24992" stroke="white" stroke-width="0.65" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M8.41699 8.95825V12.2083" stroke="white" stroke-width="0.65" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M10.583 8.95825V12.2083" stroke="white" stroke-width="0.65" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </g>
+                                        </svg>
+                                        <span class="list_common_text">Delete</span>
+                                    </div>
+                                    <!-- <div class="option" data-option="dont-show" onclick="dont_show(this,'{{item.id}}')">
+                                        <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0 3C0 1.34315 1.34315 0 3 0H16C17.6569 0 19 1.34315 19 3V16C19 17.6569 17.6569 19 16 19H3C1.34315 19 0 17.6569 0 16V3Z" fill="#FB3F1E"/>
+                                            <path d="M5 5L14 14" stroke="white"/>
+                                            <path d="M14 5L5 14" stroke="white"/>
+                                        </svg>
+                                        <span class="list_common_text">Don't show</span>
+                                    </div>
+                                    <p class="option" data-option="shortlist" onclick="shortlistToggler(this,'{{item.id}}')">
+                                        <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0 3C0 1.34315 1.34315 0 3 0H16C17.6569 0 19 1.34315 19 3V16C19 17.6569 17.6569 19 16 19H3C1.34315 19 0 17.6569 0 16V3Z" fill="#009B47"/>
+                                            <path d="M8.4418 2.83192L8.44188 2.83176C8.49111 2.73506 8.56849 2.65136 8.66726 2.59187C8.76616 2.5323 8.88168 2.5 9.00061 2.5C9.11954 2.5 9.23506 2.5323 9.33396 2.59187C9.43273 2.65136 9.51011 2.73506 9.55934 2.83176L9.55946 2.832L11.116 5.88517L11.2341 6.11697L11.4918 6.15321L14.9715 6.64264C15.089 6.65917 15.1977 6.70703 15.2858 6.77896C15.3737 6.85078 15.4372 6.94333 15.4712 7.04491C15.5052 7.14636 15.5091 7.25445 15.4828 7.35763C15.4564 7.46092 15.4002 7.55707 15.3182 7.6343L15.318 7.63451L12.7999 10.0112L12.6037 10.1964L12.6508 10.462L13.2457 13.8189L13.2457 13.819C13.2642 13.9234 13.2524 14.031 13.2108 14.1302C13.1691 14.2295 13.0986 14.3178 13.0052 14.3837C12.9116 14.4497 12.7992 14.49 12.6807 14.4984C12.5624 14.5067 12.4446 14.4828 12.3411 14.4303C12.341 14.4303 12.3409 14.4302 12.3408 14.4301L9.22683 12.8441L8.99986 12.7285L8.7729 12.8442L5.66047 14.4301C5.66043 14.4302 5.66039 14.4302 5.66035 14.4302C5.55679 14.4828 5.43895 14.5068 5.32049 14.4984C5.202 14.49 5.08966 14.4497 4.99605 14.3837C4.90257 14.3178 4.8321 14.2295 4.79045 14.1302C4.74887 14.031 4.73701 13.9234 4.75554 13.819L4.75559 13.8187L5.34908 10.4618L5.39603 10.1963L5.19991 10.0112L2.6818 7.63451L2.68166 7.63438C2.59972 7.5571 2.54351 7.46089 2.51716 7.35755C2.49084 7.25433 2.49483 7.14619 2.5289 7.04472C2.56303 6.94311 2.62658 6.85057 2.71461 6.77879C2.80278 6.70691 2.91162 6.65912 3.02919 6.64271L3.02953 6.64267L6.50926 6.15459L6.76709 6.11843L6.8853 5.88645L8.4418 2.83192Z" stroke="white"/>
+                                        </svg>
+                                        {% if item.id in shortlisted_list %}
+                                        <span class="list_common_text shortlist_button" id="un_short_list_{{item.id}}">Unshortlist</span>
+                                        {% else %}
+                                        <span class="list_common_text shortlist_button" id="short_list_{{item.id}}">Shortlist</span>
+                                        {% endif %}
+                                    </p>
+                                    <p class="option" data-option="share" onclick="openShareModel(this)" data-customer-id="{{item.id}}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none" >
+                                            <g transform="rotate(-90, 9.5, 9.5)">
+                                                <path d="M0 3C0 1.34315 1.34315 0 3 0H16C17.6569 0 19 1.34315 19 3V16C19 17.6569 17.6569 19 16 19H3C1.34315 19 0 17.6569 0 16V3Z" fill="#009B47"/>
+                                                <path d="M15 5L4 8L9.5 10.5M15 5C15 5 11.5 15.5 11.5 16C11.5 16.5 9.5 10.5 9.5 10.5M15 5L9.5 10.5" stroke="white" stroke-width="0.7"/>
+                                            </g>
+                                        </svg>
+                                        <span class="list_common_text">Share</span>
+                                    </p>
+                                    <p class="option" data-option="block" onclick="blockUser(this,'{{item.id}}')">
+                                        <svg style="background-color: rgb(251, 63, 30);" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path transform="translate(2.4, 2.4) scale(0.8, 0.8)"  d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM4 12C4 7.58 7.58 4 12 4C13.85 4 15.55 4.63 16.9 5.69L5.69 16.9C4.59163 15.5032 3.99623 13.7769 4 12ZM12 20C10.15 20 8.45 19.37 7.1 18.31L18.31 7.1C19.4084 8.49679 20.0038 10.2231 20 12C20 16.42 16.42 20 12 20Z" fill="#FFFFFF"/>
+                                        </svg>
+                                        <span class="list_common_text">Block</span>
+                                    </p> -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ******************************* -->
+
+
+                    </div>
+                </div>
+
+            <div class="chat-message-main-container d-flex flex-column">
+                <div class="chat-message-box-main w-100">
+                    <!-- iteration for message according to the date -->
+                    <div class="chat-message-box position-relative">
+                        <ul>
+                        </ul>
+                    </div>
+                </div>
+                <div class="chat-send-container w-100">
+                    <form action="" id="chatForm">
+                        <div class="position-relative">
+                            <input class="chat-send-box w-100" type="text" name="message" id="send-chat" placeholder="Type your message">
+                            <button class="chat-send-icon-svg position-absolute" type="submit">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="24" viewBox="0 0 23 24" fill="none">
+                                    <path d="M2.21624 20.5695L21.5413 12.1304L2.21624 3.69135L2.20703 10.2551L16.0172 12.1304L2.20703 14.0058L2.21624 20.5695Z" fill="white"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
 </div>
-
-
-<!-- pagination -->
-{% include 'pagination.html' %}
 
 </div>
 
 {% endblock %}
 
 {% block script %}
+
+<script>
+    // ========== WebSocket setup ==============
+    const setupWebSocket = (() => {
+        let socketInstance = null;
+
+        return function(room_id) {
+            if (socketInstance) socketInstance.close();
+
+            socketInstance = new WebSocket(`ws://127.0.0.1:8001/ws/community/${room_id}/`);
+
+            socketInstance.onmessage = function (e) {
+                let data = JSON.parse(e.data);
+                if (data.type === 'chat') {
+                    let messageBox = document.querySelector(".chat-message-box ul");
+                    let newMsg = document.createElement('li');
+                    let currentUser = parseInt('{{ user.id }}');
+                    
+                    const today = new Date();
+                    const day = String(today.getDate()).padStart(2, '0');
+                    const month = today.toLocaleString('default', { month: 'short' });
+                    const year = today.getFullYear();
+                    const formattedDate = `${day}-${month}-${year}`;
+
+
+
+                    // Get the last date tag in the message box
+                    const dateTags = messageBox.querySelectorAll('.chat-recieved-date');
+                    const lastDateTag = dateTags.length > 0 ? dateTags[dateTags.length - 1] : null;
+                    
+                    // If there's no date tag or the last date tag doesn't match today's date, add a new one
+                    if (!lastDateTag || lastDateTag.textContent !== formattedDate) {
+                        let dateTag = document.createElement('li');
+                        dateTag.classList.add('chat-recieved-date');
+                        dateTag.textContent = formattedDate;
+                        messageBox.append(dateTag);
+                    }
+
+                    if (currentUser === parseInt(data.sender)) {
+                        newMsg.classList.add('chat-type-1');
+                        newMsg.innerHTML = `
+                            <div class="chat-box-1 position-relative">
+                                <span>${data.message}</span>
+                                <span class="chat-time-display position-absolute">${data.time}</span>
+                            </div>
+                            <div class="chat-image-box">
+                                <img src="{{ current_profile_pic }}" alt="">
+                            </div>`;
+                    } else {
+                        newMsg.classList.add('chat-type-2');
+                        newMsg.innerHTML = `
+                            <div class="chat-image-box">
+                                <img src="${localStorage.getItem('chatRecieverImage')}" alt="">
+                            </div>
+                            <div class="chat-box-2 position-relative">
+                                <span>${data.message}</span>
+                                <span class="chat-time-display position-absolute">${data.time}</span>
+                            </div>`;
+                    }
+
+                    messageBox.append(newMsg);
+
+                    {% comment %} updateLastMessagePreview(chatRoom, data.message);                   
+                    updateChatOrder(chatRoom); {% endcomment %}
+                    
+                    document.querySelector(".chat-message-box-main").scrollTop = messageBox.scrollHeight;
+                }
+            };
+
+            // ==================== Chat filter/sort handlers ====================
+            const chatForm = document.getElementById("chatForm");
+            chatForm.onsubmit = function (e) {
+                e.preventDefault();
+                const message = e.target.message.value.trim();
+                if (!message) return;
+                socketInstance.send(JSON.stringify({
+                    message: message,
+                    user: '{{ request.user.id }}'
+                }));
+                
+                {% comment %} updateLastMessagePreview(chatRoom, message);
+                updateChatOrder(chatRoom); {% endcomment %}
+                
+                chatForm.reset();
+            }; 
+        };
+    })();
+
+
+
+    const fetchMessage = (chatRoom, messageBox) => {
+        fetch(`{% url 'chat_message' %}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                user: '{{ user.id }}',
+                room: chatRoom
+            })
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            // Chat header setup
+            let recieverImage = document.querySelector(".chat-person-img");
+            let chatName = document.querySelector(".chat-name-age-text");
+            let chatOnline = document.querySelector(".chat-if-online");
+            let chatProfileEducation = document.querySelector(".chat-profile-education");
+            let chatProfileJob = document.querySelector(".chat-profile-job");
+            let chatProfileIncome = document.querySelector(".chat-profile-income");
+            let chatIsVerified = document.querySelector(".chat-if-varified");
+            let recieverDetail1 = document.querySelector(".chat-height-place-text");
+            let roomId = document.querySelector("#delete-current-chat");
+
+            if (data.room) {
+                roomId.setAttribute('data-value', data.room.id);
+            }
+            if (data.reciever_pic) {
+                recieverImage.src = data.reciever_pic;
+                localStorage.setItem('chatRecieverImage', data.reciever_pic);
+            } else {
+                let defaultPic = data.reciever.gender === "male" ? `{% static 'img/male.webp' %}` : `{% static 'img/female.webp' %}`;
+                recieverImage.src = defaultPic;
+                localStorage.setItem('chatRecieverImage', defaultPic);
+            }
+
+            chatName.innerHTML = `${data.reciever.user.first_name} ${data.reciever.user.last_name}`;
+            if (data.reciever.is_online) chatOnline.classList.remove('hide');
+
+            const receiverDetails = [
+                data.reciever.height_in_feet,
+                data.reciever.city?.name,
+                data.reciever.state?.name,
+                data.reciever.caste?.title
+            ].filter(Boolean).join(', ');
+            recieverDetail1.innerHTML = receiverDetails;
+
+            chatProfileEducation.textContent = data.reciever.education?.title || '-';
+            chatProfileJob.textContent = data.reciever.employed_in?.title || '-';
+            chatProfileIncome.textContent = data.reciever.annual_income || '-';
+            if (!data.reciever.is_verified) {
+                chatIsVerified.classList.remove('d-flex');
+                chatIsVerified.style.display = 'none';
+            }
+
+            // Render messages
+            let recieverImageUrl = localStorage.getItem('chatRecieverImage');
+            let lastDisplayedDateKey = null;
+
+            if (data.data && data.data.length > 0) {
+                let chatHeaderParent = document.querySelector(".chat-personal-detail-super")
+                var welcomChatBox = document.querySelector(".default-welcome-chat");
+                if(parseInt('{{user_info.user}}') === data.room.receiver && data.interest_status === 'pending'){
+                    let defaultMsgDiv = document.createElement('div');
+                    defaultMsgDiv.classList.add('default-welcome-chat');
+
+                    defaultMsgDiv.innerHTML = `<div class="default-message">
+                                        Hi, I liked your profile and would love to connect. Looking forward to hearing from you!
+                                    </div>
+                                    <div class="interest-button-container">
+                                        <button class="accept-button" onclick="acceptRequest(this,${data.room.sender})">
+                                            Accept
+                                            <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M2.09546 2.67816L2.09577 2.67781C2.94562 1.7354 4.16844 1.20127 5.65275 1.20127C6.86246 1.20127 7.83682 1.64514 8.58655 2.48506C8.85146 2.78672 9.08105 3.1184 9.27069 3.47352L9.79995 4.46462L10.3292 3.47352C10.5189 3.1184 10.7484 2.78672 11.0134 2.48506C11.7634 1.64483 12.7379 1.19998 13.9472 1.19998C15.4264 1.19998 16.6497 1.73289 17.501 2.67346C18.3494 3.61157 18.8 4.92186 18.8 6.43307C18.8 9.0096 17.4927 11.1166 15.754 12.8034L15.7537 12.8037C14.0186 14.4893 11.8214 15.7894 9.96382 16.7598C9.91273 16.7865 9.85637 16.8001 9.79947 16.8C9.74256 16.7998 9.68627 16.7858 9.63533 16.7588L9.63476 16.7585C7.77445 15.7758 5.57633 14.4859 3.84267 12.8092C2.10511 11.1285 0.799951 9.02944 0.799951 6.43307C0.799951 4.92765 1.24836 3.61604 2.09546 2.67816Z" stroke="#FFF" stroke-width="1.2"/>
+                                            </svg>
+                                        </button>
+                                        <button class="decline-button" onclick="declineRequest(this,${data.room.sender})">Decline</button>
+                                    </div>`
+                    if(!welcomChatBox){
+                        chatHeaderParent.appendChild(defaultMsgDiv)
+                    }
+                }
+                else if(parseInt('{{user_info.user}}') === data.room.receiver && data.interest_status === 'rejected'){
+                    let defaultMsgDiv = document.createElement('div');
+                    defaultMsgDiv.classList.add('default-welcome-chat');
+                    defaultMsgDiv.innerHTML = `<div class="default-message">
+                                                    Hi, I liked your profile and would love to connect. Looking forward to hearing from you!
+                                                </div>
+                                                <div class="interest-button-container">
+                                                    <button class="decline-button">Declined</button>
+                                                </div>`
+                    if(!welcomChatBox){
+                        chatHeaderParent.appendChild(defaultMsgDiv)
+                    }
+                }
+                else{
+                    let chatSendInput = document.getElementById("send-chat");
+                    if(data.interest_status === 'accepted'){
+                        chatSendInput.removeAttribute('disabled')
+                    }
+
+                    data.data.forEach(group => {
+                        if (!group.date || !group.messages?.length) return;
+
+                        // Convert to Date object
+                        const dateObj = new Date(group.date);
+
+                        // Get date key for uniqueness (YYYY-MM-DD)
+                        const dateKey = dateObj.toISOString().slice(0, 10);
+
+                        // Format date as 01-May-2025
+                        const day = String(dateObj.getDate()).padStart(2, '0');
+                        const month = dateObj.toLocaleString('default', { month: 'short' });
+                        const year = dateObj.getFullYear();
+                        const displayDate = `${day}-${month}-${year}`;
+
+                        // Display only if different date
+                        if (lastDisplayedDateKey !== dateKey) {
+                            let dateTag = document.createElement('li');
+                            dateTag.classList.add('chat-recieved-date');
+                            dateTag.textContent = displayDate;
+                            messageBox.append(dateTag);
+                            lastDisplayedDateKey = dateKey;
+                        }
+
+                        group.messages.forEach(msg => {
+                            if (!msg.content || msg.content.trim() === '') return;
+
+                            let li = document.createElement('li');
+                            if (parseInt('{{ customer.id }}') === parseInt(msg.sender)) {
+                                li.classList.add('chat-type-1');
+                                li.innerHTML = `
+                                    <div class="chat-box-1 position-relative">
+                                        <span class="chat-content">${msg.content}</span>
+                                        <span class="chat-time-display position-absolute">${msg.time}</span>
+                                    </div>
+                                    <div class="chat-image-box">
+                                        <img src="{{ current_profile_pic }}" alt="">
+                                    </div>`;
+                            } else {
+                                li.classList.add('chat-type-2');
+                                li.innerHTML = `
+                                    <div class="chat-image-box">
+                                        <img src="${recieverImageUrl}" alt="">
+                                    </div>
+                                    <div class="chat-box-2 position-relative">
+                                        <span class="chat-content">${msg.content}</span>
+                                        <span class="chat-time-display position-absolute">${msg.time}</span>
+                                    </div>`;
+                            }
+                            messageBox.appendChild(li);
+                        });
+                    });
+                }
+            }    
+
+
+            // Update the last message display immediately
+            if (data.data && data.data.length > 0) {
+                const lastGroup = data.data[data.data.length - 1];
+                if (lastGroup.messages && lastGroup.messages.length > 0) {
+                    const lastMessage = lastGroup.messages[lastGroup.messages.length - 1];
+                    if (lastMessage && lastMessage.content) {
+                        document.querySelectorAll('.chat-last-message').forEach(element => {
+                            element.textContent = lastMessage.content;
+                        });
+                    }
+                }
+            }
+            else{
+                // to setthe default message for the unaccepted messages from sender only
+                let chatSendInput = document.getElementById("send-chat");
+                if(parseInt('{{user_info.user}}') === data.room.sender && data.interest_status === 'pending'){
+                    chatSendInput.value = "Hi, I liked your profile and would love to connect. Looking forward to hearing from you!"
+                }
+                else if(data.interest_status === 'accepted'){
+                    chatSendInput.removeAttribute('disabled')
+                }
+            }
+            document.querySelector(".chat-message-box-main").scrollTop = messageBox.scrollHeight;
+        });
+    };
+
+
+    function showTheirMessages(e,id){
+        let empty_chat = document.querySelector('.empty-chat-container');
+        let chat_history = document.querySelector('.chat-personal-detail-main');
+        empty_chat.classList.add('hide');
+        chat_history.classList.remove('hide');
+        setupWebSocket(id)
+        
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ************ Old styling for Old Chat List page ******************* -->
 <script>
     
     const handleSubmit = ()=>{

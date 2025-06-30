@@ -88,7 +88,7 @@ class Community(models.Model):
     name = models.CharField(max_length=200)
     type = models.CharField(max_length=50, choices=[("global", "Global"), ("batch", "Batch"), ("package", "Package")])
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE, null=True, blank=True)
-    package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True)
+    package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True)   
 
     def __str__(self):
         return f"{self.name} ({self.type})"
