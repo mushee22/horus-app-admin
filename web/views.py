@@ -8,6 +8,7 @@ from rest_framework import status
 # Internal funcions imports
 from web.serializers import *
 from baseapp.mixins import LoginRequiredMixin
+import pandas as pd
 
 # Create your views here.
 
@@ -301,13 +302,13 @@ class TotalProgressView(LoginRequiredMixin, APIView):
 class MessageCreateView(APIView):
 
     def post(self,request):
-        student_id = request.data.get('user')
+        user_id = request.data.get('user')
         community_id= request.data.get('community')
         content = request.data.get('content')
 
         try:
             community = Community.objects.get(id=community_id)
-            student = Student.objects.get(id=student_id)
+            student = Student.objects.get(user__id=user_id)
 
             Message.objects.create(
                 sender = student, 
@@ -323,49 +324,27 @@ class MessageCreateView(APIView):
 
 
 class ListMessagesView(APIView):
+    
     def post(self,request):
         user = int(request.data.get('user'))
         community_id = request.data.get('community_id')
         try:
-            student = Student.objects.get(user=user)
+            # student = Student.objects.get(user=user)
             community = Community.objects.get(id=community_id)
-            
-            
-            messages = Message.objects.filter(community=community).order_by('id')
+            messages = Message.objects.filter(
+                community=community
+            ).select_related('sender').order_by('id')
 
             serializer = MessageSerializer(messages,many=True)
-
             arranged_messages = self.arranage_message_by_date(serializer.data)
-
             community_serializer = CommunityMiniSerializer(community)
-            
-            if room.sender.user.id == user:
-                sender = room.sender
-                reciever = room.receiver
-            else:
-                sender = room.receiver
-                reciever = room.sender
-            
-            reciever_serializer = CustomerUserSerializer(reciever)
-
-            reciever_profile_pic = CustomerPhotos.objects.filter(
-                customer=reciever,is_profile_pic=True
-            ).order_by('-id').first()
-
-            sender_profile_pic = CustomerPhotos.objects.filter(
-                customer=sender,is_profile_pic=True
-            ).order_by('-id').first()
-
-            mark_messages_read(messages,sender)
-
+            # mark_messages_read(messages,student)
 
             return Response({'resp_code':1,'data':arranged_messages,
-                        'sender_pic':sender_profile_pic.photo.url if sender_profile_pic else "",
                         'community': community_serializer.data,
                         'message':"Success"})
         except Exception as e:
             return Response({'resp_code':0,'message':str(e)})
-    
 
     def arranage_message_by_date(self,data):
         message_date_list = []

@@ -15,13 +15,14 @@ class Student(BasemodelMixin):
     group_code = models.CharField(max_length=200,null=True,blank=True)
     profile_image = models.ImageField(null=True,blank=True,upload_to='students')
     student_bio = models.TextField(null=True,blank=True)
-    batch = models.ForeignKey(Batch,on_delete=models.CASCADE)
+    batch = models.ForeignKey(Batch,on_delete=models.CASCADE,null=True,blank=True)
     package = models.ForeignKey('Package', on_delete=models.CASCADE, null=True, blank=True)
     start_date = models.DateField(null=True,blank=True)
     end_date = models.DateField(null=True,blank=True)
 
     # def __str__(self):
     #     return f"{self.user}"
+
 
 class Chapter(BasemodelMixin):
     title = models.CharField(max_length=200)
@@ -101,7 +102,7 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.student.user.first_name}: {self.content[:20]}"
+        return f"{self.sender.user.first_name}: {self.content[:20]}"
 
 
 

@@ -123,23 +123,23 @@
             <div class="chat-personal-detail-main hide">
                 <div class="chat-personal-detail-super w-100">
                     <div class="image-details-whole-box w-100">
-                        <div class="chat-person-img-box-2">
-                            <img class="chat-person-img" src="{% static 'img/male.webp' %}" alt="">
+                        <div class="community-profile-pic">
+                            CN
+                            {% comment %} <img class="chat-person-img" src="{% static 'img/male.webp' %}" alt=""> {% endcomment %}
                         </div>
                         
                         <div class="name-age-online">
-                            <div class="chat-name-age-box" >
-                                <span class="chat-name-age-text person-name-1"></span>
-                                <div class="chat-if-online d-flex gap-1 align-items-baseline hide" style="padding-top: 2px;">
+                            <div class="chat-name-age-box">
+                                <span class="chat-name-age-text community-name">Community Name here</span>
+                                {% comment %} <div class="chat-if-online d-flex gap-1 align-items-baseline hide" style="padding-top: 2px;">
                                     <div class="chat-if-online-svg-box">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" fill="none">
                                             <circle cx="4" cy="4" r="4" fill="#009B47"/>
                                         </svg>
                                     </div>
-                                    <span class="chat-if-online-text similar-text-2">Online</span>
-                                </div>
+                                </div> {% endcomment %}
                             </div>
-                            <div class="chat-height-place-box" >
+                            {% comment %} <div class="chat-height-place-box" >
                                 <span class="chat-height-place-text similar-text-2"></span>
                                 <div class="chat-if-varified d-flex gap-2">
                                     <div class="chat-if-varified-svg-box">
@@ -149,9 +149,9 @@
                                     </div>
                                     <span class="chat-if-varified-text similar-text-2">Verified</span>
                                 </div>
-                            </div>
+                            </div> {% endcomment %}
     
-                            <div class="chat-occupation-details" >
+                            {% comment %} <div class="chat-occupation-details" >
                                 <div class="chat-degree d-flex gap-1">
                                     <div class="chat-degree-svg-box icon-3-svg">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="11" viewBox="0 0 13 11" fill="none">
@@ -177,7 +177,7 @@
                                     </div>
                                     <span class="similar-text-1 similar-text-2  chat-profile-income"></span>
                                 </div>
-                            </div>
+                            </div> {% endcomment %}
                         </div>
 
                         <!-- ************************8 -->
@@ -327,13 +327,16 @@
                     } else {
                         newMsg.classList.add('chat-type-2');
                         newMsg.innerHTML = `
+                        <div class="reciever-chat-container">
+                            <span>hellos</span>
                             <div class="chat-image-box">
                                 <img src="${localStorage.getItem('chatRecieverImage')}" alt="">
                             </div>
                             <div class="chat-box-2 position-relative">
                                 <span>${data.message}</span>
                                 <span class="chat-time-display position-absolute">${data.time}</span>
-                            </div>`;
+                            </div>
+                        </div>`;
                     }
 
                     messageBox.append(newMsg);
@@ -375,152 +378,86 @@
             },
             body: JSON.stringify({
                 user: '{{ user.id }}',
-                room: chatRoom
+                community_id: chatRoom
             })
         })
         .then(resp => resp.json())
         .then(data => {
+            console.log("here comes the data")
+            console.log(data)
             // Chat header setup
-            let recieverImage = document.querySelector(".chat-person-img");
-            let chatName = document.querySelector(".chat-name-age-text");
-            let chatOnline = document.querySelector(".chat-if-online");
-            let chatProfileEducation = document.querySelector(".chat-profile-education");
-            let chatProfileJob = document.querySelector(".chat-profile-job");
-            let chatProfileIncome = document.querySelector(".chat-profile-income");
-            let chatIsVerified = document.querySelector(".chat-if-varified");
-            let recieverDetail1 = document.querySelector(".chat-height-place-text");
-            let roomId = document.querySelector("#delete-current-chat");
+            let CommunityImage = document.querySelector(".community-profile-pic");
+            let communtiyName = document.querySelector(".community-name");
 
-            if (data.room) {
-                roomId.setAttribute('data-value', data.room.id);
-            }
-            if (data.reciever_pic) {
-                recieverImage.src = data.reciever_pic;
-                localStorage.setItem('chatRecieverImage', data.reciever_pic);
-            } else {
-                let defaultPic = data.reciever.gender === "male" ? `{% static 'img/male.webp' %}` : `{% static 'img/female.webp' %}`;
-                recieverImage.src = defaultPic;
-                localStorage.setItem('chatRecieverImage', defaultPic);
-            }
-
-            chatName.innerHTML = `${data.reciever.user.first_name} ${data.reciever.user.last_name}`;
-            if (data.reciever.is_online) chatOnline.classList.remove('hide');
-
-            const receiverDetails = [
-                data.reciever.height_in_feet,
-                data.reciever.city?.name,
-                data.reciever.state?.name,
-                data.reciever.caste?.title
-            ].filter(Boolean).join(', ');
-            recieverDetail1.innerHTML = receiverDetails;
-
-            chatProfileEducation.textContent = data.reciever.education?.title || '-';
-            chatProfileJob.textContent = data.reciever.employed_in?.title || '-';
-            chatProfileIncome.textContent = data.reciever.annual_income || '-';
-            if (!data.reciever.is_verified) {
-                chatIsVerified.classList.remove('d-flex');
-                chatIsVerified.style.display = 'none';
-            }
+            communtiyName.innerHTML = `${data.community.name}`;
 
             // Render messages
-            let recieverImageUrl = localStorage.getItem('chatRecieverImage');
             let lastDisplayedDateKey = null;
 
             if (data.data && data.data.length > 0) {
                 let chatHeaderParent = document.querySelector(".chat-personal-detail-super")
                 var welcomChatBox = document.querySelector(".default-welcome-chat");
-                if(parseInt('{{user_info.user}}') === data.room.receiver && data.interest_status === 'pending'){
-                    let defaultMsgDiv = document.createElement('div');
-                    defaultMsgDiv.classList.add('default-welcome-chat');
+                
+                // let chatSendInput = document.getElementById("send-chat");  
+                data.data.forEach(group => {
+                    if (!group.date || !group.messages?.length) return;
 
-                    defaultMsgDiv.innerHTML = `<div class="default-message">
-                                        Hi, I liked your profile and would love to connect. Looking forward to hearing from you!
-                                    </div>
-                                    <div class="interest-button-container">
-                                        <button class="accept-button" onclick="acceptRequest(this,${data.room.sender})">
-                                            Accept
-                                            <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M2.09546 2.67816L2.09577 2.67781C2.94562 1.7354 4.16844 1.20127 5.65275 1.20127C6.86246 1.20127 7.83682 1.64514 8.58655 2.48506C8.85146 2.78672 9.08105 3.1184 9.27069 3.47352L9.79995 4.46462L10.3292 3.47352C10.5189 3.1184 10.7484 2.78672 11.0134 2.48506C11.7634 1.64483 12.7379 1.19998 13.9472 1.19998C15.4264 1.19998 16.6497 1.73289 17.501 2.67346C18.3494 3.61157 18.8 4.92186 18.8 6.43307C18.8 9.0096 17.4927 11.1166 15.754 12.8034L15.7537 12.8037C14.0186 14.4893 11.8214 15.7894 9.96382 16.7598C9.91273 16.7865 9.85637 16.8001 9.79947 16.8C9.74256 16.7998 9.68627 16.7858 9.63533 16.7588L9.63476 16.7585C7.77445 15.7758 5.57633 14.4859 3.84267 12.8092C2.10511 11.1285 0.799951 9.02944 0.799951 6.43307C0.799951 4.92765 1.24836 3.61604 2.09546 2.67816Z" stroke="#FFF" stroke-width="1.2"/>
-                                            </svg>
-                                        </button>
-                                        <button class="decline-button" onclick="declineRequest(this,${data.room.sender})">Decline</button>
-                                    </div>`
-                    if(!welcomChatBox){
-                        chatHeaderParent.appendChild(defaultMsgDiv)
-                    }
-                }
-                else if(parseInt('{{user_info.user}}') === data.room.receiver && data.interest_status === 'rejected'){
-                    let defaultMsgDiv = document.createElement('div');
-                    defaultMsgDiv.classList.add('default-welcome-chat');
-                    defaultMsgDiv.innerHTML = `<div class="default-message">
-                                                    Hi, I liked your profile and would love to connect. Looking forward to hearing from you!
-                                                </div>
-                                                <div class="interest-button-container">
-                                                    <button class="decline-button">Declined</button>
-                                                </div>`
-                    if(!welcomChatBox){
-                        chatHeaderParent.appendChild(defaultMsgDiv)
-                    }
-                }
-                else{
-                    let chatSendInput = document.getElementById("send-chat");
-                    if(data.interest_status === 'accepted'){
-                        chatSendInput.removeAttribute('disabled')
+                    // Convert to Date object
+                    const dateObj = new Date(group.date);
+
+                    // Get date key for uniqueness (YYYY-MM-DD)
+                    const dateKey = dateObj.toISOString().slice(0, 10);
+
+                    // Format date as 01-May-2025
+                    const day = String(dateObj.getDate()).padStart(2, '0');
+                    const month = dateObj.toLocaleString('default', { month: 'short' });
+                    const year = dateObj.getFullYear();
+                    const displayDate = `${day}-${month}-${year}`;
+
+                    // Display only if different date
+                    if (lastDisplayedDateKey !== dateKey) {
+                        let dateTag = document.createElement('li');
+                        dateTag.classList.add('chat-recieved-date');
+                        dateTag.textContent = displayDate;
+                        messageBox.append(dateTag);
+                        lastDisplayedDateKey = dateKey;
                     }
 
-                    data.data.forEach(group => {
-                        if (!group.date || !group.messages?.length) return;
+                    group.messages.forEach(msg => {
+                        if (!msg.content || msg.content.trim() === '') return;
 
-                        // Convert to Date object
-                        const dateObj = new Date(group.date);
-
-                        // Get date key for uniqueness (YYYY-MM-DD)
-                        const dateKey = dateObj.toISOString().slice(0, 10);
-
-                        // Format date as 01-May-2025
-                        const day = String(dateObj.getDate()).padStart(2, '0');
-                        const month = dateObj.toLocaleString('default', { month: 'short' });
-                        const year = dateObj.getFullYear();
-                        const displayDate = `${day}-${month}-${year}`;
-
-                        // Display only if different date
-                        if (lastDisplayedDateKey !== dateKey) {
-                            let dateTag = document.createElement('li');
-                            dateTag.classList.add('chat-recieved-date');
-                            dateTag.textContent = displayDate;
-                            messageBox.append(dateTag);
-                            lastDisplayedDateKey = dateKey;
-                        }
-
-                        group.messages.forEach(msg => {
-                            if (!msg.content || msg.content.trim() === '') return;
-
-                            let li = document.createElement('li');
-                            if (parseInt('{{ customer.id }}') === parseInt(msg.sender)) {
-                                li.classList.add('chat-type-1');
-                                li.innerHTML = `
-                                    <div class="chat-box-1 position-relative">
-                                        <span class="chat-content">${msg.content}</span>
-                                        <span class="chat-time-display position-absolute">${msg.time}</span>
-                                    </div>
-                                    <div class="chat-image-box">
-                                        <img src="{{ current_profile_pic }}" alt="">
-                                    </div>`;
-                            } else {
-                                li.classList.add('chat-type-2');
-                                li.innerHTML = `
-                                    <div class="chat-image-box">
-                                        <img src="${recieverImageUrl}" alt="">
-                                    </div>
+                        let li = document.createElement('li');
+                        console.log(msg.sender.profile_image,"here comes the sender of messages")
+                        console.log(msg.sender.user)
+                        console.log('{{ request.user.id }}')
+                        if (parseInt('{{ request.user.id }}') === parseInt(msg.sender.user.id)) {
+                            li.classList.add('chat-type-1');
+                            li.innerHTML = `
+                                <div class="chat-box-1 position-relative">
+                                    <span class="chat-content">${msg.content}</span>
+                                    <span class="chat-time-display position-absolute">${msg.time}</span>
+                                </div>
+                                <div class="chat-image-box">
+                                    <img src="${msg.sender.profile_image}" alt="">
+                                </div>`;
+                        } else {
+                            li.classList.add('chat-type-2');
+                            li.innerHTML = `
+                                <div class="chat-image-box">
+                                    <img src="${msg.sender.profile_image}" alt="">
+                                </div>
+                                <div class="reciever-chat-container">
+                                    <span class="sender-name-span">${msg.sender.user.first_name}</span>
                                     <div class="chat-box-2 position-relative">
                                         <span class="chat-content">${msg.content}</span>
                                         <span class="chat-time-display position-absolute">${msg.time}</span>
-                                    </div>`;
-                            }
-                            messageBox.appendChild(li);
-                        });
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        messageBox.appendChild(li);
                     });
-                }
+                });
             }    
 
 
@@ -536,26 +473,26 @@
                     }
                 }
             }
-            else{
-                // to setthe default message for the unaccepted messages from sender only
-                let chatSendInput = document.getElementById("send-chat");
-                if(parseInt('{{user_info.user}}') === data.room.sender && data.interest_status === 'pending'){
-                    chatSendInput.value = "Hi, I liked your profile and would love to connect. Looking forward to hearing from you!"
-                }
-                else if(data.interest_status === 'accepted'){
-                    chatSendInput.removeAttribute('disabled')
-                }
-            }
             document.querySelector(".chat-message-box-main").scrollTop = messageBox.scrollHeight;
         });
     };
 
 
+    // ========== Clear message box ==============
+    const removeMessages = (messageBox) => {
+        messageBox.innerHTML = '';
+    };
+
+
+    // ========= Show message on clicking the Community ==========
     function showTheirMessages(e,id){
         let empty_chat = document.querySelector('.empty-chat-container');
         let chat_history = document.querySelector('.chat-personal-detail-main');
+        const messageBox = document.querySelector(".chat-message-box ul");
         empty_chat.classList.add('hide');
         chat_history.classList.remove('hide');
+        removeMessages(messageBox);
+        fetchMessage(id,messageBox);
         setupWebSocket(id)
         
     }

@@ -273,7 +273,17 @@ class PackageSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'thumbnail', 'price', 'offer', 'features']
 
 
+class StudentSerialzer(serializers.ModelSerializer):
+
+    user = CustomUserSerializer()
+    class Meta:
+        model = Student
+        fields = '__all__'
+
+
 class MessageSerializer(serializers.ModelSerializer):
+
+    sender = StudentSerialzer()
     class Meta:
         model = Message
         fields = ['id','sender','community','content']

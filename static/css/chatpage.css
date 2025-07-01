@@ -1,6 +1,7 @@
 /* Font Styles  */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
+
 /* Common Properties */
 
 body{
@@ -450,6 +451,20 @@ p{
     background: var(--reply-bg, #FFF);
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.10);
 }
+.community-profile-pic {
+    width: 60px;
+    height: 60px;
+    background-color: #32a85e; /* light background */
+    color: #fff; /* dark text for contrast */
+    font-weight: bold;
+    font-size: 24px;
+    border-radius: 50%; /* makes it a circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    user-select: none;
+}
 .name-age-online{
     display: flex;
     flex-direction: column;
@@ -479,6 +494,9 @@ p{
     font-weight: 600;
     line-height: normal;
     text-transform: capitalize;
+}
+.community-name{
+    font-size: 1.2rem;
 }
 .chat-if-online-text,.chat-if-varified-text{
     color: var(--text1, #616161);
@@ -558,7 +576,7 @@ p{
 .chat-type-1{
     display: flex;
     justify-content: flex-end;
-    align-items: end;
+    align-items: start;
     gap: 0.63rem;
     margin-bottom: 2.06rem;
 
@@ -567,7 +585,8 @@ p{
     display: flex;
     width: 21.875rem;
     padding:1.19rem 3rem 1.19rem 2rem;   
-    border-radius: 2.6875rem 2.6875rem 0rem 2.6875rem;
+    /* border-radius: 2.6875rem 2.6875rem 0rem 2.6875rem; */
+    border-radius: 1.2rem 0.8rem 0.8rem 1.2rem;
     background: var(--reply-bg, #FFF);
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.04); 
 }
@@ -590,16 +609,32 @@ p{
 .chat-type-2{
     display: flex;
     justify-content: flex-start;
-    align-items: end;
+    align-items: start;
     gap: 0.63rem;
     margin-bottom: 2.06rem;
+    
+}
+.reciever-chat-container{
+    display: flex;
+    flex-direction: column;
+    border-radius: 0.3rem 1.25rem 1.25rem 1.25rem;
+    background: #009B47;
+}
+.sender-name-span{
+    padding-left: 0.5rem;
+    font-size: 0.75rem;
+    /* color: #a5b337; */
+    color:#191c14;
+    padding-top: 0.2rem;
+    font-family: "Exo 2", sans-serif;
 }
 .chat-box-2{
     display: flex;
     width: 21.875rem;
-    padding:1.19rem 3rem 1.19rem 2rem;   
-    border-radius: 2.6875rem 2.6875rem 2.6875rem 0rem;
-    background: #009B47;
+    padding:0.7rem 3rem 1.19rem 2rem;   
+    /* border-radius: 2.6875rem 2.6875rem 2.6875rem 0rem; */
+    /* border-radius: 1.25rem 1.25rem 1.25rem 0.3rem;
+    background: #009B47; */
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.04); 
 }
 .chat-box-2 span{
@@ -1859,6 +1894,9 @@ chat-send-icon-svg svg{
 
     .person-name-1{
         font-size: 0.71rem;
+    }
+    .community-name{
+        font-size: 1rem;
     }
 
     .chat-chat-message-simple span:nth-child(1){

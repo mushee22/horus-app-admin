@@ -154,6 +154,7 @@ class CreateAdminView(LoginRequiredMixin, TemplateView):
             )
             user.set_password(request.POST.get("password"))  # Hash the password
             user.save()
+            Student.objects.create(user=user)
             messages.success(request, "Admin user created successfully.")
             return redirect('admin_user_list')
         except Exception as e:
@@ -275,6 +276,8 @@ class StudentListView(LoginRequiredMixin,ListView):
         sort = self.request.GET.get("sort")
         category_filter = self.request.GET.get("filter")
 
+        # filter only users with is_admin = False
+        queryset = queryset.filter(user__is_admin=False)
         if search:
             queryset = queryset.filter(
                 Q(user__first_name__istartswith=search)|
