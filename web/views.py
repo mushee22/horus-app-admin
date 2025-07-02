@@ -51,7 +51,7 @@ class CustomerRegistrationView(APIView):
             })
     
     
-class CustomerProfileView(LoginRequiredMixin,APIView):
+class   CustomerProfileView(LoginRequiredMixin,APIView):
     def get(self,request):
         try:
             student = Student.objects.get(user=request.user)

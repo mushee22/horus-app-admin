@@ -777,4 +777,12 @@ class CommunityListView(LoginRequiredMixin,ListView):
     template_name = 'community/list_community.html'
     context_object_name = 'context_data'
     paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context =  super().get_context_data(**kwargs)
+        student = Student.objects.get(
+            user=self.request.user
+        )
+        context['current_profile_pic'] = student.profile_image.url
+        return context 
     

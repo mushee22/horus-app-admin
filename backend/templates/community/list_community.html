@@ -326,17 +326,19 @@
                             </div>`;
                     } else {
                         newMsg.classList.add('chat-type-2');
+                        const is_admin = data.is_admin ? '( Admin )':''
                         newMsg.innerHTML = `
-                        <div class="reciever-chat-container">
-                            <span>hellos</span>
                             <div class="chat-image-box">
-                                <img src="${localStorage.getItem('chatRecieverImage')}" alt="">
+                                <img src="${data.profile_pic}" alt="">
                             </div>
-                            <div class="chat-box-2 position-relative">
-                                <span>${data.message}</span>
-                                <span class="chat-time-display position-absolute">${data.time}</span>
+                            <div class="reciever-chat-container">
+                                <span class="sender-name-span">${data.first_name}  ${is_admin}</span>
+                                <div class="chat-box-2 position-relative">
+                                    <span class="chat-content">${data.message}</span>
+                                    <span class="chat-time-display position-absolute">${data.time}</span>
+                                </div>
                             </div>
-                        </div>`;
+                        `;
                     }
 
                     messageBox.append(newMsg);
@@ -356,7 +358,11 @@
                 if (!message) return;
                 socketInstance.send(JSON.stringify({
                     message: message,
-                    user: '{{ request.user.id }}'
+                    user: '{{ request.user.id }}',
+                    first_name:'{{request.user.first_name}}',
+                    last_name:'{{request.user.last_name}}',
+                    profile_pic:'{{current_profile_pic}}',
+                    is_admin:'{{request.user.is_admin}}'
                 }));
                 
                 {% comment %} updateLastMessagePreview(chatRoom, message);
@@ -383,8 +389,6 @@
         })
         .then(resp => resp.json())
         .then(data => {
-            console.log("here comes the data")
-            console.log(data)
             // Chat header setup
             let CommunityImage = document.querySelector(".community-profile-pic");
             let communtiyName = document.querySelector(".community-name");
@@ -427,9 +431,6 @@
                         if (!msg.content || msg.content.trim() === '') return;
 
                         let li = document.createElement('li');
-                        console.log(msg.sender.profile_image,"here comes the sender of messages")
-                        console.log(msg.sender.user)
-                        console.log('{{ request.user.id }}')
                         if (parseInt('{{ request.user.id }}') === parseInt(msg.sender.user.id)) {
                             li.classList.add('chat-type-1');
                             li.innerHTML = `
@@ -442,12 +443,13 @@
                                 </div>`;
                         } else {
                             li.classList.add('chat-type-2');
+                            const is_admin = msg.sender.user.is_admin ? '( Admin )':''
                             li.innerHTML = `
                                 <div class="chat-image-box">
                                     <img src="${msg.sender.profile_image}" alt="">
                                 </div>
                                 <div class="reciever-chat-container">
-                                    <span class="sender-name-span">${msg.sender.user.first_name}</span>
+                                    <span class="sender-name-span">${msg.sender.user.first_name} ${is_admin}</span>
                                     <div class="chat-box-2 position-relative">
                                         <span class="chat-content">${msg.content}</span>
                                         <span class="chat-time-display position-absolute">${msg.time}</span>

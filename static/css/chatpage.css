@@ -627,6 +627,7 @@ p{
     color:#191c14;
     padding-top: 0.2rem;
     font-family: "Exo 2", sans-serif;
+    font-weight: 600;
 }
 .chat-box-2{
     display: flex;
