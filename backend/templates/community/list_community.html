@@ -71,32 +71,30 @@
                         <div class="chat-image-and-name">
                             <div class="chat-person-img-box-1 position-relative">
                                 <!-- <img src="{% if customer.id == chat.sender.id %}{% for pic in chat.receiver.customerphotos_set.all %}{% if pic.is_profile_pic == True %}{{pic.photo.url}}{% else %}{% static 'img/male.webp' %}{% endif %}{% endfor %}{% else %}{% for pic in chat.sender.customerphotos_set.all %}{% if pic.is_profile_pic == True %}{{pic.photo.url}}{% else %}{% static 'img/male.webp' %}{% endif %}{% endfor %}{% endif %}" alt=""> -->
-                                {% if chat.chat_profile_pic %}
-                                    <img src="{{chat.chat_profile_pic.url}}" alt="">
+                                {% if chat.profile_image %}
+                                    <img src="{{chat.profile_image.url}}" alt="">
                                 {% else %}
-                                    {% if chat.gender == male %}
-                                        <img src="{% static 'img/male.webp' %}" alt="">
-                                    {% else %}
-                                        <img src="{% static 'img/female.webp' %}" alt="">
-                                    {% endif %}
+                                    <div class="default-profile-placeholder">
+                                        {{ chat.name|default:"NA"|slice:":2"|upper }}
+                                    </div>
                                 {% endif %}
-                                
 
-
-                                {% if customer.is_prime %}
-                                <div class="chat-image-premium-svg position-absolute">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="15" viewBox="0 0 14 15" fill="none">
-                                        <rect x="0.404297" y="0.45575" width="12.6116" height="13.9105" rx="3.36309" fill="#EF9D22"/>
-                                        <path d="M3.6535 9.65158L2.80566 3.86529L5.13722 6.49542L6.62094 3.33926L8.10465 6.49542L10.4362 3.86529L9.58837 9.65158H3.6535ZM9.58837 11.2297C9.58837 11.5453 9.4188 11.7557 9.16445 11.7557H4.07742C3.82307 11.7557 3.6535 11.5453 3.6535 11.2297V10.7036H9.58837V11.2297Z" fill="white"/>
-                                    </svg>
-                                </div>
-                                {% endif %}
                             </div>
                         
                             <div class="chat-chat-message-simple">
-                                <span class="person-name-1">{% if customer.id == chat.sender.id %}{{chat.receiver.user.full_name}}{% else %}{{chat.sender.user.full_name}}{% endif %}</span>
+                                <span class="person-name-1">{{chat.name}}</span>
                                 <!-- <span>{% if chat.last_message_content %}{{chat.last_message_content}}{% else %}No message{% endif %}</span> -->
-                                <span class="last-message-content">{% if chat.last_message_content %}{{chat.last_message_content}}{% else %}No message{% endif %}</span>
+                                <span class="last-message-content">
+                                    {% if chat.last_message_content %}
+                                        {% if chat.last_message_sender == request.user.first_name %}
+                                            You: {{ chat.last_message_content|truncatechars:15 }}
+                                        {% else %}
+                                            {{ chat.last_message_sender }}: {{ chat.last_message_content|truncatechars:15 }}
+                                        {% endif %}
+                                    {% else %}
+                                        No message
+                                    {% endif %}
+                                </span>
                             </div>
                         </div>
                         <div class="time-and-count">
@@ -130,7 +128,7 @@
                         
                         <div class="name-age-online">
                             <div class="chat-name-age-box">
-                                <span class="chat-name-age-text community-name">Community Name here</span>
+                                <span class="chat-name-age-text community-name">Community</span>
                                 {% comment %} <div class="chat-if-online d-flex gap-1 align-items-baseline hide" style="padding-top: 2px;">
                                     <div class="chat-if-online-svg-box">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" fill="none">
@@ -392,8 +390,18 @@
             // Chat header setup
             let CommunityImage = document.querySelector(".community-profile-pic");
             let communtiyName = document.querySelector(".community-name");
-
-            communtiyName.innerHTML = `${data.community.name}`;
+            
+            const name = data.community.name || "";
+            const initials = name.substring(0, 2).toUpperCase();
+            console.log(data)
+            if (data.community.profile_image) {
+                CommunityImage.style.backgroundImage = `url('${data.community.profile_image}')`;
+                CommunityImage.innerText = ""; // remove initials
+            } else {
+                CommunityImage.innerText = initials; // fallback initials
+                CommunityImage.style.backgroundImage = "none";
+            }
+            communtiyName.innerHTML = `${name}`;
 
             // Render messages
             let lastDisplayedDateKey = null;

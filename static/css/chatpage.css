@@ -464,6 +464,30 @@ p{
     justify-content: center;
     text-transform: uppercase;
     user-select: none;
+    overflow: hidden;
+    text-transform: uppercase;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+.default-profile-placeholder{
+    width: 2.6875rem;
+    height: 3rem;
+    border-radius: 0.42038rem;
+    background-color: rgba(203, 203, 53, 0.641);
+    color: #fff; /* dark text for contrast */
+    font-weight: bold;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    user-select: none;
+    overflow: hidden;
+    text-transform: uppercase;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
 .name-age-online{
     display: flex;

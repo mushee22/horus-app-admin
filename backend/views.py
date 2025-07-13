@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate,login
 from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.db.models import Q,Sum,Case,When,IntegerField
+from django.db.models import Q,Sum,Case,When,IntegerField,OuterRef,Subquery
 from .forms import AdminUserCreationForm
 from django.urls import reverse_lazy
 from django.contrib.auth.models import Permission
@@ -783,6 +783,22 @@ class CommunityListView(LoginRequiredMixin,ListView):
         student = Student.objects.get(
             user=self.request.user
         )
-        context['current_profile_pic'] = student.profile_image.url
+        context['current_profile_pic'] = student.profile_image.url if student.profile_image else None
+
+        # Subquery to get latest message per community
+        latest_messages = Message.objects.filter(
+            community=OuterRef('pk')
+        ).order_by('-timestamp')
+
+        # Annotate each community with latest message content and timestamp
+        community_list = context['context_data']
+        community_list = community_list.annotate(
+            last_message_content=Subquery(latest_messages.values('content')[:1]),
+            last_message_sender=Subquery(latest_messages.values('sender__user__first_name')[:1]),
+            last_message_time=Subquery(latest_messages.values('timestamp')[:1])
+        )
+
+        context['context_data'] = community_list
+
         return context 
     

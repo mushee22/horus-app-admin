@@ -43,6 +43,10 @@ class SubChapters(BasemodelMixin):
     duration = models.IntegerField(null=True,blank=True)
     order = models.IntegerField()
 
+    def get_queryset(self):
+        return SubChapters.objects.all().order_by('order')
+    
+
 class Features(BasemodelMixin):
     name = models.CharField(max_length=200)
 
@@ -89,7 +93,8 @@ class Community(models.Model):
     name = models.CharField(max_length=200)
     type = models.CharField(max_length=50, choices=[("global", "Global"), ("batch", "Batch"), ("package", "Package")])
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE, null=True, blank=True)
-    package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True)   
+    package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True)
+    profile_image = models.ImageField(null=True,blank=True,upload_to='community')  
 
     def __str__(self):
         return f"{self.name} ({self.type})"
