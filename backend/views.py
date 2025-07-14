@@ -448,6 +448,8 @@ class ChapterListView(LoginRequiredMixin,ListView):
         else:
             queryset = queryset.order_by('-id')
 
+        queryset = queryset.order_by('order')
+
         # if category_filter:
         #     queryset = queryset.filter(category=category_filter)
 
@@ -469,7 +471,7 @@ class ChapterCreateView(LoginRequiredMixin, TemplateView):
             return redirect('chapter_list')
 
         except Exception as e:
-            messages.error(request, f"Failed to create student: {str(e)}")
+            messages.error(request, f"Failed to create Chapter: {str(e)}")
             return redirect('chapter_list')
 
 
@@ -494,11 +496,11 @@ class ChapterUpdateView(LoginRequiredMixin, DetailView):
 
             chapter.save()
 
-            messages.success(request, "Student details updated successfully.")
+            messages.success(request, "Chapter details updated successfully.")
             return redirect('chapter_list')
 
         except Exception as e:
-            messages.error(request, f"Failed to update student: {str(e)}")
+            messages.error(request, f"Failed to update chapter: {str(e)}")
             return redirect('chapter_list')
         
 class ChapterDeleteView(LoginRequiredMixin,DeleteMasterView):
@@ -571,15 +573,27 @@ class SubChapterListView(LoginRequiredMixin, ListView):
     context_object_name= "context_data"
     paginate_by = 10
 
+    def get_queryset(self):
+        chapter_id = self.kwargs.get('pk')
+        return SubChapters.objects.filter(chapter_id=chapter_id).order_by('order')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['chapter_id'] = self.kwargs.get('pk')
+        return context
+    
+
 class SubChapterCreatView(LoginRequiredMixin, TemplateView):
     template_name="sub-chapter/create_sub_chapter.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['chapters'] = Chapter.objects.all()
+        context['chapter_id'] = self.kwargs.get('pk')
+        print("chapter_id",context['chapter_id'])
         return context
 
-    def post(self, request):
+    def post(self, request,*args,**kwargs):
         try:
             
             video_file = request.FILES.get("video")
@@ -605,14 +619,15 @@ class SubChapterCreatView(LoginRequiredMixin, TemplateView):
                 status = 'pending',
                 model_id = f"subchapter_{subchapter.id}",
             )
-             
+            
             upload_subchapter_video_to_s3.delay(subchapter.id, temp_path, task.id)
 
             messages.success(request, "Sub Chapter created successfully.")
-            return redirect('sub_chapter_list')
+            return redirect('sub_chapter_list', pk=self.kwargs.get('pk'))
         except Exception as e:
             messages.error(request, f"Failed to create Sub Chapter: {str(e)}")   
-            return redirect('sub_chapter_list') 
+            return redirect('sub_chapter_list', pk=self.kwargs.get('pk')) 
+        
         
 class SubChapterUpdateView(LoginRequiredMixin, DetailView):
     template_name = 'sub-chapter/update_sub_chapter.html'
@@ -622,6 +637,14 @@ class SubChapterUpdateView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['chapters'] = Chapter.objects.all()
+        try:
+            subchapter = SubChapters.objects.select_related(
+                'chapter'
+            ).get(id=self.kwargs.get('pk'))
+            context['chapter_id'] = subchapter.chapter.id
+        except Exception as e:
+            messages.error(self.request, f"No matching chaper found: {str(e)}") 
+            return redirect('chapter_list')
         return context
     
     def post(self, request, pk):
@@ -629,7 +652,7 @@ class SubChapterUpdateView(LoginRequiredMixin, DetailView):
             chapter = Chapter.objects.get(id=request.POST.get("chapter"))
         except Chapter.DoesNotExist:
             messages.error(request, "Chapter does not exist.")
-            return redirect('sub_chapter_list')
+            return redirect('chapter_list')
 
         try:
             subChapter = get_object_or_404(SubChapters, pk=pk)
@@ -656,11 +679,11 @@ class SubChapterUpdateView(LoginRequiredMixin, DetailView):
             subChapter.save()        
 
             messages.success(request, "Sub Chapter Updated successfully.")
-            return redirect('sub_chapter_list')
+            return redirect('sub_chapter_list', pk=chapter.id)
 
         except Exception as e:
             messages.error(request, f"Failed to update: {str(e)}")
-            return redirect('sub_chapter_list')
+            return redirect('sub_chapter_list', pk=chapter.id)
         
 class SubChapterDeleteView(LoginRequiredMixin,DeleteMasterView):
     model = SubChapters

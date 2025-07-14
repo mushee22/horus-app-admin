@@ -8,7 +8,7 @@
 
 <div class="main-container">
     <div class="top-container">
-        <form action="{% url 'sub_chapter_list' %}" method="GET" id="searchSortForm">
+        <form action="{% url 'sub_chapter_list' pk=chapter_id %}" method="GET" id="searchSortForm">
             <!-- search -->
             <input class="form-control border-1" type="search" placeholder="Search" name="search" id="searchBox" value="{{request.GET.search}}">
 
@@ -38,7 +38,7 @@
             {% endcomment %}
 
         </form>
-        <a href="{% url 'create_sub_chapter' %}"><button type="submit" class="btn btn-primary">New +</button></a>
+        <a href="{% url 'create_sub_chapter' pk=chapter_id %}"><button type="submit" class="btn btn-primary">New +</button></a>
     </div>
     
     {% include 'messages.html' %}
@@ -124,10 +124,11 @@
     // document.getElementById("filterBox").addEventListener('change',handleSubmit);
 
 
-    // // delete labour
+    // // delete subchapter
     document.querySelector(".popup-delete-btn").addEventListener('click',()=>{
         var deleteItem = document.querySelector('input[name="delete_id"]').value;
-        window.location.href = `{% url 'delete_sub_chapter' %}?pk=${deleteItem}`;
+        var chapter_id = "{{chapter_id}}"
+        window.location.href = `{% url 'delete_sub_chapter' %}?pk=${deleteItem}&args=${"{{chapter_id}}"}`;
     });
 
 

@@ -8,9 +8,9 @@
 
     <div class="main-container">
         <div class="bread-crumb-container">
-            <a href="{% url 'sub_chapter_list' %}"><span class="parent">Sub Chapter</span></a>><span>Create</span>
+            <a href="{% url 'sub_chapter_list' pk=chapter_id %}"><span class="parent">Sub Chapter</span></a>><span>Create</span>
         </div>
-        <form method="POST" action="{% url 'create_sub_chapter' %}" enctype="multipart/form-data" id="CreateFormId">
+        <form method="POST" action="{% url 'create_sub_chapter' pk=chapter_id %}" enctype="multipart/form-data" id="CreateFormId">
             {% csrf_token %}
             <div class="mb-3">
                 <div class="form-label required">Image</div>
@@ -24,12 +24,13 @@
            
             <div class="mb-3">
                 <label for="chapter" class="form-label required">Chapter</label>
-                <select class="form-control" name="chapter" id="chapter">
+                <select class="form-control" name="chapter_display" id="chapter" disabled>
                     <option value="">--select a Chapter--</option>
                     {% for item in chapters %}
-                    <option value="{{item.id}}">{{item.title}}</option>
+                    <option value="{{item.id}}" {% if item.id == chapter_id %}selected{% endif %}>{{item.title}}</option>
                     {% endfor %}
                 </select>
+                <input type="hidden" name="chapter" value="{{ chapter_id }}">
             </div>
             <div class="mb-3">
                 <label for="description" class="form-label required">Description</label>

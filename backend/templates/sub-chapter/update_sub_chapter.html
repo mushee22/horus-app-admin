@@ -8,7 +8,7 @@
 
     <div class="main-container">
         <div class="bread-crumb-container">
-            <a href="{% url 'sub_chapter_list' %}"><span class="parent">Sub Chapter</span></a>><span>Create</span>
+            <a href="{% url 'sub_chapter_list' pk=chapter_id %}"><span class="parent">Sub Chapter</span></a>><span>Create</span>
         </div>
         <form method="POST" action="{% url 'update_sub_chapter' pk=context_data.id %}" enctype="multipart/form-data" id="CreateFormId">
             {% csrf_token %}
