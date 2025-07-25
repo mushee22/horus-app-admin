@@ -365,3 +365,13 @@ class ListMessagesView(APIView):
         return arranged_list
 
 
+# class CommunityMembers(APIView):
+#     def get(self, request, community_id):
+#         try:
+#             community = Community.objects.get(id=community_id)
+#             members = community.messages.sender()
+#             return Response({'resp_code':1,'user_ids':,'message':"Success"})
+#         except Community.DoesNotExist:
+#             return Response({'resp_code':0,'message':"Community not found"})
+#         except Exception as e:
+#             return Response({'resp_code':0,'message':str(e)})

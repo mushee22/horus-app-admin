@@ -282,8 +282,8 @@
 
         return function(room_id) {
             if (socketInstance) socketInstance.close();
-
-            socketInstance = new WebSocket(`ws://127.0.0.1:8001/ws/community/${room_id}/`);
+            const user_id = '{{ request.user.id }}';
+            socketInstance = new WebSocket(`ws://127.0.0.1:8001/ws/community/${room_id}/${user_id}/`);
 
             socketInstance.onmessage = function (e) {
                 let data = JSON.parse(e.data);

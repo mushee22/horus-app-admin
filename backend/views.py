@@ -17,8 +17,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.apps import apps
 from django.core.files.storage import default_storage
 from .tasks import upload_subchapter_video_to_s3
-
-
+from backend.helpers import add_to_community
 
 # Models Import
 from web.models import *
@@ -337,7 +336,7 @@ class StudentCreateView(LoginRequiredMixin, TemplateView):
             # Handle profile image properly
             profile_image = request.FILES.get("profile_image")
 
-            Student.objects.create(
+            student =Student.objects.create(
                 user=user,
                 profile_image=profile_image,
                 batch=batch,
@@ -346,6 +345,12 @@ class StudentCreateView(LoginRequiredMixin, TemplateView):
                 end_date=request.POST.get("end_date"),
                 student_bio=request.POST.get("student_bio")
             )
+            student.save()
+
+            # Add the student to the community
+            success, error = add_to_community(student, batch, package)
+            if not success:
+                raise Exception(f"Community assignment failed: {error}")
 
             messages.success(request, "Student created successfully.")
             return redirect('student_list')

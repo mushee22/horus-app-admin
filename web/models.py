@@ -19,6 +19,7 @@ class Student(BasemodelMixin):
     package = models.ForeignKey('Package', on_delete=models.CASCADE, null=True, blank=True)
     start_date = models.DateField(null=True,blank=True)
     end_date = models.DateField(null=True,blank=True)
+    community = models.ManyToManyField('Community', blank=True)  ## add related name if neeeded
 
     # def __str__(self):
     #     return f"{self.user}"
@@ -91,6 +92,7 @@ class SubChapterProgress(BasemodelMixin):
 
 class Community(models.Model):
     name = models.CharField(max_length=200)
+    default_name = models.CharField(max_length=200,unique=True)
     type = models.CharField(max_length=50, choices=[("global", "Global"), ("batch", "Batch"), ("package", "Package")])
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE, null=True, blank=True)
     package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True)
