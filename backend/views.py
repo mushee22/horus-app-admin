@@ -72,6 +72,7 @@ class MasterArchiveTogglerView(View):
         except:
             response = {'resp_code':0}
         return JsonResponse(response)
+    
 
 class LoginView(TemplateView):
     template_name = "login.html"
@@ -90,10 +91,12 @@ class LoginView(TemplateView):
         else:
             messages.error(request,"User not found")
             return redirect('admin_login')
+        
 
 def logout_view(request):
     auth.logout(request)
     return redirect('admin_login')
+
 
 class AdminView(LoginRequiredMixin,TemplateView):
     template_name = 'dashboard.html'
@@ -115,7 +118,6 @@ class AdminView(LoginRequiredMixin,TemplateView):
         # context['total_count'] = self.count_setting(contact_count+purchase_count)
         return context
 
-#*********************************************************************************
 
 class AdminListView(LoginRequiredMixin, ListView):
     model = CustomUser
@@ -128,8 +130,8 @@ class AdminListView(LoginRequiredMixin, ListView):
         queryset = queryset.filter(is_admin=True)  # Filter to show only admin users
         queryset = queryset.exclude(id=self.request.user.id)
         queryset = queryset.exclude(is_superuser=True)  # Exclude superusers if needed
-       # Exclude superusers if needed
         return queryset
+    
     
 class CreateAdminView(LoginRequiredMixin, TemplateView):
     template_name = 'users/create_user.html'
@@ -160,6 +162,7 @@ class CreateAdminView(LoginRequiredMixin, TemplateView):
         except Exception as e:
             messages.error(request, f"Failed to create admin user: {str(e)}")
             return redirect('create_admin_user')   
+
 
 class AdminUpdateView(LoginRequiredMixin, DetailView):
     template_name = 'users/update_user.html'
@@ -196,18 +199,19 @@ class AdminUpdateView(LoginRequiredMixin, DetailView):
         except Exception as e:
             messages.error(request, f"Failed to update admin user: {str(e)}")
             return redirect('update_admin_user', pk=pk)
+        
 
 class AdminDeleteView(LoginRequiredMixin, DeleteMasterView):
     model = CustomUser
     return_path = 'admin_user_list'  
 
-#*********************************************************************************
 
 class RoleListView(LoginRequiredMixin, ListView):
     model = Role
     template_name = 'role/list_role.html'
     context_object_name = 'context_data'
     paginate_by = 10    
+
 
 class RoleCreateView(LoginRequiredMixin, TemplateView):
     template_name = 'role/create_role.html'
@@ -247,8 +251,6 @@ class RoleCreateView(LoginRequiredMixin, TemplateView):
         context['grouped_permissions'] = grouped_permissions
 
         return context
-           
-    
 
     def post(self, request):
         try:
@@ -260,8 +262,7 @@ class RoleCreateView(LoginRequiredMixin, TemplateView):
         except Exception as e:
             messages.error(request, f"Failed to create role: {str(e)}")
             return redirect('role_list')
-   
-#*********************************************************************************
+
 
 class StudentListView(LoginRequiredMixin,ListView):
     model = Student
@@ -293,6 +294,7 @@ class StudentListView(LoginRequiredMixin,ListView):
         #     queryset = queryset.filter(category=category_filter)
 
         return queryset
+    
     
 class StudentCreateView(LoginRequiredMixin, TemplateView):
     template_name = 'student/create_student.html'
@@ -351,7 +353,8 @@ class StudentCreateView(LoginRequiredMixin, TemplateView):
         except Exception as e:
             messages.error(request, f"Failed to create student: {str(e)}")
             return redirect('student_list')
-       
+    
+
 class StudentUpdateView(LoginRequiredMixin, DetailView):
     template_name = 'student/update_student.html'
     model = Student
@@ -419,11 +422,10 @@ class StudentUpdateView(LoginRequiredMixin, DetailView):
             messages.error(request, f"Failed to update student: {str(e)}")
             return redirect('student_list')
         
+        
 class StudentDeleteView(LoginRequiredMixin,DeleteMasterView):
     model = Student
     return_path = 'student_list'
-
-# *********************************************************************************
 
 
 class ChapterListView(LoginRequiredMixin,ListView):
@@ -455,6 +457,7 @@ class ChapterListView(LoginRequiredMixin,ListView):
 
         return queryset
     
+
 class ChapterCreateView(LoginRequiredMixin, TemplateView):
     template_name = 'chapter/create_chapter.html'
 
@@ -502,18 +505,19 @@ class ChapterUpdateView(LoginRequiredMixin, DetailView):
         except Exception as e:
             messages.error(request, f"Failed to update chapter: {str(e)}")
             return redirect('chapter_list')
-        
+
+
 class ChapterDeleteView(LoginRequiredMixin,DeleteMasterView):
     model = Chapter
     return_path = 'chapter_list'
 
-#*********************************************************************************
 
 class BatchListView(LoginRequiredMixin,ListView):
     model = Batch
     template_name = 'batch/list_batch.html'
     context_object_name = 'context_data'
     paginate_by = 10
+
 
 class BatchStudentListView(LoginRequiredMixin, ListView):
     model = Student
@@ -529,6 +533,7 @@ class BatchStudentListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['batch'] = Batch.objects.get(pk=self.kwargs['pk'])
         return context  
+
 
 class BatchCreateView(LoginRequiredMixin, TemplateView):
 
@@ -546,6 +551,7 @@ class BatchCreateView(LoginRequiredMixin, TemplateView):
             messages.error(request, f"Failed to create batch: {str(e)}")
             return redirect('batch_list')
 
+
 class BatchUpdateView(LoginRequiredMixin, DetailView):
     template_name = 'batch/update_batch.html'
     model = Batch
@@ -562,11 +568,12 @@ class BatchUpdateView(LoginRequiredMixin, DetailView):
             messages.error(request, f"Failed to update student: {str(e)}")   
             return redirect('batch_list') 
 
+
 class BacthDeleteView(LoginRequiredMixin,DeleteMasterView):
     model = Batch
     return_path = 'batch_list' 
 
-#*************************************************************************
+
 class SubChapterListView(LoginRequiredMixin, ListView):
     model = SubChapters
     template_name= 'sub-chapter/list_sub_chapter.html'
@@ -665,14 +672,14 @@ class SubChapterUpdateView(LoginRequiredMixin, DetailView):
             if request.FILES.get("thumbnail"):
                 subChapter.thumbnail = request.FILES.get("thumbnail")
             if request.FILES.get("video"):
-                 video_file = request.FILES.get("video")
-                 temp_path = default_storage.save(f'temp_subchapters/{video_file.name}', video_file)
-                 task = BackgroundTaskStatus.objects.create(
+                video_file = request.FILES.get("video")
+                temp_path = default_storage.save(f'temp_subchapters/{video_file.name}', video_file)
+                task = BackgroundTaskStatus.objects.create(
                     name = f"UPDATING {subChapter.title}",
                     status = 'pending',
                     model_id = f"subchapter_{subChapter.id}",
                 )
-                 upload_subchapter_video_to_s3.delay(subChapter.id, temp_path, task.id)
+                upload_subchapter_video_to_s3.delay(subChapter.id, temp_path, task.id)
                 
                 # subChapter.video= request.FILES.get("video")
 
@@ -685,11 +692,11 @@ class SubChapterUpdateView(LoginRequiredMixin, DetailView):
             messages.error(request, f"Failed to update: {str(e)}")
             return redirect('sub_chapter_list', pk=chapter.id)
         
+        
 class SubChapterDeleteView(LoginRequiredMixin,DeleteMasterView):
     model = SubChapters
     return_path = 'sub_chapter_list'  
 
-#*********************************************************************************
 
 class PackageListView(LoginRequiredMixin, ListView):
     model = Package
@@ -716,7 +723,8 @@ class PackageListView(LoginRequiredMixin, ListView):
         # if category_filter:
         #     queryset = queryset.filter(category=category_filter)
 
-        return queryset      
+        return queryset  
+        
 
 class PackageStudentListView(LoginRequiredMixin, ListView):
     model = Student
@@ -732,6 +740,7 @@ class PackageStudentListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['package'] = Package.objects.get(pk=self.kwargs['pk'])
         return context
+    
 
 class PackageCreateView(LoginRequiredMixin, TemplateView):
     template_name = 'package/create_package.html'
@@ -754,7 +763,8 @@ class PackageCreateView(LoginRequiredMixin, TemplateView):
 
         except Exception as e:
             messages.error(request, f"Failed to create package: {str(e)}")
-            return redirect('package_list')   
+            return redirect('package_list')  
+        
 
 class PackageUpdateView(LoginRequiredMixin, DetailView):
     template_name = 'package/update_package.html'
@@ -777,11 +787,13 @@ class PackageUpdateView(LoginRequiredMixin, DetailView):
 
         except Exception as e:
             messages.error(request, f"Failed to update package: {str(e)}")
-            return redirect('package_list')    
+            return redirect('package_list')  
+        
 
 class PackageDeleteView(LoginRequiredMixin,DeleteMasterView):
     model = Package
     return_path = 'package_list'
+
 
 class UploadStatusView(LoginRequiredMixin, TemplateView):
     template_name = "sub-chapter/task_list.html"

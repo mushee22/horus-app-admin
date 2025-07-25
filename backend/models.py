@@ -39,7 +39,7 @@ class CustomUser(AbstractUser,BasemodelMixin):
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=200)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
-    is_admin = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
