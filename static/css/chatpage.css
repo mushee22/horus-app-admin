@@ -26,6 +26,8 @@ p{
 .chat-main-container{
     display: flex;
     justify-content: center;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
 }
 .chat-sub-container{
     display: flex;
@@ -34,7 +36,30 @@ p{
     box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.20);
     margin-top: 2.25rem;
     margin-bottom: 2.25rem;
+    justify-content: center;
 
+}
+/* Chatpage backbutton styles */
+.chat-back-button{
+    padding-right: 1rem;
+    padding-top: 1rem;
+}
+.chat-back-button svg{
+    width: 2rem;
+    height: 2rem;
+    fill: #009CFF;
+}
+
+.back-button-box{
+    padding: 0.5rem;
+    border-radius: 50%;
+    /* background-color: #48abe0; */
+    background-color: #deedf5;
+    color: white;
+    border: none;
+    box-shadow: 0 2px 4px rgb(214, 252, 252);
+    /* box-shadow: 0 2px 4px darkslategray; */
+    cursor: pointer;
 }
 .chat-left-container{
     display: flex;
@@ -313,11 +338,15 @@ p{
 /* for the right container section */
 
 .chat-right-container{
-    width: 42.2475rem;
+    /* width: 42.2475rem; */
+    width: 80%;
+    /* border: 1px solid greenyellow; */
     /* padding-left: 0.81rem; */
 }
 .chat-personal-detail-main{
-    padding-left: 0.81rem;
+    /* padding-left: 0.81rem; */
+        background-color: #efefef;
+
 }
 .chat-personal-detail-super{
     padding: 0.94rem 1.25rem 1.31rem 1.25rem;
@@ -672,8 +701,8 @@ p{
 }
 .chat-send-container{
     margin-top: 1rem;
-    padding-right: 0.8rem;
-    padding-left: 0.8rem;
+    /* padding-right: 0.8rem;
+    padding-left: 0.8rem; */
 }
 .chat-send-box{
     height: 3.3405rem;
@@ -1965,5 +1994,29 @@ chat-send-icon-svg svg{
     chat-send-icon-svg svg{
         width: 1rem;
         height: 1rem;
+    }
+}
+
+/* ============================================================ */
+/*  Scrollbar Length Inside Message box */
+/* ============================================================ */
+.chat-message-box-main::-webkit-scrollbar {
+    width: 4px; /* Adjust thickness here */
+}
+
+.chat-message-box-main::-webkit-scrollbar-track {
+    background: transparent; /* Optional: background of the track */
+}
+
+.chat-message-box-main::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2); /* Scrollbar color */
+    border-radius: 10px;
+}
+
+/* Optional: for Firefox */
+@-moz-document url-prefix() {
+    .chat-message-box-main {
+        scrollbar-width: thin;           /* Makes scrollbar thinner */
+        scrollbar-color: rgba(0,0,0,0.2) transparent; /* Thumb and track color */
     }
 }

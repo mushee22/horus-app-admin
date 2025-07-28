@@ -28,6 +28,6 @@ urlpatterns = [
     path('messages/', MessageCreateView.as_view(), name='messages-create'),
     path('chat-message/',ListMessagesView.as_view(),name="chat_message"),
     # Community - user_ids
-    # path('community/<pk:community_id>/members/', CommunityMembers.as_view(), name='members'),
+    path('community/<int:community_id>/members/', CommunityMembers.as_view(), name='members'),
 
 ]

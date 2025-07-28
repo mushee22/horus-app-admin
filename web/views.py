@@ -329,7 +329,7 @@ class ListMessagesView(APIView):
         user = int(request.data.get('user'))
         community_id = request.data.get('community_id')
         try:
-            # student = Student.objects.get(user=user)
+            student = Student.objects.get(user=user)
             community = Community.objects.get(id=community_id)
             messages = Message.objects.filter(
                 community=community
@@ -365,13 +365,14 @@ class ListMessagesView(APIView):
         return arranged_list
 
 
-# class CommunityMembers(APIView):
-#     def get(self, request, community_id):
-#         try:
-#             community = Community.objects.get(id=community_id)
-#             members = community.messages.sender()
-#             return Response({'resp_code':1,'user_ids':,'message':"Success"})
-#         except Community.DoesNotExist:
-#             return Response({'resp_code':0,'message':"Community not found"})
-#         except Exception as e:
-#             return Response({'resp_code':0,'message':str(e)})
+class CommunityMembers(APIView):
+    def get(self, request, community_id):
+        try:
+            user_ids = Student.objects.filter(
+                community__id=community_id
+            ).values_list("user_id",flat=True)
+            return Response({'resp_code':1,'user_ids':user_ids,'message':"Success"})
+        except Community.DoesNotExist:
+            return Response({'resp_code':0,'message':"Community not found"})
+        except Exception as e:
+            return Response({'resp_code':0,'message':str(e)})

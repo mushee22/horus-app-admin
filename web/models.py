@@ -19,7 +19,7 @@ class Student(BasemodelMixin):
     package = models.ForeignKey('Package', on_delete=models.CASCADE, null=True, blank=True)
     start_date = models.DateField(null=True,blank=True)
     end_date = models.DateField(null=True,blank=True)
-    community = models.ManyToManyField('Community', blank=True)  ## add related name if neeeded
+    community = models.ManyToManyField('Community', blank=True)  ## add related name if needed
 
     # def __str__(self):
     #     return f"{self.user}"

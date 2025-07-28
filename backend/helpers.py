@@ -1,13 +1,13 @@
 from web.models import Community
 
 
-def add_to_community(student, batch, package):
+def add_to_community(student, Batch, Package):
     
     try:
         community_names = {
             'global': 'public_community',
-            'batch': f'{batch.name}_community',
-            'package': f'{package.title}_community'
+            'batch': f'{Batch.name}_community',
+            'package': f'{Package.title}_community'
         }
 
         for community_type, default_name in community_names.items():
@@ -15,7 +15,9 @@ def add_to_community(student, batch, package):
                 default_name=default_name,
                 defaults={
                     'name': default_name,
-                    'type': community_type
+                    'type': community_type,
+                    'batch':Batch,  # Batch is an instance
+                    'package':Package # Package is an instance
                 }
             )
             student.community.add(community)
