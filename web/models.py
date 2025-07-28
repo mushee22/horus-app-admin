@@ -112,4 +112,16 @@ class Message(models.Model):
         return f"{self.sender.user.first_name}: {self.content[:20]}"
 
 
+class MessageReadTracker(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    community = models.ForeignKey(Community, on_delete=models.CASCADE)
+    last_read_message = models.ForeignKey(Message, on_delete=models.SET_NULL, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('student', 'community')  # one entry per user per community
+
+    def __str__(self):
+        return f"{self.student.user.username} read up to {self.last_read_message.id if self.last_read_message else 'None'} in {self.community}"
+    
 

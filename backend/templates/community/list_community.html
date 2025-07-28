@@ -106,8 +106,8 @@
                         </div>
                         <div class="time-and-count">
                             <span class="chat-time-mini">{{chat.formatted_last_message_time}}</span>
-                            {% if chat.unread_msg > 0 %}
-                            <span class="chat-notification-2">{{chat.unread_msg}}</span>
+                            {% if chat.unread_count %}
+                            <span class="chat-notification-2">{{chat.unread_count}}</span>
                             {% endif %}
                         </div>
                     </div>

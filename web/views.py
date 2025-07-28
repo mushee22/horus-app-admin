@@ -12,18 +12,23 @@ import pandas as pd
 
 # Create your views here.
 
-def mark_messages_read(messages,sender):
+def mark_messages_read(last_message,student,community):
     """
-    this function recieves a list of message objects as parameter and change
-    the status of all messages as read.
+    Marks the given message as the last read by the student in the specified community.
+    Creates or updates the read tracker entry.
     """
-    for message in messages:
-        if message.sender.id != sender.id:
-            message.is_read = True
-            message.save()
+
+    print("hello comes the last message id",last_message.id,student,community)
+    MessageReadTracker.objects.update_or_create(
+        student=student,
+        community=community,
+        defaults={'last_read_message': last_message}
+    )
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
 
 class CustomerRegistrationView(APIView):
     def post(self, request):
@@ -334,11 +339,13 @@ class ListMessagesView(APIView):
             messages = Message.objects.filter(
                 community=community
             ).select_related('sender').order_by('id')
+            last_message = messages.last()
 
             serializer = MessageSerializer(messages,many=True)
             arranged_messages = self.arranage_message_by_date(serializer.data)
             community_serializer = CommunityMiniSerializer(community)
-            # mark_messages_read(messages,student)
+            if last_message:
+                mark_messages_read(last_message,student,community)
 
             return Response({'resp_code':1,'data':arranged_messages,
                         'community': community_serializer.data,
