@@ -299,5 +299,39 @@ class CommunityMiniSerializer(serializers.ModelSerializer):
     class Meta:
         model = Community
         fields = '__all__'
-        
+
+
+class CommunitySerializer(serializers.ModelSerializer):
+    last_message = serializers.SerializerMethodField()
+    unread_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Community
+        fields = [
+            'id', 'name', 'type',
+            'batch', 'package', 'profile_image',
+            'last_message', 'unread_count'
+        ]
+
+    def get_last_message(self, obj):
+        last_msg =  obj.messages.order_by('-timestamp').first()
+        if last_msg:
+            return MessageSerializer(last_msg).data
+
+    def get_unread_count(self, obj):
+        student = self.context.get('student')
+        if not student:
+            return 0
+
+        last_read_tracker = MessageReadTracker.objects.filter(
+            student=student,
+            community=obj
+        ).first()
+
+        if last_read_tracker and last_read_tracker.last_read_message:
+            return obj.messages.filter(
+                id__gt=last_read_tracker.last_read_message.id
+            ).count()
+
+        return 0
 

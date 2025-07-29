@@ -21,8 +21,8 @@ class Student(BasemodelMixin):
     end_date = models.DateField(null=True,blank=True)
     community = models.ManyToManyField('Community', blank=True)  ## add related name if needed
 
-    # def __str__(self):
-    #     return f"{self.user}"
+    def __str__(self):
+        return f"{self.user.full_name()}"
 
 
 class Chapter(BasemodelMixin):

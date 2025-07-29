@@ -327,6 +327,26 @@ class MessageCreateView(APIView):
             return Response({'resp_code':0,'message':"failed to create message"})
 
 
+class Chatlistview(LoginRequiredMixin,APIView):
+
+    def get(self, request):
+        user = request.user
+
+        if user.is_admin:
+            communities = Community.objects.all()
+        else:
+            try:
+                student = Student.objects.get(user=user)
+                communities = student.community.all()
+            except Student.DoesNotExist:
+                return Response({"error": "Student profile not found."}, status=404)
+            
+        serializer = CommunitySerializer(
+            communities, many=True,
+            context={'student': student}
+        )
+        return Response({"resp_code":1,"data":serializer.data,"message":"succes"})
+        
 
 class ListMessagesView(APIView):
     
@@ -373,6 +393,10 @@ class ListMessagesView(APIView):
 
 
 class CommunityMembers(APIView):
+    """
+    This function fetches all the members in the community and sends their id as
+    a list. This is for managing Live chat notification in the community.
+    """
     def get(self, request, community_id):
         try:
             user_ids = Student.objects.filter(

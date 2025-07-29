@@ -882,3 +882,58 @@ class CommunityListView(LoginRequiredMixin,ListView):
         context['context_data'] = community_list
         return context
     
+
+# class CommunityListView(LoginRequiredMixin, ListView):
+#     model = Community
+#     template_name = 'community/list_community.html'
+#     context_object_name = 'context_data'
+#     paginate_by = 10
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         student = Student.objects.get(
+#             user=self.request.user
+#         )
+#         context['current_profile_pic'] = student.profile_image.url if student.profile_image else None
+
+#         # Subquery to get latest message per community
+#         latest_messages = Message.objects.filter(
+#             community=OuterRef('pk')
+#         ).order_by('-timestamp')
+
+#         # Subquery to get the last read message ID for the current user
+#         last_read_message_id = MessageReadTracker.objects.filter(
+#             student=student,
+#             community=OuterRef('pk')
+#         ).values('last_read_message_id')[:1]
+
+#         # Annotate each community with latest message content, timestamp, and unread count
+#         community_list = context['context_data']
+#         community_list = community_list.annotate(
+#             last_message_content=Subquery(latest_messages.values('content')[:1]),
+#             last_message_sender=Subquery(latest_messages.values('sender__user__first_name')[:1]),
+#             last_message_time=Subquery(latest_messages.values('timestamp')[:1]),
+#             unread_count=Case(
+#                 When(
+#                     # If there's a last read message, count messages after it
+#                     Q(messagereadtracker__student=student) & 
+#                     Q(messagereadtracker__last_read_message__isnull=False),
+#                     then=Count(
+#                         'messages',
+#                         filter=Q(messages__id__gt=Subquery(last_read_message_id))
+#                     )
+#                 ),
+#                 When(
+#                     # If no tracking record exists or last_read_message is null, count all messages
+#                     ~Q(messagereadtracker__student=student) |
+#                     Q(messagereadtracker__student=student, messagereadtracker__last_read_message__isnull=True),
+#                     then=Count('messages')
+#                 ),
+#                 default=0,
+#                 output_field=IntegerField()
+#             )
+#         )
+
+#         context['context_data'] = community_list
+
+#         return context
