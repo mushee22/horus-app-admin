@@ -331,7 +331,7 @@ class CommunitySerializer(serializers.ModelSerializer):
         if last_read_tracker and last_read_tracker.last_read_message:
             return obj.messages.filter(
                 id__gt=last_read_tracker.last_read_message.id
-            ).count()
+            ).exclude(sender=student).count()
 
         return 0
 

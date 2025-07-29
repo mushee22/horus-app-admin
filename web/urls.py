@@ -25,6 +25,7 @@ urlpatterns = [
     # Packages
     path('packages/', PackageListView.as_view(), name='package-list'),
     # Chats 
+    path('list-rooms/',Chatlistview.as_view(),name='rooms-list'),
     path('messages/', MessageCreateView.as_view(), name='messages-create'),
     path('chat-message/',ListMessagesView.as_view(),name="chat_message"),
     # Community - user_ids
