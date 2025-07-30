@@ -106,6 +106,7 @@ class Message(models.Model):
     sender = models.ForeignKey(Student, on_delete=models.CASCADE)
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name="messages")
     content = models.TextField()
+    image = models.ImageField(null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

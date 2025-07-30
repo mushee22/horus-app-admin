@@ -250,7 +250,7 @@
                     </div>
                 </div>
 
-            <div class="chat-message-main-container d-flex flex-column">
+            <div class="chat-message-main-container d-flex flex-column position-relative">
                 <div class="chat-message-box-main w-100">
                     <!-- iteration for message according to the date -->
                     <div class="chat-message-box position-relative">
@@ -262,18 +262,21 @@
                     <form action="" id="chatForm">
                         <div class="position-relative">
                             <input class="chat-send-box w-100" type="text" name="message" id="send-chat" placeholder="Type your message">
+                            <button class="chat-send-icon-svg image-upload-button position-absolute" onclick="uploadImageFiles(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                                    <path d="M160 96C124.7 96 96 124.7 96 160L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 160C544 124.7 515.3 96 480 96L160 96zM224 176C250.5 176 272 197.5 272 224C272 250.5 250.5 272 224 272C197.5 272 176 250.5 176 224C176 197.5 197.5 176 224 176zM368 288C376.4 288 384.1 292.4 388.5 299.5L476.5 443.5C481 450.9 481.2 460.2 477 467.8C472.8 475.4 464.7 480 456 480L184 480C175.1 480 166.8 475 162.7 467.1C158.6 459.2 159.2 449.6 164.3 442.3L220.3 362.3C224.8 355.9 232.1 352.1 240 352.1C247.9 352.1 255.2 355.9 259.7 362.3L286.1 400.1L347.5 299.6C351.9 292.5 359.6 288.1 368 288.1z"  />
+                                </svg>
+                            </button>
                             <button class="chat-send-icon-svg position-absolute" type="submit">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="23" height="24" viewBox="0 0 23 24" fill="none">
                                     <path d="M2.21624 20.5695L21.5413 12.1304L2.21624 3.69135L2.20703 10.2551L16.0172 12.1304L2.20703 14.0058L2.21624 20.5695Z" fill="white"/>
                                 </svg>
                             </button>
-                            <button class="chat-send-icon-svg image-upload-button position-absolute">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                                    <path d="M160 96C124.7 96 96 124.7 96 160L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 160C544 124.7 515.3 96 480 96L160 96zM224 176C250.5 176 272 197.5 272 224C272 250.5 250.5 272 224 272C197.5 272 176 250.5 176 224C176 197.5 197.5 176 224 176zM368 288C376.4 288 384.1 292.4 388.5 299.5L476.5 443.5C481 450.9 481.2 460.2 477 467.8C472.8 475.4 464.7 480 456 480L184 480C175.1 480 166.8 475 162.7 467.1C158.6 459.2 159.2 449.6 164.3 442.3L220.3 362.3C224.8 355.9 232.1 352.1 240 352.1C247.9 352.1 255.2 355.9 259.7 362.3L286.1 400.1L347.5 299.6C351.9 292.5 359.6 288.1 368 288.1z"  />
-                                </svg>
-                            </button>
                         </div>
                     </form>
+                </div>
+                <div class="show-uploaded-image position-absolute" id="show-image-uploaded">
+                    
                 </div>
             </div>
         </div>
@@ -524,6 +527,13 @@
         fetchMessage(id,messageBox);
         setupWebSocket(id)
         
+    }
+
+
+    // *********   Function for uploading image files to the chat **********
+
+    function uploadImageFiles(e){
+
     }
 </script>
 

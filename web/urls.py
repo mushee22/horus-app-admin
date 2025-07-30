@@ -28,6 +28,7 @@ urlpatterns = [
     path('list-rooms/',Chatlistview.as_view(),name='rooms-list'),
     path('messages/', MessageCreateView.as_view(), name='messages-create'),
     path('chat-message/',ListMessagesView.as_view(),name="chat_message"),
+    path('upload-image-file/',upload_chat_image, name='save-image'),
     # Community - user_ids
     path('community/<int:community_id>/members/', CommunityMembers.as_view(), name='members'),
 

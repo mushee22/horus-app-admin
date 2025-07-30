@@ -5,10 +5,18 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
+import uuid
+from PIL import Image
+from io import BytesIO
+from django.http import JsonResponse
+import os
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 # Internal funcions imports
 from web.serializers import *
 from baseapp.mixins import LoginRequiredMixin
 import pandas as pd
+
 
 # Create your views here.
 
@@ -310,15 +318,16 @@ class MessageCreateView(APIView):
         user_id = request.data.get('user')
         community_id= request.data.get('community')
         content = request.data.get('content')
+        image_url = request.data.get('image_url',None)
 
         try:
             community = Community.objects.get(id=community_id)
             student = Student.objects.get(user__id=user_id)
-
             Message.objects.create(
                 sender = student, 
                 community=community,
-                content = content
+                content = content,
+                image = image_url
             )
             return Response({'resp_code':1,'message':"Success"})
         except (Community.DoesNotExist, Student.DoesNotExist):
@@ -390,6 +399,35 @@ class ListMessagesView(APIView):
             message_data = {}
         
         return arranged_list
+
+
+@csrf_exempt
+def upload_chat_image(request):
+    if request.method == "POST" and request.FILES.get("image"):
+        image = request.FILES["image"]
+        filename = f"{uuid.uuid4().hex}_{image.name}"
+
+        # Open image using Pillow
+        img = Image.open(image)
+
+        # Convert image to RGB if it's not already
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+
+        # Create buffer to compress image
+        buffer = BytesIO()
+        img.save(buffer, format="JPEG", quality=70, optimize=True)  # You can tweak quality value
+        buffer.seek(0)
+
+        # Save compressed image to disk
+        save_path = os.path.join(settings.MEDIA_ROOT, "chat_images", filename)
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        with open(save_path, "wb+") as f:
+            f.write(buffer.read())
+
+        return JsonResponse({"image_url": f"/media/chat_images/{filename}"})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 class CommunityMembers(APIView):
