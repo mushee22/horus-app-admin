@@ -277,21 +277,21 @@
                     </form>
                 </div>
                 <div class="show-uploaded-image position-absolute hide" id="show-image-uploaded">
-                    <div class="image-text-wrapper">
+                    <form class="image-text-wrapper" id="chat-image-form">
                         <div class="image-box-community w-100">
 
                         </div>
                         <div class="input-box-community w-100">
-                            <input class="chat-send-box input-size-1 w-100" name="image-related-text" id="image-based-text" placeholder="Add a caption...">
+                            <input class="chat-send-box input-size-1 w-100" name="imageText" id="image-based-text" placeholder="Add a caption...">
                             <button class="chat-send-icon-svg no-transform button-size-1" type="submit">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="23" height="24" viewBox="0 0 23 24" fill="none">
                                     <path d="M2.21624 20.5695L21.5413 12.1304L2.21624 3.69135L2.20703 10.2551L16.0172 12.1304L2.20703 14.0058L2.21624 20.5695Z" fill="white"/>
                                 </svg>
                             </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
-                <div class="close-button-image-upload position-absolute hide" id="close-button-upload-box" onclick="exitImageUpload(this)">
+                <div class="close-button-image-upload position-absolute hide" id="close-button-upload-box" onclick="exitImageUpload()">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                         <path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z"/>
                     </svg>
@@ -402,6 +402,53 @@
                 
                 chatForm.reset();
             }; 
+
+            //  ============= Image based text message =============
+            
+            const chatImageForm = document.getElementById('chat-image-form');
+            chatImageForm.onsubmit = function (e) {
+                e.preventDefault()
+                const chatImage = document.getElementById('imageUploader');
+                var chatImageFile = chatImage.files[0];
+                const chatMessage = e.target.imageText.value.trim();
+                if (!chatMessage || !chatImageFile) return;
+                const url = "{% url 'save-image' %}"
+                const formData = new FormData
+                formData.append("image",chatImageFile)
+                fetch(url,{
+                    method:"POST",
+                    body:formData,
+                    headers:{
+                        "X-CSRFToken":"csrf_token"
+                    }
+                }).then(resp=>resp.json())
+                .then(data=>{
+                    console.log("here comes the data",data)
+                    if (data.image_url){
+                            socketInstance.send(JSON.stringify({
+                            message: chatMessage,
+                            type:"image",
+                            user: '{{ request.user.id }}',
+                            first_name:'{{request.user.first_name}}',
+                            last_name:'{{request.user.last_name}}',
+                            profile_pic:'{{current_profile_pic}}',
+                            is_admin:'{{request.user.is_admin}}',
+                            image_url:data.image_url,
+
+                        }));
+                        console.log("image send successfullly")
+                    }
+                    else{
+                        console.log("Some error",data)
+                    }
+
+                    chatImageForm.reset();
+                    exitImageUpload();
+                })
+                .catch(error=>{
+                    console.error("upload failed",error);
+                })
+            }
         };
     })();
 
@@ -548,8 +595,9 @@
         
     }
 
-
-    // *********   Function for uploading image files to the chat **********
+    // *********************************************************************
+    // *********   Functions for uploading image files to the chat **********
+    // *********************************************************************
     function uploadImageFiles() {
         // Simulate click on the hidden file input
         document.getElementById('imageUploader').click();
@@ -574,7 +622,7 @@
         }
     }
 
-    function exitImageUpload(e){
+    function exitImageUpload(){
         document.getElementById('show-image-uploaded').classList.add('hide');
         document.getElementById('close-button-upload-box').classList.add('hide');
         document.getElementById('image-based-text').value = '';
