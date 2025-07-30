@@ -286,7 +286,7 @@ class MessageSerializer(serializers.ModelSerializer):
     sender = StudentSerialzer()
     class Meta:
         model = Message
-        fields = ['id','sender','community','content']
+        fields = ['id','sender','community','content','image']
     
     def to_representation(self, instance):
         data = super().to_representation(instance)

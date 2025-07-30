@@ -262,11 +262,12 @@
                     <form action="" id="chatForm">
                         <div class="position-relative">
                             <input class="chat-send-box w-100" type="text" name="message" id="send-chat" placeholder="Type your message">
-                            <button class="chat-send-icon-svg image-upload-button position-absolute" onclick="uploadImageFiles(this)">
+                            <button class="chat-send-icon-svg image-upload-button position-absolute" onclick="uploadImageFiles(this)" type="button">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                                     <path d="M160 96C124.7 96 96 124.7 96 160L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 160C544 124.7 515.3 96 480 96L160 96zM224 176C250.5 176 272 197.5 272 224C272 250.5 250.5 272 224 272C197.5 272 176 250.5 176 224C176 197.5 197.5 176 224 176zM368 288C376.4 288 384.1 292.4 388.5 299.5L476.5 443.5C481 450.9 481.2 460.2 477 467.8C472.8 475.4 464.7 480 456 480L184 480C175.1 480 166.8 475 162.7 467.1C158.6 459.2 159.2 449.6 164.3 442.3L220.3 362.3C224.8 355.9 232.1 352.1 240 352.1C247.9 352.1 255.2 355.9 259.7 362.3L286.1 400.1L347.5 299.6C351.9 292.5 359.6 288.1 368 288.1z"  />
                                 </svg>
                             </button>
+                            <input type="file" id="imageUploader" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
                             <button class="chat-send-icon-svg position-absolute" type="submit">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="23" height="24" viewBox="0 0 23 24" fill="none">
                                     <path d="M2.21624 20.5695L21.5413 12.1304L2.21624 3.69135L2.20703 10.2551L16.0172 12.1304L2.20703 14.0058L2.21624 20.5695Z" fill="white"/>
@@ -275,8 +276,25 @@
                         </div>
                     </form>
                 </div>
-                <div class="show-uploaded-image position-absolute" id="show-image-uploaded">
-                    
+                <div class="show-uploaded-image position-absolute hide" id="show-image-uploaded">
+                    <div class="image-text-wrapper">
+                        <div class="image-box-community w-100">
+
+                        </div>
+                        <div class="input-box-community w-100">
+                            <input class="chat-send-box input-size-1 w-100" name="image-related-text" id="image-based-text" placeholder="Add a caption...">
+                            <button class="chat-send-icon-svg no-transform button-size-1" type="submit">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="24" viewBox="0 0 23 24" fill="none">
+                                    <path d="M2.21624 20.5695L21.5413 12.1304L2.21624 3.69135L2.20703 10.2551L16.0172 12.1304L2.20703 14.0058L2.21624 20.5695Z" fill="white"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="close-button-image-upload position-absolute hide" id="close-button-upload-box" onclick="exitImageUpload(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                        <path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z"/>
+                    </svg>
                 </div>
             </div>
         </div>
@@ -371,6 +389,7 @@
                 if (!message) return;
                 socketInstance.send(JSON.stringify({
                     message: message,
+                    type:"text",
                     user: '{{ request.user.id }}',
                     first_name:'{{request.user.first_name}}',
                     last_name:'{{request.user.last_name}}',
@@ -401,17 +420,17 @@
             })
         })
         .then(resp => resp.json())
-        .then(data => {
+        .then(data =>{
 
             console.log(data, "here comes the data")
             // Chat header setup
             let CommunityImage = document.querySelector(".community-profile-pic");
             let communtiyName = document.querySelector(".community-name");
             
-            const name = data.community.name || "";
+            const name = data.results.community.name || "";
             const initials = name.substring(0, 2).toUpperCase();
-            if (data.community.profile_image) {
-                CommunityImage.style.backgroundImage = `url('${data.community.profile_image}')`;
+            if (data.results.community.profile_image) {
+                CommunityImage.style.backgroundImage = `url('${data.results.community.profile_image}')`;
                 CommunityImage.innerText = ""; // remove initials
             } else {
                 CommunityImage.innerText = initials; // fallback initials
@@ -422,12 +441,12 @@
             // Render messages
             let lastDisplayedDateKey = null;
 
-            if (data.data && data.data.length > 0) {
+            if (data.results.data && data.results.data.length > 0) {
                 let chatHeaderParent = document.querySelector(".chat-personal-detail-super")
                 var welcomChatBox = document.querySelector(".default-welcome-chat");
                 
                 // let chatSendInput = document.getElementById("send-chat");  
-                data.data.forEach(group => {
+                data.results.data.forEach(group => {
                     if (!group.date || !group.messages?.length) return;
 
                     // Convert to Date object
@@ -488,8 +507,8 @@
 
 
             // Update the last message display immediately
-            if (data.data && data.data.length > 0) {
-                const lastGroup = data.data[data.data.length - 1];
+            if (data.results.data && data.results.data.length > 0) {
+                const lastGroup = data.results.data[data.results.data.length - 1];
                 if (lastGroup.messages && lastGroup.messages.length > 0) {
                     const lastMessage = lastGroup.messages[lastGroup.messages.length - 1];
                     if (lastMessage && lastMessage.content) {
@@ -531,10 +550,37 @@
 
 
     // *********   Function for uploading image files to the chat **********
-
-    function uploadImageFiles(e){
-
+    function uploadImageFiles() {
+        // Simulate click on the hidden file input
+        document.getElementById('imageUploader').click();
     }
+
+    function handleImageUpload(event) {
+        const file = event.target.files[0];
+        const imageBox = document.querySelector('.image-box-community');
+        const closeButton = document.getElementById('close-button-upload-box');
+
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imageBox.style.backgroundImage = `url('${e.target.result}')`;
+                imageBox.style.backgroundImage = `url('${e.target.result}')`;
+                document.getElementById('show-image-uploaded').classList.remove('hide');
+                closeButton.classList.remove('hide');
+            };
+            reader.readAsDataURL(file);
+        } else {
+            imageBox.innerHTML = '<span>Only image files can be uploaded.</span>';
+        }
+    }
+
+    function exitImageUpload(e){
+        document.getElementById('show-image-uploaded').classList.add('hide');
+        document.getElementById('close-button-upload-box').classList.add('hide');
+        document.getElementById('image-based-text').value = '';
+        
+    }
+
 </script>
 
 

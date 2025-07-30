@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 import uuid
 from PIL import Image
 from io import BytesIO
@@ -358,6 +359,11 @@ class Chatlistview(LoginRequiredMixin,APIView):
         
 
 class ListMessagesView(APIView):
+
+    class MessagePagination(PageNumberPagination):
+        page_size = 20
+        page_size_query_param = 'page_size'
+        max_page_size = 100
     
     def post(self,request):
         user = int(request.data.get('user'))
@@ -370,15 +376,25 @@ class ListMessagesView(APIView):
             ).select_related('sender').order_by('id')
             last_message = messages.last()
 
-            serializer = MessageSerializer(messages,many=True)
+            # Paginate
+            paginator = self.MessagePagination()
+            page = paginator.paginate_queryset(messages, request)
+
+            serializer = MessageSerializer(page,many=True)
             arranged_messages = self.arranage_message_by_date(serializer.data)
             community_serializer = CommunityMiniSerializer(community)
             if last_message:
                 mark_messages_read(last_message,student,community)
+            # Mark messages read for current student (based on last in this page)
+            # if page:
+            #     mark_messages_read(page[-1], student, community)
 
-            return Response({'resp_code':1,'data':arranged_messages,
-                        'community': community_serializer.data,
-                        'message':"Success"})
+            return paginator.get_paginated_response({
+                'resp_code':1,
+                'data':arranged_messages,
+                'community': community_serializer.data,
+                'message':"Success"
+            })
         except Exception as e:
             return Response({'resp_code':0,'message':str(e)})
 
@@ -425,7 +441,7 @@ def upload_chat_image(request):
         with open(save_path, "wb+") as f:
             f.write(buffer.read())
 
-        return JsonResponse({"image_url": f"/media/chat_images/{filename}"})
+        return JsonResponse({"image_url": f"chat_images/{filename}"})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
