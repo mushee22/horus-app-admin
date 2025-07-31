@@ -320,7 +320,8 @@
 
             socketInstance.onmessage = function (e) {
                 let data = JSON.parse(e.data);
-                if (data.type === 'chat') {
+
+                if(data.type=='chat' || data.type=='image'){
                     let messageBox = document.querySelector(".chat-message-box ul");
                     let newMsg = document.createElement('li');
                     let currentUser = parseInt('{{ user.id }}');
@@ -331,11 +332,14 @@
                     const year = today.getFullYear();
                     const formattedDate = `${day}-${month}-${year}`;
 
-
-
                     // Get the last date tag in the message box
                     const dateTags = messageBox.querySelectorAll('.chat-recieved-date');
                     const lastDateTag = dateTags.length > 0 ? dateTags[dateTags.length - 1] : null;
+                    const bgImageStyle = data.image ? `style="background-image: url('/media/${data.image}');"` : '';
+
+                    const profileImage = data.profile_pic;
+                    const initials = (data.first_name || data.last_name || '?').charAt(0).toUpperCase();
+                    const profileDisplay = profileImage? `<img src="${profileImage}" alt="">`: `<div class="initials-circle">${initials}</div>`;
                     
                     // If there's no date tag or the last date tag doesn't match today's date, add a new one
                     if (!lastDateTag || lastDateTag.textContent !== formattedDate) {
@@ -344,27 +348,29 @@
                         dateTag.textContent = formattedDate;
                         messageBox.append(dateTag);
                     }
-
+                    
                     if (currentUser === parseInt(data.sender)) {
                         newMsg.classList.add('chat-type-1');
                         newMsg.innerHTML = `
                             <div class="chat-box-1 position-relative">
+                                ${data.image ? `<span class="chat-image-display-box" ${bgImageStyle}></span>` : ''}
                                 <span>${data.message}</span>
                                 <span class="chat-time-display position-absolute">${data.time}</span>
                             </div>
                             <div class="chat-image-box">
-                                <img src="{{ current_profile_pic }}" alt="">
+                                ${profileDisplay}
                             </div>`;
                     } else {
                         newMsg.classList.add('chat-type-2');
                         const is_admin = data.is_admin ? '( Admin )':''
                         newMsg.innerHTML = `
                             <div class="chat-image-box">
-                                <img src="${data.profile_pic}" alt="">
+                                ${profileDisplay}
                             </div>
                             <div class="reciever-chat-container">
                                 <span class="sender-name-span">${data.first_name}  ${is_admin}</span>
                                 <div class="chat-box-2 position-relative">
+                                    ${data.image ? `<span class="chat-image-display-box" ${bgImageStyle}></span>` : ''}
                                     <span class="chat-content">${data.message}</span>
                                     <span class="chat-time-display position-absolute">${data.time}</span>
                                 </div>
@@ -379,8 +385,10 @@
                     
                     document.querySelector(".chat-message-box-main").scrollTop = messageBox.scrollHeight;
                 }
+
             };
 
+            
             // ==================== Chat filter/sort handlers ====================
             const chatForm = document.getElementById("chatForm");
             chatForm.onsubmit = function (e) {
@@ -393,7 +401,7 @@
                     user: '{{ request.user.id }}',
                     first_name:'{{request.user.first_name}}',
                     last_name:'{{request.user.last_name}}',
-                    profile_pic:'{{current_profile_pic}}',
+                    profile_pic:'{{current_profile_pic|default:""}}',
                     is_admin:'{{request.user.is_admin}}'
                 }));
                 
@@ -411,7 +419,7 @@
                 const chatImage = document.getElementById('imageUploader');
                 var chatImageFile = chatImage.files[0];
                 const chatMessage = e.target.imageText.value.trim();
-                if (!chatMessage || !chatImageFile) return;
+                if (!chatMessage && !chatImageFile) return;
                 const url = "{% url 'save-image' %}"
                 const formData = new FormData
                 formData.append("image",chatImageFile)
@@ -423,7 +431,6 @@
                     }
                 }).then(resp=>resp.json())
                 .then(data=>{
-                    console.log("here comes the data",data)
                     if (data.image_url){
                             socketInstance.send(JSON.stringify({
                             message: chatMessage,
@@ -436,7 +443,6 @@
                             image_url:data.image_url,
 
                         }));
-                        console.log("image send successfullly")
                     }
                     else{
                         console.log("Some error",data)
@@ -451,7 +457,6 @@
             }
         };
     })();
-
 
 
     const fetchMessage = (chatRoom, messageBox) => {
@@ -469,7 +474,6 @@
         .then(resp => resp.json())
         .then(data =>{
 
-            console.log(data, "here comes the data")
             // Chat header setup
             let CommunityImage = document.querySelector(".community-profile-pic");
             let communtiyName = document.querySelector(".community-name");
@@ -519,28 +523,35 @@
 
                     group.messages.forEach(msg => {
                         if (!msg.content || msg.content.trim() === '') return;
+                        const profileImage = msg.sender.profile_image;
+                        const initials = (msg.sender.user.first_name || msg.sender.user.last_name || '?').charAt(0).toUpperCase();
+                        const profileDisplay = profileImage? `<img src="${profileImage}" alt="">`: `<div class="initials-circle">${initials}</div>`;
 
                         let li = document.createElement('li');
                         if (parseInt('{{ request.user.id }}') === parseInt(msg.sender.user.id)) {
                             li.classList.add('chat-type-1');
+                            const bgImageStyle = msg.image ? `style="background-image: url('${msg.image}');"` : ''; 
                             li.innerHTML = `
                                 <div class="chat-box-1 position-relative">
+                                    ${msg.image ? `<span class="chat-image-display-box" ${bgImageStyle}></span>` : ''}
                                     <span class="chat-content">${msg.content}</span>
                                     <span class="chat-time-display position-absolute">${msg.time}</span>
                                 </div>
                                 <div class="chat-image-box">
-                                    <img src="${msg.sender.profile_image}" alt="">
+                                    ${profileDisplay}
                                 </div>`;
                         } else {
                             li.classList.add('chat-type-2');
+                            const bgImageStyle = msg.image ? `style="background-image: url('${msg.image}');"` : '';
                             const is_admin = msg.sender.user.is_admin ? '( Admin )':''
                             li.innerHTML = `
                                 <div class="chat-image-box">
-                                    <img src="${msg.sender.profile_image}" alt="">
+                                    ${profileDisplay}
                                 </div>
                                 <div class="reciever-chat-container">
                                     <span class="sender-name-span">${msg.sender.user.first_name} ${is_admin}</span>
                                     <div class="chat-box-2 position-relative">
+                                        ${msg.image ? `<span class="chat-image-display-box" ${bgImageStyle}></span>` : ''}
                                         <span class="chat-content">${msg.content}</span>
                                         <span class="chat-time-display position-absolute">${msg.time}</span>
                                     </div>
@@ -578,6 +589,7 @@
 
     // ========= Show message on clicking the Community ==========
     function showTheirMessages(e,id){
+        currentChatRoomId = id
         let empty_chat = document.querySelector('.empty-chat-container');
         let chat_history = document.querySelector('.chat-personal-detail-main');
         let chat_list = document.getElementById('chat-left-container-id');
@@ -629,6 +641,126 @@
         
     }
 
+
+    let currentPage = 1;
+    let isLoading = false;
+    let hasMore = true;
+    currentChatRoomId  = 1;
+
+    const messageBoxContainer = document.querySelector(".chat-message-box-main");
+    const chatMessageBox = document.querySelector('.chat-message-box')
+     let messageBox = document.querySelector(".chat-message-box ul");
+     
+    messageBoxContainer.addEventListener('scroll', () => {
+        if (messageBoxContainer.scrollTop === 0 && !isLoading && hasMore) {
+            loadPreviousMessages();
+        }
+    });
+
+    function loadPreviousMessages() {
+        isLoading = true;
+
+        const ul = chatMessageBox.querySelector("ul");
+        const scrollHeightBefore = chatMessageBox.scrollHeight;
+
+        fetch(`{% url 'chat_message' %}?page=${currentPage + 1}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+                user: '{{ user.id }}',
+                community_id: currentChatRoomId // define this elsewhere
+            })
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            console.log("it is the datas",data)
+            const messages = data.results?.data;
+            if (!messages || messages.length === 0) {
+                hasMore  = false;
+                return;
+            }
+            renderMessages(messages, true); // Prepend
+            currentPage++;
+        })
+        .finally(() => {
+            isLoading = false;
+
+            // Maintain scroll position
+            const scrollHeightAfter = chatMessageBox.scrollHeight;
+            chatMessageBox.scrollTop = scrollHeightAfter - scrollHeightBefore;
+        });
+    }
+
+
+function renderMessages(data, prepend = false) {
+    let lastDisplayedDateKey = null;
+
+    data.forEach(group => {
+        if (!group.date || !group.messages?.length) return;
+
+        const dateObj = new Date(group.date);
+        const dateKey = dateObj.toISOString().slice(0, 10);
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = dateObj.toLocaleString('default', { month: 'short' });
+        const year = dateObj.getFullYear();
+        const displayDate = `${day}-${month}-${year}`;
+
+        if (lastDisplayedDateKey !== dateKey) {
+            let dateTag = document.createElement('li');
+            dateTag.classList.add('chat-recieved-date');
+            dateTag.textContent = displayDate;
+            if (prepend) messageBox.prepend(dateTag);
+            else messageBox.append(dateTag);
+            lastDisplayedDateKey = dateKey;
+        }
+        console.log("here comes the data for this ",data)
+        group.messages.forEach(msg => {
+            if (!msg.content || msg.content.trim() === '') return;
+
+            const profileImage = msg.sender.profile_image;
+            const initials = (msg.sender.user.first_name || msg.sender.user.last_name || '?').charAt(0).toUpperCase();
+            const profileDisplay = profileImage ? `<img src="${profileImage}" alt="">` : `<div class="initials-circle">${initials}</div>`;
+
+            let li = document.createElement('li');
+            const bgImageStyle = msg.image ? `style="background-image: url('${msg.image}');"` : '';
+
+            if (parseInt('{{ request.user.id }}') === parseInt(msg.sender.user.id)) {
+                li.classList.add('chat-type-1');
+                li.innerHTML = `
+                    <div class="chat-box-1 position-relative">
+                        ${msg.image ? `<span class="chat-image-display-box" ${bgImageStyle}></span>` : ''}
+                        <span class="chat-content">${msg.content}</span>
+                        <span class="chat-time-display position-absolute">${msg.time}</span>
+                    </div>
+                    <div class="chat-image-box">
+                        ${profileDisplay}
+                    </div>`;
+            } else {
+                li.classList.add('chat-type-2');
+                const is_admin = msg.sender.user.is_admin ? '( Admin )' : '';
+                li.innerHTML = `
+                    <div class="chat-image-box">
+                        ${profileDisplay}
+                    </div>
+                    <div class="reciever-chat-container">
+                        <span class="sender-name-span">${msg.sender.user.first_name} ${is_admin}</span>
+                        <div class="chat-box-2 position-relative">
+                            ${msg.image ? `<span class="chat-image-display-box" ${bgImageStyle}></span>` : ''}
+                            <span class="chat-content">${msg.content}</span>
+                            <span class="chat-time-display position-absolute">${msg.time}</span>
+                        </div>
+                    </div>`;
+            }
+
+            if (prepend) messageBox.prepend(li);
+            else messageBox.appendChild(li);
+        });
+    });
+}
+    
 </script>
 
 

@@ -21,6 +21,7 @@ from django.apps import apps
 from django.core.files.storage import default_storage
 from .tasks import upload_subchapter_video_to_s3
 from backend.helpers import add_to_community
+from django.templatetags.static import static
 
 # Models Import
 from web.models import *
@@ -819,7 +820,6 @@ class CommunityListView(LoginRequiredMixin,ListView):
     model = Community
     template_name = 'community/list_community.html'
     context_object_name = 'context_data'
-    paginate_by = 10
 
 #     # def get_context_data(self, **kwargs):
 #     #     context =  super().get_context_data(**kwargs)

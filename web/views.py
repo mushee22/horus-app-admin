@@ -373,12 +373,13 @@ class ListMessagesView(APIView):
             community = Community.objects.get(id=community_id)
             messages = Message.objects.filter(
                 community=community
-            ).select_related('sender').order_by('id')
+            ).select_related('sender').order_by('-id')
             last_message = messages.last()
 
             # Paginate
             paginator = self.MessagePagination()
             page = paginator.paginate_queryset(messages, request)
+            page = list(page)[::-1]
 
             serializer = MessageSerializer(page,many=True)
             arranged_messages = self.arranage_message_by_date(serializer.data)
@@ -409,6 +410,7 @@ class ListMessagesView(APIView):
         for date in message_date_list:
             message_data['date'] = date
             messages = df.loc[df['date']==date]
+            # messages = messages.sort_values(by='id', ascending=True)
             message_list = messages.to_dict(orient='records')
             message_data['messages'] = message_list
             arranged_list.append(message_data)
