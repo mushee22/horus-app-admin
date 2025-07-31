@@ -90,39 +90,39 @@ class SubChapterProgress(BasemodelMixin):
 
 
 
-class Community(models.Model):
-    name = models.CharField(max_length=200)
-    default_name = models.CharField(max_length=200,unique=True)
-    type = models.CharField(max_length=50, choices=[("global", "Global"), ("batch", "Batch"), ("package", "Package")])
-    batch = models.ForeignKey(Batch, on_delete=models.CASCADE, null=True, blank=True)
-    package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True)
-    profile_image = models.ImageField(null=True,blank=True,upload_to='community')  
+# class Community(models.Model):
+#     name = models.CharField(max_length=200)
+#     default_name = models.CharField(max_length=200,unique=True)
+#     type = models.CharField(max_length=50, choices=[("global", "Global"), ("batch", "Batch"), ("package", "Package")])
+#     batch = models.ForeignKey(Batch, on_delete=models.CASCADE, null=True, blank=True)
+#     package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True)
+#     profile_image = models.ImageField(null=True,blank=True,upload_to='community')  
 
-    def __str__(self):
-        return f"{self.name} ({self.type})"
+#     def __str__(self):
+#         return f"{self.name} ({self.type})"
     
 
-class Message(models.Model):
-    sender = models.ForeignKey(Student, on_delete=models.CASCADE)
-    community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name="messages")
-    content = models.TextField()
-    image = models.ImageField(null=True, blank=True)
-    timestamp = models.DateTimeField(auto_now_add=True)
+# class Message(models.Model):
+#     sender = models.ForeignKey(Student, on_delete=models.CASCADE)
+#     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name="messages")
+#     content = models.TextField()
+#     image = models.ImageField(null=True, blank=True)
+#     timestamp = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.sender.user.first_name}: {self.content[:20]}"
+#     def __str__(self):
+#         return f"{self.sender.user.first_name}: {self.content[:20]}"
 
 
-class MessageReadTracker(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    community = models.ForeignKey(Community, on_delete=models.CASCADE)
-    last_read_message = models.ForeignKey(Message, on_delete=models.SET_NULL, null=True, blank=True)
-    updated_at = models.DateTimeField(auto_now=True)
+# class MessageReadTracker(models.Model):
+#     student = models.ForeignKey(Student, on_delete=models.CASCADE)
+#     community = models.ForeignKey(Community, on_delete=models.CASCADE)
+#     last_read_message = models.ForeignKey(Message, on_delete=models.SET_NULL, null=True, blank=True)
+#     updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        unique_together = ('student', 'community')  # one entry per user per community
+#     class Meta:
+#         unique_together = ('student', 'community')  # one entry per user per community
 
-    def __str__(self):
-        return f"{self.student.user.username} read up to {self.last_read_message.id if self.last_read_message else 'None'} in {self.community}"
+#     def __str__(self):
+#         return f"{self.student.user.username} read up to {self.last_read_message.id if self.last_read_message else 'None'} in {self.community}"
     
 
