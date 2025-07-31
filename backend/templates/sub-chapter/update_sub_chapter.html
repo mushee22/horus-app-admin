@@ -169,6 +169,7 @@
         $(element).removeClass("is-invalid");
       },
       submitHandler: function (form) {
+        $("#loading-overlay").show();
         form.submit();
       }
     });

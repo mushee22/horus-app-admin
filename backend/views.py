@@ -617,7 +617,7 @@ class SubChapterCreatView(LoginRequiredMixin, TemplateView):
             chapter = Chapter.objects.get(id=request.POST.get("chapter"))
 
             # Save temporarily
-            temp_path = default_storage.save(f'temp_subchapters/{video_file.name}', video_file)
+            # temp_path = default_storage.save(f'temp_subchapters/{video_file.name}', video_file)
 
             subchapter = SubChapters.objects.create(
                 title=request.POST.get("title"),
@@ -625,18 +625,19 @@ class SubChapterCreatView(LoginRequiredMixin, TemplateView):
                 duration=request.POST.get("duration"),
                 description=request.POST.get("description"),
                 thumbnail=request.FILES.get("thumbnail"),
+                video=video_file,
                 chapter=chapter
             )
 
             # Create a background task to upload the video to S3
 
-            task = BackgroundTaskStatus.objects.create(
-                name = f"ADDINING {subchapter.title}",
-                status = 'pending',
-                model_id = f"subchapter_{subchapter.id}",
-            )
+            # task = BackgroundTaskStatus.objects.create(
+            #     name = f"ADDINING {subchapter.title}",
+            #     status = 'pending',
+            #     model_id = f"subchapter_{subchapter.id}",
+            # )
             
-            upload_subchapter_video_to_s3.delay(subchapter.id, temp_path, task.id)
+            # upload_subchapter_video_to_s3.delay(subchapter.id, temp_path, task.id)
 
             messages.success(request, "Sub Chapter created successfully.")
             return redirect('sub_chapter_list', pk=self.kwargs.get('pk'))
@@ -682,13 +683,14 @@ class SubChapterUpdateView(LoginRequiredMixin, DetailView):
                 subChapter.thumbnail = request.FILES.get("thumbnail")
             if request.FILES.get("video"):
                 video_file = request.FILES.get("video")
-                temp_path = default_storage.save(f'temp_subchapters/{video_file.name}', video_file)
-                task = BackgroundTaskStatus.objects.create(
-                    name = f"UPDATING {subChapter.title}",
-                    status = 'pending',
-                    model_id = f"subchapter_{subChapter.id}",
-                )
-                upload_subchapter_video_to_s3.delay(subChapter.id, temp_path, task.id)
+                subChapter.video = video_file
+                # temp_path = default_storage.save(f'temp_subchapters/{video_file.name}', video_file)
+                # task = BackgroundTaskStatus.objects.create(
+                #     name = f"UPDATING {subChapter.title}",
+                #     status = 'pending',
+                #     model_id = f"subchapter_{subChapter.id}",
+                # )
+                # upload_subchapter_video_to_s3.delay(subChapter.id, temp_path, task.id)
                 
                 # subChapter.video= request.FILES.get("video")
 

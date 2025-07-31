@@ -321,6 +321,8 @@ class MessageCreateView(APIView):
         content = request.data.get('content')
         image_url = request.data.get('image_url',None)
 
+        print("hello comes the image url",image_url)
+
         try:
             community = Community.objects.get(id=community_id)
             student = Student.objects.get(user__id=user_id)
@@ -379,6 +381,8 @@ class ListMessagesView(APIView):
             # Paginate
             paginator = self.MessagePagination()
             page = paginator.paginate_queryset(messages, request)
+            page = list(page)[::-1]
+
             page = list(page)[::-1]
 
             serializer = MessageSerializer(page,many=True)
