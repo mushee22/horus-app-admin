@@ -66,7 +66,15 @@
                     <td><img class="flex-shrink-0" src="{% static 'images/default-image.jpg' %}" alt="" style="width: 40px; height: 40px;"></td>
                     {% endif %}
                     <td>{{item.title}}</td>
-                    <td>{{item.description}}</td>
+                    <!-- <td>{{item.description}}</td> -->
+                    <td class="description-cell">
+                        <div class="description-content">
+                            {{ item.description }}
+                            {% if item.description|length > 100 %}
+                            <div class="description-fade"></div>
+                            {% endif %}
+                        </div>
+                    </td>
                     <td>{{item.chapter.title}}</td>
                     <td>
                         <div class="action-box">
