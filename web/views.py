@@ -502,7 +502,7 @@ def upload_chat_image(request):
         # Get the URL (works for both S3 and local storage)
         image_url = default_storage.url(saved_path)
 
-        logger.info("here comes the image_url",image_url)
+        logger.info(f"here comes the image_url: {image_url}")
 
         return JsonResponse({"image_url": image_url})
 
