@@ -40,6 +40,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:3000",
     "https://horus-web-app.vercel.app/",
     "https://admin.horuslearn.club",
+    "https://admin.horuslearn.club:8001",
 ]
 
 #aws
@@ -101,7 +102,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:3000",
     "http://13.201.128.86:81",
-    "https://horuslearn.club"
+    "https://horuslearn.club",
+    "https://admin.horuslearn.club:8001",
 ]
 
 CORS_ALLOW_METHODS = (
