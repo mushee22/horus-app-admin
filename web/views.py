@@ -507,7 +507,7 @@ def upload_chat_image(request):
 
         logger.info(f"here comes the image_url: {image_url}")
 
-        return JsonResponse({"image_url": constructed_url })
+        return JsonResponse({"image_url": file_path })
 
     except Exception as e:
         logger.error(f"Image upload error: {e}")
