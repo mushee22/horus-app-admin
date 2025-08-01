@@ -1,4 +1,4 @@
-# from web.models import Community
+from web.models import Community
 
 
 def add_to_community(student, Batch, Package):
