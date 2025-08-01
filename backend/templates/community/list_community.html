@@ -316,7 +316,7 @@
         return function(room_id) {
             if (socketInstance) socketInstance.close();
             const user_id = '{{ request.user.id }}';
-            // socketInstance = new WebSocket(`ws://127.0.0.1:8001/ws/community/${room_id}/${user_id}/`);
+            {% comment %} socketInstance = new WebSocket(`ws://127.0.0.1:8001/ws/community/${room_id}/${user_id}/`); {% endcomment %}
             socketInstance = new WebSocket(`wss://admin.horuslearn.club/ws/community/${room_id}/${user_id}/`);
 
             socketInstance.onmessage = function (e) {
@@ -408,6 +408,7 @@
                 
                 {% comment %} updateLastMessagePreview(chatRoom, message);
                 updateChatOrder(chatRoom); {% endcomment %}
+                console.log("message sent successfully")
                 
                 chatForm.reset();
             }; 
@@ -590,7 +591,7 @@
 
     // ========= Show message on clicking the Community ==========
     function showTheirMessages(e,id){
-        currentChatRoomId = id
+        // currentChatRoomId = id
         let empty_chat = document.querySelector('.empty-chat-container');
         let chat_history = document.querySelector('.chat-personal-detail-main');
         let chat_list = document.getElementById('chat-left-container-id');
@@ -643,7 +644,7 @@
     }
 
 
-    let currentPage = 1;
+    {% comment %} let currentPage = 1;
     let isLoading = false;
     let hasMore = true;
     currentChatRoomId  = 1;
@@ -761,7 +762,7 @@ function renderMessages(data, prepend = false) {
         });
     });
 }
-    
+     {% endcomment %}
 </script>
 
 
