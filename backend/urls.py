@@ -54,5 +54,5 @@ urlpatterns = [
     path('package/delete',PackageDeleteView.as_view(),name="delete_package"),
     path('package/<int:pk>/student',PackageStudentListView.as_view(),name="list_package_student"),
     # Community
-    # path('community',CommunityListView.as_view(),name="community_list"),
+    path('community',CommunityListView.as_view(),name="community_list"),
 ]
