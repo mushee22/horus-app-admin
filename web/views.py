@@ -476,7 +476,7 @@ class ListMessagesView(APIView):
 
 
 @csrf_exempt
-def upload_chat_image_with_storage(request):
+def upload_chat_image(request):
     if request.method != "POST" or not request.FILES.get("image"):
         return JsonResponse({"error": "Invalid request"}, status=400)
     
