@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from web.serializers import *
 from baseapp.mixins import LoginRequiredMixin
 import pandas as pd
+import boto3
 
 
 # Create your views here.
@@ -383,8 +384,6 @@ class ListMessagesView(APIView):
             page = paginator.paginate_queryset(messages, request)
             page = list(page)[::-1]
 
-            page = list(page)[::-1]
-
             serializer = MessageSerializer(page,many=True)
             arranged_messages = self.arranage_message_by_date(serializer.data)
             community_serializer = CommunityMiniSerializer(community)
@@ -441,13 +440,31 @@ def upload_chat_image(request):
         img.save(buffer, format="JPEG", quality=70, optimize=True)  # You can tweak quality value
         buffer.seek(0)
 
-        # Save compressed image to disk
-        save_path = os.path.join(settings.MEDIA_ROOT, "chat_images", filename)
-        os.makedirs(os.path.dirname(save_path), exist_ok=True)
-        with open(save_path, "wb+") as f:
-            f.write(buffer.read())
+        if settings.DEBUG:
+            # Upload to S3 in debug mode
+            s3 = boto3.client(
+                's3',
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                region_name=settings.AWS_S3_REGION_NAME
+            )
+            s3_key = f"chat_images/{filename}"
+            s3.upload_fileobj(
+                buffer,
+                settings.AWS_STORAGE_BUCKET_NAME,
+                s3_key,
+                ExtraArgs={'ContentType': 'image/jpeg', 'ACL': 'public-read'}
+            )
+            image_url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{s3_key}"
+        else:
+            # Save locally in production mode
+            save_path = os.path.join(settings.MEDIA_ROOT, "chat_images", filename)
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            with open(save_path, "wb+") as f:
+                f.write(buffer.read())
+            image_url = f"chat_images/{filename}"
 
-        return JsonResponse({"image_url": f"chat_images/{filename}"})
+        return JsonResponse({"image_url":image_url})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
