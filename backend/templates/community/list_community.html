@@ -323,6 +323,7 @@
                 let data = JSON.parse(e.data);
 
                 if(data.type=='chat' || data.type=='image'){
+                    console.log("yes the message cameback",data)
                     let messageBox = document.querySelector(".chat-message-box ul");
                     let newMsg = document.createElement('li');
                     let currentUser = parseInt('{{ user.id }}');
