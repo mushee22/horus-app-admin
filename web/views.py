@@ -440,7 +440,7 @@ def upload_chat_image(request):
         img.save(buffer, format="JPEG", quality=70, optimize=True)  # You can tweak quality value
         buffer.seek(0)
 
-        if settings.DEBUG:
+        if not settings.DEBUG:
             # Upload to S3 in debug mode
             s3 = boto3.client(
                 's3',
