@@ -498,13 +498,16 @@ def upload_chat_image(request):
         # Save using Django's default storage (automatically handles S3 vs local)
         file_path = f"chat_images/{filename}"
         saved_path = default_storage.save(file_path, ContentFile(buffer.getvalue()))
+
+        const_value = "https://horuslearn.s3.amazonaws.com/"
+        constructed_url = f"{const_value}{file_path}"
         
         # Get the URL (works for both S3 and local storage)
         image_url = default_storage.url(saved_path)
 
         logger.info(f"here comes the image_url: {image_url}")
 
-        return JsonResponse({"image_url": image_url})
+        return JsonResponse({"image_url": constructed_url })
 
     except Exception as e:
         logger.error(f"Image upload error: {e}")
