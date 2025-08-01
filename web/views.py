@@ -18,7 +18,13 @@ from web.serializers import *
 from baseapp.mixins import LoginRequiredMixin
 import pandas as pd
 import boto3
+from decouple import config
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
+
+import logging
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 
@@ -422,51 +428,83 @@ class ListMessagesView(APIView):
         return arranged_list
 
 
+# @csrf_exempt
+# def upload_chat_image(request):
+#     if request.method == "POST" and request.FILES.get("image"):
+#         image = request.FILES["image"]
+#         filename = f"{uuid.uuid4().hex}_{image.name}"
+
+#         # Open image using Pillow
+#         img = Image.open(image)
+
+#         # Convert image to RGB if it's not already
+#         if img.mode in ("RGBA", "P"):
+#             img = img.convert("RGB")
+
+#         # Create buffer to compress image
+#         buffer = BytesIO()
+#         img.save(buffer, format="JPEG", quality=70, optimize=True)  # You can tweak quality value
+#         buffer.seek(0)
+
+#         if not settings.DEBUG:
+#             # Upload to S3 in production
+#             s3 = boto3.client(
+#                 's3',
+#                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+#                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+#                 region_name=settings.AWS_S3_REGION_NAME
+#             )
+#             s3_key = f"chat_images/{filename}"
+#             s3.upload_fileobj(
+#                 buffer,
+#                 settings.AWS_STORAGE_BUCKET_NAME,
+#                 s3_key,
+#                 ExtraArgs={'ContentType': 'image/jpeg', 'ACL': 'public-read'}
+#             )
+#             image_url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{s3_key}"
+#         else:
+#             # Save locally in debug mode
+#             save_path = os.path.join(settings.MEDIA_ROOT, "chat_images", filename)
+#             os.makedirs(os.path.dirname(save_path), exist_ok=True)
+#             with open(save_path, "wb+") as f:
+#                 f.write(buffer.read())
+#             image_url = f"chat_images/{filename}"
+
+#         return JsonResponse({"image_url":image_url})
+
+#     return JsonResponse({"error": "Invalid request"}, status=400)
+
+
 @csrf_exempt
-def upload_chat_image(request):
-    if request.method == "POST" and request.FILES.get("image"):
+def upload_chat_image_with_storage(request):
+    if request.method != "POST" or not request.FILES.get("image"):
+        return JsonResponse({"error": "Invalid request"}, status=400)
+    
+    try:
         image = request.FILES["image"]
         filename = f"{uuid.uuid4().hex}_{image.name}"
 
-        # Open image using Pillow
+        # Open and process image using Pillow
         img = Image.open(image)
-
-        # Convert image to RGB if it's not already
         if img.mode in ("RGBA", "P"):
             img = img.convert("RGB")
 
         # Create buffer to compress image
         buffer = BytesIO()
-        img.save(buffer, format="JPEG", quality=70, optimize=True)  # You can tweak quality value
-        buffer.seek(0)
+        img.save(buffer, format="JPEG", quality=70, optimize=True)
+        
+        # Save using Django's default storage (automatically handles S3 vs local)
+        file_path = f"chat_images/{filename}"
+        saved_path = default_storage.save(file_path, ContentFile(buffer.getvalue()))
+        
+        # Get the URL (works for both S3 and local storage)
+        image_url = default_storage.url(saved_path)
 
-        if not settings.DEBUG:
-            # Upload to S3 in debug mode
-            s3 = boto3.client(
-                's3',
-                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                region_name=settings.AWS_S3_REGION_NAME
-            )
-            s3_key = f"chat_images/{filename}"
-            s3.upload_fileobj(
-                buffer,
-                settings.AWS_STORAGE_BUCKET_NAME,
-                s3_key,
-                ExtraArgs={'ContentType': 'image/jpeg', 'ACL': 'public-read'}
-            )
-            image_url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{s3_key}"
-        else:
-            # Save locally in production mode
-            save_path = os.path.join(settings.MEDIA_ROOT, "chat_images", filename)
-            os.makedirs(os.path.dirname(save_path), exist_ok=True)
-            with open(save_path, "wb+") as f:
-                f.write(buffer.read())
-            image_url = f"chat_images/{filename}"
+        return JsonResponse({"image_url": image_url})
 
-        return JsonResponse({"image_url":image_url})
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
+    except Exception as e:
+        logger.error(f"Image upload error: {e}")
+        return JsonResponse({"error": "Upload failed"}, status=500)
 
 
 class CommunityMembers(APIView):
