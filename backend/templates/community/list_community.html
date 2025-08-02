@@ -316,14 +316,13 @@
         return function(room_id) {
             if (socketInstance) socketInstance.close();
             const user_id = '{{ request.user.id }}';
-            socketInstance = new WebSocket(`ws://127.0.0.1:8001/ws/community/${room_id}/${user_id}/`);
-            // socketInstance = new WebSocket(`wss://admin.horuslearn.club/ws/community/${room_id}/${user_id}/`);  // For Production
+            //socketInstance = new WebSocket(`ws://127.0.0.1:8001/ws/community/${room_id}/${user_id}/`);
+            socketInstance = new WebSocket(`wss://admin.horuslearn.club/ws/community/${room_id}/${user_id}/`);  // For Production
 
             socketInstance.onmessage = function (e) {
                 let data = JSON.parse(e.data);
 
                 if(data.type=='chat' || data.type=='image'){
-                    console.log("yes the message cameback",data)
                     let messageBox = document.querySelector(".chat-message-box ul");
                     let newMsg = document.createElement('li');
                     let currentUser = parseInt('{{ user.id }}');
@@ -337,9 +336,9 @@
                     // Get the last date tag in the message box
                     const dateTags = messageBox.querySelectorAll('.chat-recieved-date');
                     const lastDateTag = dateTags.length > 0 ? dateTags[dateTags.length - 1] : null;
-                    const bgImageStyle = data.image ? `style="background-image: url('/media/${data.image}');"` : '';  // For Debug Mode
-                    // const base_url = 'https://horuslearn.s3.amazonaws.com'     // For Production only
-                    // const bgImageStyle = data.image ? `style="background-image: url('${base_url}/${data.image}');"` : '';    // For Production
+                    //const bgImageStyle = data.image ? `style="background-image: url('/media/${data.image}');"` : '';  // For Debug Mode
+                    const base_url = 'https://horuslearn.s3.amazonaws.com'     // For Production only
+                    const bgImageStyle = data.image ? `style="background-image: url('${base_url}/${data.image}');"` : '';    // For Production
 
                     const profileImage = (data.profile_pic && data.profile_pic !== 'None') ? data.profile_pic : null;
                     const initials = (data.first_name || data.last_name || '?').charAt(0).toUpperCase();
@@ -411,7 +410,6 @@
                 
                 {% comment %} updateLastMessagePreview(chatRoom, message);
                 updateChatOrder(chatRoom); {% endcomment %}
-                console.log("message sent successfully")
                 
                 chatForm.reset();
             }; 
@@ -495,6 +493,8 @@
             communtiyName.innerHTML = `${name}`;
 
             // Render messages
+            renderMessages(data.results.data,messageBox)
+            /*
             let lastDisplayedDateKey = null;
 
             if (data.results.data && data.results.data.length > 0) {
@@ -566,7 +566,11 @@
                         messageBox.appendChild(li);
                     });
                 });
-            }    
+            }   
+            
+            */
+
+
 
 
             // Update the last message display immediately
@@ -594,7 +598,7 @@
 
     // ========= Show message on clicking the Community ==========
     function showTheirMessages(e,id){
-        // currentChatRoomId = id
+        currentChatRoomId = id
         let empty_chat = document.querySelector('.empty-chat-container');
         let chat_history = document.querySelector('.chat-personal-detail-main');
         let chat_list = document.getElementById('chat-left-container-id');
@@ -647,26 +651,25 @@
     }
 
 
-    {% comment %} let currentPage = 1;
+    // ========================  Paginated Message View Activation ===========================
+
+
+    let currentPage = 1;
     let isLoading = false;
     let hasMore = true;
-    currentChatRoomId  = 1;
-
     const messageBoxContainer = document.querySelector(".chat-message-box-main");
-    const chatMessageBox = document.querySelector('.chat-message-box')
-     let messageBox = document.querySelector(".chat-message-box ul");
-     
+    const messageBox = document.querySelector(".chat-message-box ul");
     messageBoxContainer.addEventListener('scroll', () => {
         if (messageBoxContainer.scrollTop === 0 && !isLoading && hasMore) {
-            loadPreviousMessages();
+            loadPreviousMessages(currentChatRoomId,messageBox);
         }
     });
 
-    function loadPreviousMessages() {
+
+    function loadPreviousMessages(id,messageBox) {
         isLoading = true;
 
-        const ul = chatMessageBox.querySelector("ul");
-        const scrollHeightBefore = chatMessageBox.scrollHeight;
+        const scrollHeightBefore = messageBox.scrollHeight;
 
         fetch(`{% url 'chat_message' %}?page=${currentPage + 1}`, {
             method: "POST",
@@ -676,33 +679,31 @@
             },
             body: JSON.stringify({
                 user: '{{ user.id }}',
-                community_id: currentChatRoomId // define this elsewhere
+                community_id: id // define this elsewhere
             })
         })
         .then(resp => resp.json())
         .then(data => {
-            console.log("it is the datas",data)
-            const messages = data.results?.data;
+            const messages = data.results?.data?.slice().reverse();
             if (!messages || messages.length === 0) {
                 hasMore  = false;
                 return;
             }
-            renderMessages(messages, true); // Prepend
+            renderMessages(messages,messageBox, true); // Prepend
             currentPage++;
         })
         .finally(() => {
             isLoading = false;
 
             // Maintain scroll position
-            const scrollHeightAfter = chatMessageBox.scrollHeight;
-            chatMessageBox.scrollTop = scrollHeightAfter - scrollHeightBefore;
+            const scrollHeightAfter = messageBox.scrollHeight;
+            messageBox.scrollTop = scrollHeightAfter - scrollHeightBefore;
         });
     }
 
 
-function renderMessages(data, prepend = false) {
+function renderMessages(data,messageBox, prepend = false) {
     let lastDisplayedDateKey = null;
-
     data.forEach(group => {
         if (!group.date || !group.messages?.length) return;
 
@@ -713,16 +714,20 @@ function renderMessages(data, prepend = false) {
         const year = dateObj.getFullYear();
         const displayDate = `${day}-${month}-${year}`;
 
-        if (lastDisplayedDateKey !== dateKey) {
+        if (lastDisplayedDateKey !== dateKey && !prepend) {
             let dateTag = document.createElement('li');
             dateTag.classList.add('chat-recieved-date');
             dateTag.textContent = displayDate;
-            if (prepend) messageBox.prepend(dateTag);
-            else messageBox.append(dateTag);
+            if (!prepend) messageBox.append(dateTag);
+            // else messageBox.append(dateTag);
             lastDisplayedDateKey = dateKey;
         }
-        console.log("here comes the data for this ",data)
-        group.messages.forEach(msg => {
+        if (prepend){
+            messages = group.messages.slice().reverse()
+        }else{
+            messages = group.messages
+        }
+        messages.forEach(msg => {
             if (!msg.content || msg.content.trim() === '') return;
 
             const profileImage = msg.sender.profile_image;
@@ -763,9 +768,16 @@ function renderMessages(data, prepend = false) {
             if (prepend) messageBox.prepend(li);
             else messageBox.appendChild(li);
         });
+        if (lastDisplayedDateKey !== dateKey  && prepend) {
+            let dateTag = document.createElement('li');
+            dateTag.classList.add('chat-recieved-date');
+            dateTag.textContent = displayDate;
+            if (prepend) messageBox.prepend(dateTag)
+            // else messageBox.append(dateTag);
+            lastDisplayedDateKey = dateKey;
+        }
     });
 }
-     {% endcomment %}
 </script>
 
 
