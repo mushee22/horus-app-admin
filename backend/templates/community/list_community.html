@@ -337,7 +337,8 @@
                     // Get the last date tag in the message box
                     const dateTags = messageBox.querySelectorAll('.chat-recieved-date');
                     const lastDateTag = dateTags.length > 0 ? dateTags[dateTags.length - 1] : null;
-                    const bgImageStyle = data.image ? `style="background-image: url('/media/${data.image}');"` : '';
+                    //const bgImageStyle = data.image ? `style="background-image: url('/media/${data.image}');"` : '';  // For Debug Mode
+                    const bgImageStyle = data.image ? `style="background-image: url('/${data.image}');"` : '';    // For Production
 
                     const profileImage = data.profile_pic;
                     const initials = (data.first_name || data.last_name || '?').charAt(0).toUpperCase();
@@ -443,7 +444,7 @@
                             last_name:'{{request.user.last_name}}',
                             profile_pic:'{{current_profile_pic}}',
                             is_admin:'{{request.user.is_admin}}',
-                            image_url:data.image_url,
+                            image_url: data.image_url || "",
 
                         }));
                     }
