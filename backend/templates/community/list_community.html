@@ -338,7 +338,8 @@
                     const dateTags = messageBox.querySelectorAll('.chat-recieved-date');
                     const lastDateTag = dateTags.length > 0 ? dateTags[dateTags.length - 1] : null;
                     //const bgImageStyle = data.image ? `style="background-image: url('/media/${data.image}');"` : '';  // For Debug Mode
-                    const bgImageStyle = data.image ? `style="background-image: url('/${data.image}');"` : '';    // For Production
+                    const base_url = 'https://horuslearn.s3.amazonaws.com'     // For Production only
+                    const bgImageStyle = data.image ? `style="background-image: url('${base_url}/${data.image}');"` : '';    // For Production
 
                     const profileImage = data.profile_pic;
                     const initials = (data.first_name || data.last_name || '?').charAt(0).toUpperCase();
