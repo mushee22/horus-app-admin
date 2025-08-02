@@ -341,7 +341,7 @@
                     const base_url = 'https://horuslearn.s3.amazonaws.com'     // For Production only
                     const bgImageStyle = data.image ? `style="background-image: url('${base_url}/${data.image}');"` : '';    // For Production
 
-                    const profileImage = data.profile_pic;
+                    const profileImage = (data.profile_pic && data.profile_pic !== 'None') ? data.profile_pic : null;
                     const initials = (data.first_name || data.last_name || '?').charAt(0).toUpperCase();
                     const profileDisplay = profileImage? `<img src="${profileImage}" alt="">`: `<div class="initials-circle">${initials}</div>`;
                     
