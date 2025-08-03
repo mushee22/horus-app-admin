@@ -896,6 +896,7 @@ class CommunityListView(LoginRequiredMixin,ListView):
         try:
             community_list = community_list.annotate(
                 last_message_content=Subquery(latest_messages.values('content')[:1]),
+                last_message_image=Subquery(latest_messages.values('image')[:1]),
                 last_message_sender=Subquery(latest_messages.values('sender__user__first_name')[:1]),
                 last_message_time=Subquery(latest_messages.values('timestamp')[:1]),
                 unread_count=Coalesce(Subquery(unread_counts, output_field=IntegerField()), Value(0))

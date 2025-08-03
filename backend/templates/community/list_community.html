@@ -98,6 +98,12 @@
                                         {% else %}
                                             {{ chat.last_message_sender }}: {{ chat.last_message_content|truncatechars:15 }}
                                         {% endif %}
+                                    {% elif chat.last_message_image %}
+                                        {% if chat.last_message_sender == request.user.first_name %}
+                                            You: Image
+                                        {% else %}
+                                            {{ chat.last_message_sender }}: Image
+                                        {% endif %}
                                     {% else %}
                                         No message
                                     {% endif %}
