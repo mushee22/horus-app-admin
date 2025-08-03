@@ -65,7 +65,7 @@ p{
     display: flex;
     flex-direction: column;
     /* width: 37.3%; */
-    width: 25.125rem;
+    width: 29.125rem;
     background: var(--reply-bg, #FFF);
 }
 .chat-left-1{
@@ -130,11 +130,12 @@ p{
     justify-content: space-between;
     padding-left: 0.62rem;
     padding-right: 0.62rem;
+    margin-top: 1.44rem;
 }
 .chat-search-container{
     display: flex;
-    /* width: 71.3%; */
-    width: 17.9375rem;
+    /* width: 17.9375rem; */
+    width: 100%;
     height: 2.1875rem;
 }
 .chat-search-box{
@@ -339,7 +340,7 @@ p{
 
 .chat-right-container{
     /* width: 42.2475rem; */
-    width: 80%;
+    width: 100%;
     /* border: 1px solid greenyellow; */
     /* padding-left: 0.81rem; */
 }
@@ -837,7 +838,7 @@ chat-send-icon-svg svg{
     .chat-left-container{
         display: flex;
         flex-direction: column;
-        width: 24.125rem;
+        width: 29.125rem;
         background: var(--reply-bg, #FFF);
     }
     .chat-left-1{
@@ -876,7 +877,7 @@ chat-send-icon-svg svg{
         padding-right: 0.62rem;
     }
     .chat-search-container{
-        width: 16.7rem;
+        /* width: 16.7rem; */
         height: 2rem;
     }
     .chat-search-box{
@@ -950,7 +951,7 @@ chat-send-icon-svg svg{
     .chat-left-container{
         display: flex;
         flex-direction: column;
-        width: 24.125rem;
+        width: 28.125rem;
         background: var(--reply-bg, #FFF);
     }
     .chat-left-1{
@@ -1003,7 +1004,7 @@ chat-send-icon-svg svg{
         padding-right: 0.62rem;
     }
     .chat-search-container{
-        width: 16.7rem;
+        /* width: 16.7rem; */
         height: 2rem;
     }
     .chat-search-box{
@@ -1177,7 +1178,7 @@ chat-send-icon-svg svg{
         gap: 0.6rem;
     }
     .chat-search-container{
-        width: 15rem;
+        /* width: 15rem; */
         height: 2rem;
     }
     .chat-search-box{
@@ -1416,7 +1417,7 @@ chat-send-icon-svg svg{
         gap: 0.6rem;
     }
     .chat-search-container{
-        width: 17rem;
+        /* width: 17rem; */
         height: 2rem;
     }
     .chat-search-box{
@@ -1649,7 +1650,7 @@ chat-send-icon-svg svg{
         gap: 0.6rem;
     }
     .chat-search-container{
-        width: 17rem;
+        /* width: 17rem; */
         height: 2rem;
     }
     .chat-search-box{
@@ -1884,7 +1885,7 @@ chat-send-icon-svg svg{
         gap: 0.6rem;
     }
     .chat-search-container{
-        width: 17rem;
+        /* width: 17rem; */
         height: 2rem;
     }
     .chat-search-box{

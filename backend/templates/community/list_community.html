@@ -25,7 +25,7 @@
                 <div class="chat-left-1 w-100">
                     <span>Community</span>
                 </div>
-                <div class="chat-left-2 w-100">
+                {% comment %} <div class="chat-left-2 w-100">
                     <label class="position-relative chat-button">
                         <span class="c-tag {% if request.GET.chat_filter_bttons == '' or not request.GET.chat_filter_bttons %}selected{% endif %}">All</span>
                         <span class="chat-notification position-absolute hide">5</span>
@@ -46,7 +46,7 @@
                         <span class="chat-notification position-absolute hide">5</span>
                         <input type="radio" name="chat_filter_bttons" id="" value="received" style="display: none;" {% if request.GET.chat_filter_bttons == 'received' %}checked{% endif %}>
                     </label>
-                </div>
+                </div> {% endcomment %}
                 <div class="chat-left-3 w-100">
                     <div class="chat-search-container position-relative">
                         <input class="chat-search-box" id="chat-search-1" name="chat_search" placeholder="Search name" value="{{request.GET.chat_search}}"></input>
@@ -56,7 +56,7 @@
                             </svg>
                         </div>
                     </div>
-                    <label class="chat-sortby-container">
+                    {% comment %} <label class="chat-sortby-container">
                         {% if request.GET.chat_sort == 'on' %}
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="12" viewBox="0 0 16 12" fill="none">
                             <path d="M7.25 3.75H14V5.25H7.25V3.75ZM7.25 6.75H12.5V8.25H7.25V6.75ZM7.25 0.75H15.5V2.25H7.25V0.75ZM7.25 9.75H11V11.25H7.25V9.75ZM2.75 12H4.25V3H6.5L3.5 0L0.5 3H2.75V12Z" fill="black"/>
@@ -67,7 +67,7 @@
                         </svg>
                         {% endif %}
                         <input type="checkbox" name="chat_sort" id="chatSort" {% if request.GET.chat_sort == 'on' %}checked{% endif %} style="display: none;">
-                    </label>
+                    </label> {% endcomment %}
                 </div>
             </form>
             <div class="chat-left-4 w-100">
@@ -106,9 +106,9 @@
                         </div>
                         <div class="time-and-count">
                             <span class="chat-time-mini">{{chat.formatted_last_message_time}}</span>
-                            {% if chat.unread_count %}
+                            {% comment %} {% if chat.unread_count %}
                             <span class="chat-notification-2">{{chat.unread_count}}</span>
-                            {% endif %}
+                            {% endif %} {% endcomment %}
                         </div>
                     </div>
                     {% endfor %}
@@ -599,6 +599,7 @@
     // ========= Show message on clicking the Community ==========
     function showTheirMessages(e,id){
         currentChatRoomId = id
+        const chatRightContainer = document.getElementById('chat-right-container-id');
         let empty_chat = document.querySelector('.empty-chat-container');
         let chat_history = document.querySelector('.chat-personal-detail-main');
         let chat_list = document.getElementById('chat-left-container-id');
@@ -610,6 +611,9 @@
         chat_list.classList.add('hide');
         back_button.classList.remove('hide');
         chat_sub_container.style.boxShadow = "none";
+        if (chatRightContainer && window.getComputedStyle(chatRightContainer).display === 'none') {
+            chatRightContainer.style.display = 'block'; // or 'flex' depending on your layout
+        }
         removeMessages(messageBox);
         fetchMessage(id,messageBox);
         setupWebSocket(id)
@@ -778,6 +782,16 @@ function renderMessages(data,messageBox, prepend = false) {
         }
     });
 }
+
+
+// ===========  Search, Sort community Form submit and Logic =================
+
+    const handleSubmit = ()=>{
+        document.getElementById("chatFilterSortSearchForm").submit();
+    }
+
+    document.getElementById("searchBox").addEventListener('change',handleSubmit);
+    {% comment %} document.getElementById("sortBox").addEventListener('change',handleSubmit); {% endcomment %}
 </script>
 
 
@@ -804,20 +818,20 @@ function renderMessages(data,messageBox, prepend = false) {
 <!-- ************ Old styling for Old Chat List page ******************* -->
 <script>
     
-    const handleSubmit = ()=>{
+    {% comment %} const handleSubmit = ()=>{
         document.getElementById("searchSortForm").submit();
     }
 
     document.getElementById("searchBox").addEventListener('change',handleSubmit);
-    document.getElementById("sortBox").addEventListener('change',handleSubmit);
+    document.getElementById("sortBox").addEventListener('change',handleSubmit); {% endcomment %}
     // document.getElementById("filterBox").addEventListener('change',handleSubmit);
 
 
     // // delete labour
-    document.querySelector(".popup-delete-btn").addEventListener('click',()=>{
+    {% comment %} document.querySelector(".popup-delete-btn").addEventListener('click',()=>{
         var deleteItem = document.querySelector('input[name="delete_id"]').value;
         window.location.href = `{% url 'delete_batch' %}?pk=${deleteItem}`;
-    });
+    }); {% endcomment %}
 
 
     // labour status toggler function

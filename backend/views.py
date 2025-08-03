@@ -825,104 +825,36 @@ class CommunityListView(LoginRequiredMixin,ListView):
     template_name = 'community/list_community.html'
     context_object_name = 'context_data'
 
-#     # def get_context_data(self, **kwargs):
-#     #     context =  super().get_context_data(**kwargs)
-#     #     student = Student.objects.get(
-#     #         user=self.request.user
-#     #     )
-#     #     context['current_profile_pic'] = student.profile_image.url if student.profile_image else None
-
-#     #     # Subquery to get latest message per community
-#     #     latest_messages = Message.objects.filter(
-#     #         community=OuterRef('pk')
-#     #     ).order_by('-timestamp')
-
-#     #     # Annotate each community with latest message content and timestamp
-#     #     community_list = context['context_data']
-#     #     community_list = community_list.annotate(
-#     #         last_message_content=Subquery(latest_messages.values('content')[:1]),
-#     #         last_message_sender=Subquery(latest_messages.values('sender__user__first_name')[:1]),
-#     #         last_message_time=Subquery(latest_messages.values('timestamp')[:1])
-#     #     )
-
-#     #     context['context_data'] = community_list
-
-#     #     return context 
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         student = Student.objects.get(user=self.request.user)
-#         context['current_profile_pic'] = student.profile_image.url if student.profile_image else None
-
-#         community_list = context['context_data']
-
-#         # Subqueries to get last message per community
-#         latest_messages = Message.objects.filter(
-#             community=OuterRef('pk')
-#         ).order_by('-timestamp')
-
-#         # Subquery to get last_read_message.id per community for current student
-#         last_read_subquery = MessageReadTracker.objects.filter(
-#             community=OuterRef('pk'),
-#             student=student
-#         ).values('last_read_message__id')[:1]
-
-#         # Unread count = number of messages with id > last_read_message.id
-#         unread_counts = Message.objects.filter(
-#             community=OuterRef('pk'),
-#             id__gt=Coalesce(Subquery(last_read_subquery), 0)  # fallback to 0 if no tracker exists
-#         ).values('community').annotate(
-#             unread=Count('id')
-#         ).values('unread')[:1]
-
-#         # Annotate each community
-#         community_list = community_list.annotate(
-#             last_message_content=Subquery(latest_messages.values('content')[:1]),
-#             last_message_sender=Subquery(latest_messages.values('sender__user__first_name')[:1]),
-#             last_message_time=Subquery(latest_messages.values('timestamp')[:1]),
-#             unread_count=Coalesce(Subquery(unread_counts, output_field=IntegerField()), Value(0))
-#         )
-
-#         context['context_data'] = community_list
-#         return context
-    
-
-
     # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     student = Student.objects.get(user=self.request.user)
+    #     context =  super().get_context_data(**kwargs)
+    #     student = Student.objects.get(
+    #         user=self.request.user
+    #     )
     #     context['current_profile_pic'] = student.profile_image.url if student.profile_image else None
 
-    #     community_list = context['context_data']
-
-    #     # Subquery: last read message timestamp per community
-    #     last_read_timestamp_subquery = MessageReadTracker.objects.filter(
-    #         community=OuterRef('pk'),
-    #         student=student
-    #     ).values('last_read_message__timestamp')[:1]
-
-    #     # Subquery: count of unread messages with timestamp > last_read_message.timestamp
-    #     unread_counts = Message.objects.filter(
-    #         community=OuterRef('pk'),
-    #         timestamp__gt=Coalesce(Subquery(last_read_timestamp_subquery), Value('1900-01-01'))
-    #     ).values('community').annotate(
-    #         unread=Count('id')
-    #     ).values('unread')[:1]
-
-    #     # Subquery: last message per community
+    #     # Subquery to get latest message per community
     #     latest_messages = Message.objects.filter(
     #         community=OuterRef('pk')
     #     ).order_by('-timestamp')
 
+    #     # Annotate each community with latest message content and timestamp
+    #     community_list = context['context_data']
     #     community_list = community_list.annotate(
     #         last_message_content=Subquery(latest_messages.values('content')[:1]),
     #         last_message_sender=Subquery(latest_messages.values('sender__user__first_name')[:1]),
-    #         last_message_time=Subquery(latest_messages.values('timestamp')[:1]),
-    #         unread_count=Coalesce(Subquery(unread_counts, output_field=IntegerField()), Value(0))
+    #         last_message_time=Subquery(latest_messages.values('timestamp')[:1])
     #     )
 
     #     context['context_data'] = community_list
-    #     return context
+
+    #     return context 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        chat_search = self.request.GET.get('chat_search', '').strip()
+        if chat_search:
+            queryset = queryset.filter(Q(name__icontains=chat_search))
+        return queryset
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -944,13 +876,15 @@ class CommunityListView(LoginRequiredMixin,ListView):
         last_read_timestamp_subquery = MessageReadTracker.objects.filter(
             community=OuterRef('pk'),
             student=student
-        ).values('last_read_message__timestamp')[:1]
+        ).values('last_read_message__id')[:1]
 
-        # Subquery: count of unread messages with timestamp > last_read_message.timestamp
+        # Subquery: count of unread messages with id > last_read_message.id
         unread_counts = Message.objects.filter(
             community=OuterRef('pk'),
-            timestamp__gt=Coalesce(Subquery(last_read_timestamp_subquery), Value('1900-01-01'))
-        ).values('community').annotate(
+            id__gt=Coalesce(Subquery(last_read_timestamp_subquery), Value(0)),
+            # 👇 Exclude messages sent by the current student.user
+            # ~Q(sender=student.user)
+        ).annotate(
             unread=Count('id')
         ).values('unread')[:1]
 
