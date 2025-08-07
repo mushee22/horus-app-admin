@@ -111,8 +111,8 @@
                             </div>
                         </div>
                         <div class="time-and-count">
-                            <span class="chat-time-mini">{{chat.formatted_last_message_time}}</span>
-                            {% comment %} {% if chat.unread_count %}
+                            {% comment %} <span class="chat-time-mini">{{chat.formatted_last_message_time}}</span>
+                            {% if chat.unread_count %}
                             <span class="chat-notification-2">{{chat.unread_count}}</span>
                             {% endif %} {% endcomment %}
                         </div>
@@ -322,8 +322,8 @@
         return function(room_id) {
             if (socketInstance) socketInstance.close();
             const user_id = '{{ request.user.id }}';
-            socketInstance = new WebSocket(`ws://127.0.0.1:8001/ws/community/${room_id}/${user_id}/`);
-            // socketInstance = new WebSocket(`wss://admin.horuslearn.club/ws/community/${room_id}/${user_id}/`);  // For Production
+            // socketInstance = new WebSocket(`ws://127.0.0.1:8001/ws/community/${room_id}/${user_id}/`);  // For Debug mode
+            socketInstance = new WebSocket(`wss://admin.horuslearn.club/ws/community/${room_id}/${user_id}/`);  // For Production
 
             socketInstance.onmessage = function (e) {
                 let data = JSON.parse(e.data);
@@ -342,9 +342,9 @@
                     // Get the last date tag in the message box
                     const dateTags = messageBox.querySelectorAll('.chat-recieved-date');
                     const lastDateTag = dateTags.length > 0 ? dateTags[dateTags.length - 1] : null;
-                    const bgImageStyle = data.image ? `style="background-image: url('/media/${data.image}');"` : '';  // For Debug Mode
-                    // const base_url = 'https://horuslearn.s3.amazonaws.com'     // For Production only
-                    // const bgImageStyle = data.image ? `style="background-image: url('${base_url}/${data.image}');"` : '';    // For Production
+                    // const bgImageStyle = data.image ? `style="background-image: url('/media/${data.image}');"` : '';  // For Debug Mode
+                    const base_url = 'https://horuslearn.s3.amazonaws.com'     // For Production only
+                    const bgImageStyle = data.image ? `style="background-image: url('${base_url}/${data.image}');"` : '';    // For Production
 
                     const profileImage = (data.profile_pic && data.profile_pic !== 'None') ? data.profile_pic : null;
                     const initials = (data.first_name || data.last_name || '?').charAt(0).toUpperCase();
@@ -738,7 +738,8 @@ function renderMessages(data,messageBox, prepend = false) {
             messages = group.messages
         }
         messages.forEach(msg => {
-            if (!msg.content || msg.content.trim() === '') return;
+            console.log(msg)
+            if ((!msg.content || msg.content.trim() === '') && msg.image.trim().length==0)return;
 
             const profileImage = msg.sender.profile_image;
             const initials = (msg.sender.user.first_name || msg.sender.user.last_name || '?').charAt(0).toUpperCase();
