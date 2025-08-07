@@ -21,6 +21,7 @@ import boto3
 from decouple import config
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from datetime import datetime
 
 from botocore.exceptions import NoCredentialsError, ClientError
 
@@ -381,9 +382,12 @@ class ListMessagesView(APIView):
         community_id = request.data.get('community_id')
         try:
             student = Student.objects.get(user=user)
+            joined_date = datetime.combine(student.created_date, student.created_time)
+            
             community = Community.objects.get(id=community_id)
             messages = Message.objects.filter(
-                community=community
+                community=community,
+                timestamp__gte=joined_date
             ).select_related('sender').order_by('-id')
             last_message = messages.last()
 
