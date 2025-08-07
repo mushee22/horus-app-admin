@@ -395,11 +395,12 @@ class ListMessagesView(APIView):
             serializer = MessageSerializer(page,many=True)
             arranged_messages = self.arranage_message_by_date(serializer.data)
             community_serializer = CommunityMiniSerializer(community)
-            if last_message:
-                mark_messages_read(last_message,student,community)
+            # if last_message:
+            #     mark_messages_read(last_message,student,community)
             # Mark messages read for current student (based on last in this page)
-            # if page:
-            #     mark_messages_read(page[-1], student, community)
+            if page:
+                mark_messages_read(page[-1], student, community)
+
 
             return paginator.get_paginated_response({
                 'resp_code':1,
