@@ -354,14 +354,16 @@ class Chatlistview(LoginRequiredMixin,APIView):
     def get(self, request):
         user = request.user
 
-        if user.is_admin:
-            communities = Community.objects.all()
-        else:
-            try:
-                student = Student.objects.get(user=user)
+        try:
+            student = Student.objects.get(user=user)
+            if user.is_admin:
+                communities = Community.objects.all()
+            else:
                 communities = student.community.all()
-            except Student.DoesNotExist:
-                return Response({"error": "Student profile not found."}, status=404)
+        except Student.DoesNotExist:
+            return Response({"error": "Student profile not found."}, status=404)
+        except Exception as e:
+            return Response({"error": f"Failed to fetch data: {e}"}, status=404)
             
         serializer = CommunitySerializer(
             communities, many=True,
