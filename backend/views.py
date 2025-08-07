@@ -86,8 +86,9 @@ class LoginView(TemplateView):
         email = request.POST.get('email')
         password = request.POST.get('password')
         user = authenticate(request,username=email,password=password)
+        print("the user is logged in",user)
         if user is not None:
-            if user.is_admin:
+            if user.is_admin or user.is_superuser:
                 login(request,user)
                 return redirect('student_list')
             else:

@@ -45,7 +45,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 #aws
 
-
+LOGIN_URL = 'admin_login_root'
 
 # Application definition
 AUTH_USER_MODEL = 'backend.CustomUser'

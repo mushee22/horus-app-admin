@@ -51,13 +51,13 @@
                 </select>
             </div>
             <div class="mb-3">
-                <label for="start_date" class="form-label required">Start Date ({{context_data.start_date}})</label>
+                <label for="start_date" class="form-label required">Start Date</label>
 
-                <input type="date" class="form-control" id="start_date" name="start_date">
+                <input type="date" class="form-control" id="start_date" name="start_date" value="{{context_data.start_date|date:'Y-m-d'}}">
             </div>
             <div class="mb-3">
-                <label for="end_date" class="form-label required">End Date ({{context_data.end_date}})</label>
-                <input type="date" class="form-control" id="end_date" name="end_date">
+                <label for="end_date" class="form-label required">End Date</label>
+                <input type="date" class="form-control" id="end_date" name="end_date" value="{{context_data.end_date|date:'Y-m-d'}}">
             </div>
             <a href="{% url 'student_list' %}"><button type="button" class="btn btn-secondary">Cancel</button></a>
             <button type="submit" class="btn btn-primary">Update</button>
