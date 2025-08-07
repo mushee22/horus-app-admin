@@ -21,6 +21,7 @@ import boto3
 from decouple import config
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from datetime import datetime
 
 from botocore.exceptions import NoCredentialsError, ClientError
 
@@ -353,14 +354,16 @@ class Chatlistview(LoginRequiredMixin,APIView):
     def get(self, request):
         user = request.user
 
-        if user.is_admin:
-            communities = Community.objects.all()
-        else:
-            try:
-                student = Student.objects.get(user=user)
+        try:
+            student = Student.objects.get(user=user)
+            if user.is_admin:
+                communities = Community.objects.all()
+            else:
                 communities = student.community.all()
-            except Student.DoesNotExist:
-                return Response({"error": "Student profile not found."}, status=404)
+        except Student.DoesNotExist:
+            return Response({"error": "Student profile not found."}, status=404)
+        except Exception as e:
+            return Response({"error": f"Failed to fetch data: {e}"}, status=404)
             
         serializer = CommunitySerializer(
             communities, many=True,
@@ -381,9 +384,12 @@ class ListMessagesView(APIView):
         community_id = request.data.get('community_id')
         try:
             student = Student.objects.get(user=user)
+            joined_date = datetime.combine(student.created_date, student.created_time)
+            
             community = Community.objects.get(id=community_id)
             messages = Message.objects.filter(
-                community=community
+                community=community,
+                timestamp__gte=joined_date
             ).select_related('sender').order_by('-id')
             last_message = messages.last()
 
@@ -395,11 +401,12 @@ class ListMessagesView(APIView):
             serializer = MessageSerializer(page,many=True)
             arranged_messages = self.arranage_message_by_date(serializer.data)
             community_serializer = CommunityMiniSerializer(community)
-            if last_message:
-                mark_messages_read(last_message,student,community)
+            # if last_message:
+            #     mark_messages_read(last_message,student,community)
             # Mark messages read for current student (based on last in this page)
-            # if page:
-            #     mark_messages_read(page[-1], student, community)
+            if page:
+                mark_messages_read(page[-1], student, community)
+
 
             return paginator.get_paginated_response({
                 'resp_code':1,
