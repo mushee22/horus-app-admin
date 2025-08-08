@@ -92,17 +92,17 @@
                                 <span class="person-name-1">{{chat.name}}</span>
                                 <!-- <span>{% if chat.last_message_content %}{{chat.last_message_content}}{% else %}No message{% endif %}</span> -->
                                 <span class="last-message-content">
-                                    {% if chat.last_message_content %}
-                                        {% if chat.last_message_sender == request.user.first_name %}
-                                            You: {{ chat.last_message_content|truncatechars:15 }}
+                                    {% if chat.last_message.content %}
+                                        {% if chat.last_message.sender.user == request.user %}
+                                            You: {{ chat.last_message.content|truncatechars:15 }}
                                         {% else %}
-                                            {{ chat.last_message_sender }}: {{ chat.last_message_content|truncatechars:15 }}
+                                            {{ chat.last_message.first_name }}: {{ chat.last_message.content|truncatechars:15 }}
                                         {% endif %}
-                                    {% elif chat.last_message_image %}
-                                        {% if chat.last_message_sender == request.user.first_name %}
+                                    {% elif chat.last_message.image %}
+                                        {% if chat.last_message.sender.user == request.user %}
                                             You: Image
                                         {% else %}
-                                            {{ chat.last_message_sender }}: Image
+                                            {{ chat.last_message.first_name }}: Image
                                         {% endif %}
                                     {% else %}
                                         No message
@@ -111,10 +111,10 @@
                             </div>
                         </div>
                         <div class="time-and-count">
-                            {% comment %} <span class="chat-time-mini">{{chat.formatted_last_message_time}}</span>
+                            <span class="chat-time-mini">{{chat.last_message.timestamp|date:'h:i a'}}</span>
                             {% if chat.unread_count %}
-                            <span class="chat-notification-2">{{chat.unread_count}}</span>
-                            {% endif %} {% endcomment %}
+                                <span class="chat-notification-2">{{chat.unread_count}}</span>
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}

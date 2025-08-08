@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate,login
 from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import (Q,Sum,Case,When,IntegerField,OuterRef
-    ,Subquery,Count,Value
+    ,Subquery,Count,Value,Prefetch,Max,F
 )
 from django.db.models.functions import Coalesce
 from .forms import AdminUserCreationForm
@@ -826,85 +826,60 @@ class CommunityListView(LoginRequiredMixin,ListView):
     template_name = 'community/list_community.html'
     context_object_name = 'context_data'
 
-    # def get_context_data(self, **kwargs):
-    #     context =  super().get_context_data(**kwargs)
-    #     student = Student.objects.get(
-    #         user=self.request.user
-    #     )
-    #     context['current_profile_pic'] = student.profile_image.url if student.profile_image else None
-
-    #     # Subquery to get latest message per community
-    #     latest_messages = Message.objects.filter(
-    #         community=OuterRef('pk')
-    #     ).order_by('-timestamp')
-
-    #     # Annotate each community with latest message content and timestamp
-    #     community_list = context['context_data']
-    #     community_list = community_list.annotate(
-    #         last_message_content=Subquery(latest_messages.values('content')[:1]),
-    #         last_message_sender=Subquery(latest_messages.values('sender__user__first_name')[:1]),
-    #         last_message_time=Subquery(latest_messages.values('timestamp')[:1])
-    #     )
-
-    #     context['context_data'] = community_list
-
-    #     return context 
     def get_queryset(self):
         queryset = super().get_queryset()
         chat_search = self.request.GET.get('chat_search', '').strip()
+        print("here comes the chat ::->",chat_search)
+
         if chat_search:
             queryset = queryset.filter(Q(name__icontains=chat_search))
         return queryset
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        logger.info(f"Community list requested by user: {user.username} (ID: {user.id})")
 
         try:
             student = Student.objects.get(user=user)
-            logger.debug(f"Loaded student profile for user: {user.username}")
         except Student.DoesNotExist:
-            logger.error(f"Student profile not found for user: {user.username}")
             context['current_profile_pic'] = None
             return context
 
         context['current_profile_pic'] = student.profile_image.url if student.profile_image else None
-        community_list = context['context_data']
 
-        # Subquery: last read message timestamp per community
-        last_read_timestamp_subquery = MessageReadTracker.objects.filter(
-            community=OuterRef('pk'),
-            student=student
-        ).values('last_read_message__id')[:1]
+        # Build a dict of last read message ids for each community
+        last_reads = dict(
+            MessageReadTracker.objects.filter(student=student)
+            .values_list('community_id', 'last_read_message_id')
+        )
 
-        # Subquery: count of unread messages with id > last_read_message.id
-        unread_counts = Message.objects.filter(
-            community=OuterRef('pk'),
-            id__gt=Coalesce(Subquery(last_read_timestamp_subquery), Value(0)),
-            # 👇 Exclude messages sent by the current student.user
-            # ~Q(sender=student.user)
-        ).annotate(
-            unread=Count('id')
-        ).values('unread')[:1]
+        # Prefetch only messages from others and newer than last read
+        all_message_qs = Message.objects.select_related('sender__user').order_by('-timestamp')
+        unread_messages_qs = all_message_qs.exclude(sender=student)  # for latest message display
 
-        # Subquery: last message per community
-        latest_messages = Message.objects.filter(
-            community=OuterRef('pk')
-        ).order_by('-timestamp')
-
-        try:
-            community_list = community_list.annotate(
-                last_message_content=Subquery(latest_messages.values('content')[:1]),
-                last_message_image=Subquery(latest_messages.values('image')[:1]),
-                last_message_sender=Subquery(latest_messages.values('sender__user__first_name')[:1]),
-                last_message_time=Subquery(latest_messages.values('timestamp')[:1]),
-                unread_count=Coalesce(Subquery(unread_counts, output_field=IntegerField()), Value(0))
+        community_list = (
+            self.object_list
+            .prefetch_related(
+                Prefetch(
+                    'messages',
+                    queryset=unread_messages_qs,
+                    to_attr='all_messages'
+                ),
+                Prefetch(
+                    'messages',
+                    queryset=all_message_qs,
+                    to_attr='all_messages_all'
+                )
             )
-            logger.debug(f"Annotated community list for student {student.id}")
-        except Exception as e:
-            logger.exception(f"Error annotating communities for user {user.username}: {e}")
+        )
+
+        # Now enrich each community object with `unread_count` & latest message info
+        for community in community_list:
+            last_read_id = last_reads.get(community.id, 0)
+            community.unread_count = sum(
+                1 for m in community.all_messages if m.id > (last_read_id or 0)
+            )
+            community.last_message = community.all_messages_all[0] if community.all_messages_all else None
 
         context['context_data'] = community_list
         return context

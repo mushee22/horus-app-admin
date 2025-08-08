@@ -111,6 +111,8 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.sender.user.first_name}: {self.content[:20]}"
+    def first_name(self):
+        return self.sender.user.first_name
 
 
 class MessageReadTracker(models.Model):

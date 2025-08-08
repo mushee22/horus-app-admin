@@ -407,7 +407,6 @@ class ListMessagesView(APIView):
             if page:
                 mark_messages_read(page[-1], student, community)
 
-
             return paginator.get_paginated_response({
                 'resp_code':1,
                 'data':arranged_messages,
